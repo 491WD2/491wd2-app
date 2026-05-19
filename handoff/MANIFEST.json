@@ -1,0 +1,19 @@
+{
+  "package": "FamilySite491-chore-kiosk-handoff",
+  "generatedAt": "2026-05-16T19:46:02.773Z",
+  "distFileCount": 267,
+  "documentation": [
+    "ACCESSIBILITY.md",
+    "AI_AND_PERSONALIZATION.md",
+    "BUILD_AND_DEPLOY.md",
+    "COMPONENT_REFERENCE.md",
+    "PAGES_AND_SCREENSHOTS.md",
+    "README.md",
+    "STATE_AND_DATA.md",
+    "UX_GUIDE.md"
+  ],
+  "quickStart": [
+    "cd handoff/dist && npx --yes serve -l 4173",
+    "Open http://localhost:4173/chores"
+  ]
+}

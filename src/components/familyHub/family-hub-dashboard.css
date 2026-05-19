@@ -1,0 +1,65 @@
+/* Family Hub — member progress tiles (widget cards use shared fh-widget-* / bd-* tokens) */
+
+.fh-family-hub__member-grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+}
+
+.fh-family-hub__member-card {
+  padding: 14px;
+  border-radius: 18px;
+  border: 2px solid var(--bd-border);
+  background: var(--bd-bg-card);
+  text-align: center;
+  cursor: pointer;
+  touch-action: manipulation;
+  transition: transform var(--bd-motion-fast) var(--bd-ease-out),
+    box-shadow var(--bd-motion-fast) var(--bd-ease-out);
+}
+
+.fh-family-hub__member-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--bd-shadow-card-hover);
+}
+
+.fh-family-hub__member-avatar {
+  margin: 0 auto 10px;
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 1rem;
+}
+
+.fh-family-hub__member-name {
+  margin: 0;
+  font-size: 0.9375rem;
+  font-weight: 800;
+  color: var(--bd-text-heading);
+}
+
+.fh-family-hub__member-meta {
+  margin-top: 6px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--bd-text-muted);
+}
+
+.fh-family-hub__progress-bar {
+  margin-top: 10px;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--bd-border);
+  overflow: hidden;
+}
+
+.fh-family-hub__progress-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--bd-primary), #8b5cf6);
+  transition: width 0.4s var(--bd-ease-out);
+}

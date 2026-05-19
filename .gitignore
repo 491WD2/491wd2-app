@@ -1,0 +1,11 @@
+# Local Netlify folder
+.netlify
+node_modules
+dist
+.DS_Store
+.env
+.env.local
+*.tsbuildinfo
+
+# Supabase CLI (local)
+supabase/.temp

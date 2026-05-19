@@ -1,0 +1,161 @@
+.fh-cal-planner {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.fh-cal-planner__filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.fh-cal-planner__filter-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 40px;
+  padding: 0 14px;
+  border-radius: 999px;
+  border: 2px solid #e2e8f0;
+  background: #fff;
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: #475569;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.fh-cal-planner__filter-chip--active {
+  border-color: #6366f1;
+  background: #eef2ff;
+  color: #4338ca;
+}
+
+.fh-cal-planner__week {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+
+@media (max-width: 900px) {
+  .fh-cal-planner__week {
+    grid-template-columns: repeat(7, minmax(120px, 1fr));
+  }
+}
+
+.fh-cal-planner__day {
+  min-height: 200px;
+  border-radius: 20px;
+  border: 2px solid #e8ecf1;
+  background: linear-gradient(180deg, #fafbff 0%, #fff 100%);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.fh-cal-planner__day--today {
+  border-color: #818cf8;
+  box-shadow: 0 0 0 1px rgba(99, 102, 241, 0.2);
+}
+
+.fh-cal-planner__day-head {
+  padding: 12px 12px 8px;
+  border-bottom: 1px solid #f1f5f9;
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.fh-cal-planner__day-name {
+  margin: 0;
+  font-size: 0.6875rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #64748b;
+}
+
+.fh-cal-planner__day-date {
+  margin: 2px 0 0;
+  font-size: 1.125rem;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.fh-cal-planner__day-body {
+  flex: 1;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 120px;
+}
+
+.fh-cal-planner__day-body--drag-over {
+  background: #eef2ff;
+}
+
+.fh-cal-planner__section-grid {
+  display: grid;
+  gap: 16px;
+}
+
+@media (min-width: 1024px) {
+  .fh-cal-planner__section-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.fh-cal-planner__panel {
+  border-radius: 24px;
+  border: 2px solid #e8ecf1;
+  background: #fff;
+  box-shadow: 0 4px 20px rgba(15, 23, 42, 0.06);
+  overflow: hidden;
+}
+
+.fh-cal-planner__panel-head {
+  padding: 16px 18px;
+  border-bottom: 1px solid #f1f5f9;
+  background: linear-gradient(90deg, #f5f3ff 0%, transparent 70%);
+}
+
+.fh-cal-planner__panel-title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.fh-cal-planner__panel-body {
+  padding: 14px 18px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 320px;
+  overflow-y: auto;
+}
+
+.fh-cal-planner__member-strip {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+
+.fh-cal-planner__member-pill {
+  flex: 0 0 auto;
+  min-width: 120px;
+  padding: 12px 14px;
+  border-radius: 16px;
+  border: 2px solid #e2e8f0;
+  background: #fff;
+  text-align: left;
+  cursor: pointer;
+}
+
+.fh-cal-planner__member-pill--active {
+  border-color: #6366f1;
+  background: #eef2ff;
+}

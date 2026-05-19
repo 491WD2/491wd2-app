@@ -1,0 +1,355 @@
+/* Pantry ordering board — restaurant command-center lanes */
+
+.fh-pantry-board {
+  --fh-pantry-lane-w: 300px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.fh-pantry-board__chips {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  padding: 4px 2px 8px;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+}
+
+.fh-pantry-board__chip {
+  flex-shrink: 0;
+  min-height: 44px;
+  padding: 0 18px;
+  border-radius: 999px;
+  border: 2px solid #e8ecf1;
+  background: #fff;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: #475569;
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease,
+    transform 0.15s ease;
+  touch-action: manipulation;
+}
+
+.fh-pantry-board__chip:hover {
+  border-color: #c4b5fd;
+  transform: translateY(-1px);
+}
+
+.fh-pantry-board__chip--active {
+  border-color: transparent;
+  background: linear-gradient(135deg, #ffecd9 0%, #ede9fe 100%);
+  color: #4c1d95;
+  box-shadow: 0 4px 14px rgba(115, 93, 255, 0.15);
+}
+
+.fh-pantry-board__lanes {
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  padding-bottom: 12px;
+  -webkit-overflow-scrolling: touch;
+  align-items: stretch;
+}
+
+.fh-pantry-board__lane {
+  flex: 0 0 var(--fh-pantry-lane-w);
+  max-width: var(--fh-pantry-lane-w);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  border-radius: 20px;
+  background: linear-gradient(180deg, #fafbfc 0%, #f4f6f9 100%);
+  border: 2px solid #e8ecf1;
+  min-height: 200px;
+}
+
+.fh-pantry-board__lane-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.fh-pantry-board__lane-emoji {
+  font-size: 1.75rem;
+  line-height: 1;
+}
+
+.fh-pantry-board__lane-title {
+  margin: 0;
+  font-size: 1.0625rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: #0f172a;
+}
+
+.fh-pantry-board__lane-desc {
+  margin: 2px 0 0;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #64748b;
+}
+
+.fh-pantry-board__lane-count {
+  margin-left: auto;
+  min-width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  font-size: 0.8125rem;
+  font-weight: 800;
+  color: #475569;
+}
+
+.fh-pantry-board__lane-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex: 1;
+}
+
+/* Product card */
+.fh-pantry-product {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 14px;
+  border-radius: 20px;
+  background: #fff;
+  border: 2px solid #e8ecf1;
+  box-shadow: 0 2px 12px rgba(15, 23, 42, 0.06);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.fh-pantry-product:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.1);
+}
+
+.fh-pantry-product--use-first {
+  border-color: #fed7aa;
+  background: linear-gradient(180deg, #fffbeb 0%, #fff 40%);
+}
+
+.fh-pantry-product--expired {
+  border-color: #fecaca;
+  background: linear-gradient(180deg, #fef2f2 0%, #fff 40%);
+}
+
+.fh-pantry-product--low {
+  border-color: #fde68a;
+}
+
+.fh-pantry-product__media {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  border-radius: 14px;
+  overflow: hidden;
+  background: linear-gradient(145deg, #f1f5f9, #e2e8f0);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.fh-pantry-product__media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.fh-pantry-product__placeholder {
+  font-size: 3rem;
+  opacity: 0.85;
+}
+
+.fh-pantry-product__use-first {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: #ea580c;
+  color: #fff;
+  font-size: 0.6875rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  box-shadow: 0 2px 8px rgba(234, 88, 12, 0.35);
+}
+
+.fh-pantry-product__qty {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  min-width: 36px;
+  height: 36px;
+  padding: 0 10px;
+  border-radius: 12px;
+  background: rgba(15, 23, 42, 0.82);
+  color: #fff;
+  font-size: 0.9375rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.fh-pantry-product__name {
+  margin: 0;
+  font-size: 1.0625rem;
+  font-weight: 800;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+  color: #0f172a;
+}
+
+.fh-pantry-product__badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.fh-pantry-product__badge {
+  display: inline-flex;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.6875rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.fh-pantry-product__badge--expiry-soon {
+  background: #ffedd5;
+  color: #c2410c;
+}
+
+.fh-pantry-product__badge--expiry-ok {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.fh-pantry-product__badge--expiry-expired {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.fh-pantry-product__badge--loc {
+  background: #e0e7ff;
+  color: #3730a3;
+}
+
+.fh-pantry-product__badge--scan {
+  background: #f3e8ff;
+  color: #6b21a8;
+}
+
+.fh-pantry-product__actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.fh-pantry-product__btn {
+  min-height: 44px;
+  border-radius: 12px;
+  border: 2px solid #e2e8f0;
+  background: #f8fafc;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: #334155;
+  cursor: pointer;
+  touch-action: manipulation;
+  transition: background 0.12s ease, transform 0.12s ease;
+}
+
+.fh-pantry-product__btn:hover {
+  background: #fff;
+  transform: translateY(-1px);
+}
+
+.fh-pantry-product__btn--primary {
+  border-color: transparent;
+  background: linear-gradient(135deg, #16a34a, #22c55e);
+  color: #fff;
+}
+
+.fh-pantry-product__btn--accent {
+  border-color: transparent;
+  background: linear-gradient(135deg, #735dff, #9b87ff);
+  color: #fff;
+}
+
+.fh-pantry-board__empty {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 20px 12px;
+  border-radius: 16px;
+  border: 2px dashed #cbd5e1;
+  background: rgba(255, 255, 255, 0.6);
+}
+
+.fh-pantry-board__empty-emoji {
+  font-size: 2rem;
+  margin-bottom: 8px;
+}
+
+.fh-pantry-board__empty-title {
+  margin: 0;
+  font-size: 0.9375rem;
+  font-weight: 800;
+  color: #334155;
+}
+
+.fh-pantry-board__empty-hint {
+  margin: 6px 0 0;
+  font-size: 0.8125rem;
+  color: #64748b;
+  line-height: 1.45;
+}
+
+.fh-pantry-board__global-empty {
+  padding: 48px 24px;
+  text-align: center;
+  border-radius: 24px;
+  border: 2px dashed #cbd5e1;
+  background: #fff;
+}
+
+.fh-pantry-board__toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.fh-pantry-board__add-panel {
+  border-radius: 20px;
+  border: 1px solid #e8ecf1;
+  background: #fafbfc;
+  padding: 16px;
+}
+
+@media (min-width: 1100px) {
+  .fh-pantry-board__layout {
+    display: grid;
+    grid-template-columns: minmax(260px, 320px) minmax(0, 1fr);
+    gap: 20px;
+    align-items: start;
+  }
+}
