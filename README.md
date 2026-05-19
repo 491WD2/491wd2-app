@@ -40,3 +40,4 @@ Deployment, SPA routing, and accessibility: **[docs/DEPLOYMENT.md](docs/DEPLOYME
 ## Optional: AI backend (paused)
 
 A separate `server/` Express proxy was scaffolded for a future ChatGPT-style assistant and is **not required** for Help Center or the rest of the app.
+# 491wd2
