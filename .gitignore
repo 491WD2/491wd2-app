@@ -9,3 +9,16 @@ dist
 
 # Supabase CLI (local)
 supabase/.temp
+node_modules/
+dist/
+.netlify/
+.env
+.env.local
+.env.production
+.DS_Store
+backups/
+checkpoints/
+.design-ref/
+.zip-inspect/
+.tmp-pantry-export/
+server_DISABLED/
