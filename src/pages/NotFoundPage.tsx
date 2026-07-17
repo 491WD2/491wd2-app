@@ -1,5 +1,4 @@
-import { Button } from "../components/ui/Button";
-import { Card, CardHeader } from "../components/ui/Card";
+import "../styles/guided-kiosk.css";
 
 type NotFoundPageProps = {
   onOpenDashboard: () => void;
@@ -11,21 +10,28 @@ export function NotFoundPage({
   onOpenSettings,
 }: NotFoundPageProps) {
   return (
-    <Card>
-      <CardHeader title="Page not found" eyebrow="Navigation" />
-      <div className="space-y-4">
-        <p className="max-w-2xl text-sm leading-6 text-slate-600">
-          This address is not part of this household workspace. Your saved data is unchanged.
-        </p>
-        <div className="flex flex-col gap-3 sm:flex-row">
-          <Button onClick={onOpenDashboard} variant="primary">
-            Back to Dashboard
-          </Button>
-          <Button onClick={onOpenSettings} variant="secondary">
-            Open Settings
-          </Button>
+    <div className="wd-guided-kiosk wd-guided-kiosk--not-found">
+      <section className="wd-guided-kiosk__hero" aria-labelledby="not-found-title">
+        <div>
+          <p className="wd-guided-kiosk__eyebrow">Navigation</p>
+          <h1 id="not-found-title">Page not found</h1>
+          <p>This address is not part of this household workspace. Your saved data is unchanged.</p>
         </div>
-      </div>
-    </Card>
+        <div className="wd-guided-kiosk__status">
+          <span>Unknown route</span>
+          <span>Data safe</span>
+          <span>Choose next step</span>
+        </div>
+      </section>
+
+      <section className="wd-guided-kiosk__actions-grid" aria-label="Not found actions">
+        <button className="wd-guided-kiosk__action wd-guided-kiosk__action--primary" onClick={onOpenDashboard} type="button">
+          <span><strong>Back to Dashboard</strong><small>Open Family Hub</small></span>
+        </button>
+        <button className="wd-guided-kiosk__action" onClick={onOpenSettings} type="button">
+          <span><strong>Open Settings</strong><small>Check app sections</small></span>
+        </button>
+      </section>
+    </div>
   );
 }

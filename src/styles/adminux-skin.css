@@ -1,0 +1,2566 @@
+/**
+ * Bright AdminUX-inspired theme for FamilySite_491.
+ * Applied via `.adminux-app` (shell) and `.adminux-skin` (page canvas).
+ */
+
+/* Fonts are loaded via <link> in index.html (an @import here lands mid-bundle and PostCSS rejects it). */
+
+/* ——— Tokens ——— */
+.adminux-app,
+.adminux-skin {
+  --aux-theme: #3b6ef5;
+  --aux-theme-1: #3b6ef5;
+  --aux-theme-2: #5b8cff;
+  --aux-theme-soft: rgba(59, 110, 245, 0.14);
+  --aux-accent: #ff6b9d;
+  --aux-accent-soft: rgba(255, 107, 157, 0.16);
+  --aux-primary: #4f46e5;
+  --aux-secondary: #64748b;
+  --aux-success: #12b76a;
+  --aux-success-soft: rgba(18, 183, 106, 0.16);
+  --aux-danger: #f04438;
+  --aux-danger-soft: rgba(240, 68, 56, 0.14);
+  --aux-warning: #f79009;
+  --aux-warning-soft: rgba(247, 144, 9, 0.18);
+  --aux-info: #0ba5ec;
+  --aux-info-soft: rgba(11, 165, 236, 0.16);
+  --aux-teal: #15b8a6;
+  --aux-pink: #ee46bc;
+  --aux-purple: #7a5af8;
+  --aux-brown: #b54708;
+  --aux-light: #f8fafc;
+  --aux-dark: #101828;
+  --aux-text: #101828;
+  --aux-muted: #667085;
+  --aux-card: #ffffff;
+  --aux-border: rgba(16, 24, 40, 0.08);
+  --aux-radius: 1.05rem;
+  --aux-title: "SUSE", "Open Sans", sans-serif;
+  --aux-body: "Open Sans", sans-serif;
+  /* Streamline-style pastel accents */
+  --aux-ico-cyan: #b8e4ff;
+  --aux-ico-mint: #c6f6d5;
+  --aux-ico-peach: #ffd8b5;
+  --aux-ico-pink: #ffc5d8;
+  --aux-ico-yellow: #ffe8a3;
+  --aux-ico-lavender: #ddd6fe;
+}
+
+/* AdminUX background presets (Theme / Grad-1…10) */
+.adminux-app .bg-none {
+  background: transparent !important;
+}
+.adminux-app .bg-white,
+.adminux-app .white {
+  background: #ffffff !important;
+}
+.adminux-app .bg-r-gradient,
+.adminux-app .bg-theme-r-gradient {
+  background: radial-gradient(circle at 20% 20%, #dbeafe, #fff 55%, #ffe4f0) !important;
+}
+.adminux-app .bg-gradient-1 {
+  background: radial-gradient(circle at 30% 20%, #cfe8ff, #ffffff 62%) !important;
+}
+.adminux-app .bg-gradient-2 {
+  background: radial-gradient(circle at 70% 10%, #ffd6e8, #ffffff 60%) !important;
+}
+.adminux-app .bg-gradient-3 {
+  background: radial-gradient(circle at 40% 30%, #d8f5e5, #ffffff 58%) !important;
+}
+.adminux-app .bg-gradient-4 {
+  background: radial-gradient(circle at 20% 80%, #e4ddff, #ffffff 55%) !important;
+}
+.adminux-app .bg-gradient-5 {
+  background: radial-gradient(circle at 80% 40%, #ffe7c2, #ffffff 58%) !important;
+}
+.adminux-app .bg-gradient-6 {
+  background: radial-gradient(circle at 50% 0%, #c9f0ff, #fff5fb 70%) !important;
+}
+.adminux-app .bg-gradient-7 {
+  background: radial-gradient(circle at 10% 50%, #ffd0d8, #f3fff8 65%) !important;
+}
+.adminux-app .bg-gradient-8 {
+  background: radial-gradient(circle at 90% 20%, #fff1b8, #e8f4ff 60%) !important;
+}
+.adminux-app .bg-gradient-9 {
+  background: radial-gradient(circle at 40% 10%, #d2ffe8, #ffe9f4 62%) !important;
+}
+.adminux-app .bg-gradient-10 {
+  background: radial-gradient(circle at 60% 80%, #cdd9ff, #fff8e8 58%) !important;
+}
+
+/* Feather + pastel Streamline-style icon tiles */
+.adminux-app .aux-feather svg,
+.adminux-app .aux-feather .feather {
+  display: block;
+  stroke: currentColor;
+}
+
+.adminux-app .aux-ico {
+  width: 2.35rem;
+  height: 2.35rem;
+  border-radius: 0.8rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #1f2937;
+  flex-shrink: 0;
+  box-shadow: inset 0 0 0 1px rgba(16, 24, 40, 0.06);
+}
+
+.adminux-app .aux-ico--cyan {
+  background: var(--aux-ico-cyan);
+}
+.adminux-app .aux-ico--mint {
+  background: var(--aux-ico-mint);
+}
+.adminux-app .aux-ico--peach {
+  background: var(--aux-ico-peach);
+}
+.adminux-app .aux-ico--pink {
+  background: var(--aux-ico-pink);
+}
+.adminux-app .aux-ico--yellow {
+  background: var(--aux-ico-yellow);
+}
+.adminux-app .aux-ico--lavender {
+  background: var(--aux-ico-lavender);
+}
+
+.adminux-app .nav-pills .aux-ico,
+.adminux-app .nav-link .aux-ico {
+  width: 1.65rem;
+  height: 1.65rem;
+  border-radius: 0.55rem;
+  margin-right: 0.2rem;
+}
+
+.adminux-app aside[aria-label="Primary navigation"] .aux-ico {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 0.7rem;
+}
+
+/* ——— App shell ——— */
+.adminux-app {
+  color: var(--aux-text);
+  font-family: var(--aux-body);
+  background:
+    radial-gradient(circle at 8% -10%, rgba(91, 140, 255, 0.35), transparent 42%),
+    radial-gradient(circle at 92% 0%, rgba(255, 107, 157, 0.22), transparent 38%),
+    radial-gradient(circle at 50% 100%, rgba(18, 183, 106, 0.12), transparent 45%),
+    linear-gradient(165deg, #eef3ff 0%, #f7f9ff 42%, #fff5f9 100%);
+  min-height: 100dvh;
+}
+
+.adminux-app h1,
+.adminux-app h2,
+.adminux-app h3,
+.adminux-app h4,
+.adminux-app h5,
+.adminux-app h6,
+.adminux-skin h1,
+.adminux-skin h2,
+.adminux-skin h3,
+.adminux-skin h4,
+.adminux-skin h5,
+.adminux-skin h6 {
+  font-family: var(--aux-title);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--aux-text);
+}
+
+/* ——— Navbar / sidebar (AdminUX nav demos) ——— */
+.adminux-app aside[aria-label="Primary navigation"] {
+  background: #e3f2fd !important;
+  border-color: rgba(59, 110, 245, 0.16) !important;
+  backdrop-filter: none;
+  box-shadow: 8px 0 28px rgba(59, 110, 245, 0.08);
+}
+
+.adminux-app aside[aria-label="Primary navigation"] .adminux-brand-card {
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(59, 110, 245, 0.14);
+  border-radius: 1rem;
+  box-shadow: 0 8px 22px rgba(59, 110, 245, 0.08);
+}
+
+.adminux-app aside[aria-label="Primary navigation"] .company-name {
+  font-family: var(--aux-title);
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--aux-text);
+  line-height: 1.15;
+}
+
+.adminux-app aside[aria-label="Primary navigation"] .company-name b {
+  color: var(--aux-theme);
+}
+
+.adminux-app aside[aria-label="Primary navigation"] .company-tagline {
+  margin: 0.1rem 0 0;
+  color: var(--aux-muted);
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+
+/* menu-active-line style */
+.adminux-app aside[aria-label="Primary navigation"] button {
+  position: relative;
+  border-radius: 0.85rem !important;
+}
+
+.adminux-app aside[aria-label="Primary navigation"] button[aria-current="page"] {
+  background: rgba(255, 255, 255, 0.88) !important;
+  color: var(--aux-theme) !important;
+  box-shadow: 0 6px 16px rgba(59, 110, 245, 0.12);
+  font-weight: 700;
+}
+
+.adminux-app aside[aria-label="Primary navigation"] button[aria-current="page"]::before {
+  content: "";
+  position: absolute;
+  left: 0.2rem;
+  top: 18%;
+  bottom: 18%;
+  width: 3px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, var(--aux-theme), var(--aux-accent));
+}
+
+.adminux-app aside.adminuiux-sidebar-fill-theme {
+  background: linear-gradient(180deg, var(--aux-theme-1), var(--aux-theme-2)) !important;
+  color: #fff;
+}
+
+.adminux-app aside.adminuiux-sidebar-fill-accent {
+  background: linear-gradient(180deg, #ff6b9d, #ff8a65) !important;
+  color: #fff;
+}
+
+/* Header — light blue navbar */
+.adminux-app header.sticky {
+  background: #e3f2fd !important;
+  border-bottom: 1px solid rgba(59, 110, 245, 0.16) !important;
+  color: var(--aux-text) !important;
+  backdrop-filter: none;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.65);
+}
+
+.adminux-app header.sticky .nav-link,
+.adminux-app .aux-top-nav .nav-link {
+  color: var(--aux-muted);
+  font-weight: 700;
+  font-size: 0.9rem;
+  padding: 0.45rem 0.75rem;
+  border-radius: 0.65rem;
+  text-decoration: none;
+}
+
+.adminux-app header.sticky .nav-link:hover,
+.adminux-app .aux-top-nav .nav-link:hover {
+  color: var(--aux-theme);
+  background: rgba(255, 255, 255, 0.55);
+}
+
+.adminux-app header.sticky .nav-link.active,
+.adminux-app .aux-top-nav .nav-link.active {
+  color: var(--aux-theme);
+  background: rgba(255, 255, 255, 0.85);
+}
+
+.adminux-app main {
+  background: transparent !important;
+  color: var(--aux-text);
+}
+
+/* Bottom mobile nav — pill style */
+.adminux-app nav[aria-label="Quick navigation"] {
+  background: rgba(227, 242, 253, 0.96) !important;
+  border-top-color: rgba(59, 110, 245, 0.18) !important;
+}
+
+/* ——— Page canvas ——— */
+.adminux-skin {
+  color: var(--aux-text);
+  font-family: var(--aux-body);
+  min-height: 100%;
+  margin: 0;
+  padding: 0.25rem 0 2rem;
+}
+
+.aux-gradient-text {
+  background: linear-gradient(120deg, var(--aux-theme-1), var(--aux-accent) 55%, #12b76a);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Cards */
+.aux-card,
+.adminux-app .aux-card {
+  background: var(--aux-card);
+  border: 1px solid var(--aux-border);
+  border-radius: var(--aux-radius);
+  box-shadow: 0 12px 34px rgba(16, 24, 40, 0.07);
+}
+
+.aux-card-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 1.1rem 0.35rem;
+}
+
+.aux-card-body {
+  padding: 0.85rem 1.1rem 1.1rem;
+}
+
+.aux-card.bg-theme-1,
+.aux-card.aux-bg-theme {
+  background: linear-gradient(145deg, var(--aux-theme-1), var(--aux-theme-2));
+  color: #fff;
+  border: 0;
+}
+
+.aux-card.bg-theme-accent-1,
+.aux-card.aux-bg-accent {
+  background: linear-gradient(145deg, #ff6b9d, #ff8f6b);
+  color: #fff;
+  border: 0;
+}
+
+.aux-card.bg-theme-r-gradient,
+.aux-card.aux-bg-theme-r {
+  background: linear-gradient(120deg, #fff, #e8efff 55%, #ffd9e8);
+}
+
+.aux-card.bg-theme-l-gradient,
+.aux-card.aux-bg-theme-l {
+  background: linear-gradient(300deg, #fff, #eaf7ff 50%, #e8fff5);
+}
+
+.aux-card.bg-gradient-1 {
+  background: linear-gradient(135deg, #dbeafe, #fce7f3);
+}
+
+.aux-card.bg-gradient-4 {
+  background: linear-gradient(135deg, #cffafe, #ddd6fe);
+}
+
+.aux-card.bg-gradient-8 {
+  background: linear-gradient(135deg, #fef3c7, #fecdd3);
+}
+
+.aux-card.bg-success-subtle {
+  background: var(--aux-success-soft);
+  border-color: rgba(18, 183, 106, 0.22);
+}
+
+.aux-card.bg-warning-subtle {
+  background: var(--aux-warning-soft);
+  border-color: rgba(247, 144, 9, 0.25);
+}
+
+.aux-card.bg-info-subtle {
+  background: var(--aux-info-soft);
+  border-color: rgba(11, 165, 236, 0.22);
+}
+
+.aux-card.bg-danger,
+.aux-card.aux-bg-danger {
+  background: linear-gradient(145deg, #f04438, #f97066);
+  color: #fff;
+  border: 0;
+}
+
+/* Avatars / icons */
+.aux-avatar {
+  width: 2.55rem;
+  height: 2.55rem;
+  border-radius: 0.85rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--aux-theme-soft);
+  color: var(--aux-theme);
+  flex-shrink: 0;
+}
+
+.aux-avatar.theme-yellow,
+.aux-avatar.theme-warning {
+  background: var(--aux-warning-soft);
+  color: var(--aux-warning);
+}
+.aux-avatar.theme-red,
+.aux-avatar.theme-danger {
+  background: var(--aux-danger-soft);
+  color: var(--aux-danger);
+}
+.aux-avatar.theme-green,
+.aux-avatar.theme-success {
+  background: var(--aux-success-soft);
+  color: var(--aux-success);
+}
+.aux-avatar.theme-pink,
+.aux-avatar.theme-accent {
+  background: var(--aux-accent-soft);
+  color: var(--aux-accent);
+}
+.aux-avatar.theme-purple {
+  background: rgba(122, 90, 248, 0.16);
+  color: var(--aux-purple);
+}
+.aux-avatar.theme-info {
+  background: var(--aux-info-soft);
+  color: var(--aux-info);
+}
+
+.aux-muted {
+  color: var(--aux-muted);
+  font-size: 0.875rem;
+}
+
+.aux-metric {
+  font-family: var(--aux-title);
+  font-size: 1.7rem;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+/* Buttons — bright AdminUX set */
+.aux-btn,
+.adminux-app .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  border-radius: 0.8rem;
+  padding: 0.55rem 1rem;
+  font-size: 0.9rem;
+  font-weight: 700;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: transform 0.15s ease, filter 0.15s ease, box-shadow 0.15s ease;
+  line-height: 1.2;
+  text-decoration: none;
+}
+
+.aux-btn:hover,
+.adminux-app .btn:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.03);
+}
+
+.aux-btn-theme,
+.adminux-app .btn-theme {
+  background: linear-gradient(135deg, var(--aux-theme-1), var(--aux-theme-2));
+  color: #fff;
+  box-shadow: 0 8px 20px rgba(59, 110, 245, 0.28);
+}
+
+.aux-btn-accent,
+.adminux-app .btn-accent {
+  background: linear-gradient(135deg, #ff6b9d, #ff8a65);
+  color: #fff;
+  box-shadow: 0 8px 20px rgba(255, 107, 157, 0.28);
+}
+
+.aux-btn-primary,
+.adminux-app .btn-primary {
+  background: linear-gradient(135deg, #4f46e5, #6366f1);
+  color: #fff;
+}
+
+.aux-btn-secondary,
+.adminux-app .btn-secondary {
+  background: #e4e7ec;
+  color: #344054;
+}
+
+.aux-btn-success,
+.adminux-app .btn-success {
+  background: linear-gradient(135deg, #12b76a, #32d583);
+  color: #fff;
+  box-shadow: 0 8px 18px rgba(18, 183, 106, 0.25);
+}
+
+.aux-btn-danger,
+.adminux-app .btn-danger {
+  background: linear-gradient(135deg, #f04438, #f97066);
+  color: #fff;
+}
+
+.aux-btn-warning,
+.adminux-app .btn-warning {
+  background: linear-gradient(135deg, #f79009, #fdb022);
+  color: #fff;
+}
+
+.aux-btn-info,
+.adminux-app .btn-info {
+  background: linear-gradient(135deg, #0ba5ec, #36bffa);
+  color: #fff;
+}
+
+.aux-btn-light,
+.adminux-app .btn-light {
+  background: #fff;
+  color: var(--aux-text);
+  border-color: var(--aux-border);
+}
+
+.aux-btn-dark,
+.adminux-app .btn-dark {
+  background: var(--aux-dark);
+  color: #fff;
+}
+
+.aux-btn-link {
+  background: transparent;
+  color: var(--aux-theme);
+  border-color: transparent;
+  box-shadow: none;
+}
+
+.aux-btn-outline,
+.adminux-app .btn-outline-theme {
+  background: #fff;
+  border-color: rgba(59, 110, 245, 0.3);
+  color: var(--aux-theme);
+}
+
+/* Soft / light-color buttons */
+.adminux-app .btn-light-color.btn-theme,
+.aux-btn-soft-theme {
+  background: var(--aux-theme-soft);
+  color: var(--aux-theme);
+  box-shadow: none;
+}
+.adminux-app .btn-light-color.btn-accent,
+.aux-btn-soft-accent {
+  background: var(--aux-accent-soft);
+  color: #e11d74;
+  box-shadow: none;
+}
+.adminux-app .btn-light-color.btn-primary {
+  background: rgba(79, 70, 229, 0.14);
+  color: var(--aux-primary);
+  box-shadow: none;
+}
+.adminux-app .btn-light-color.btn-secondary {
+  background: rgba(100, 116, 139, 0.14);
+  color: #475569;
+  box-shadow: none;
+}
+.adminux-app .btn-light-color.btn-success,
+.aux-btn-soft-success {
+  background: var(--aux-success-soft);
+  color: #027a48;
+  box-shadow: none;
+}
+.adminux-app .btn-light-color.btn-danger,
+.aux-btn-soft-danger {
+  background: var(--aux-danger-soft);
+  color: #b42318;
+  box-shadow: none;
+}
+.adminux-app .btn-light-color.btn-warning,
+.aux-btn-soft-warning {
+  background: var(--aux-warning-soft);
+  color: #b54708;
+  box-shadow: none;
+}
+.adminux-app .btn-light-color.btn-info {
+  background: var(--aux-info-soft);
+  color: #026aa2;
+  box-shadow: none;
+}
+.adminux-app .btn-light-color.btn-light {
+  background: #f2f4f7;
+  color: #344054;
+  box-shadow: none;
+}
+.adminux-app .btn-light-color.btn-dark {
+  background: rgba(16, 24, 40, 0.1);
+  color: var(--aux-dark);
+  box-shadow: none;
+}
+
+.aux-btn-square,
+.adminux-app .btn-square {
+  width: 2.5rem;
+  height: 2.5rem;
+  padding: 0;
+}
+
+.aux-nav-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.5rem 0.85rem;
+  border-radius: 999px;
+  background: #fff;
+  border: 1px solid rgba(59, 110, 245, 0.16);
+  color: var(--aux-text);
+  font-size: 0.84rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(59, 110, 245, 0.08);
+}
+
+.aux-nav-chip:hover {
+  border-color: rgba(59, 110, 245, 0.4);
+  color: var(--aux-theme);
+  background: #f5f8ff;
+}
+
+/* Badges */
+.aux-badge,
+.adminux-app .badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 0.22rem 0.6rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.aux-badge-ok,
+.adminux-app .badge-light.text-bg-success,
+.adminux-app .text-bg-success {
+  background: var(--aux-success-soft);
+  color: #027a48;
+}
+.aux-badge-soon,
+.adminux-app .text-bg-warning {
+  background: var(--aux-warning-soft);
+  color: #b54708;
+}
+.aux-badge-expired,
+.adminux-app .text-bg-danger {
+  background: var(--aux-danger-soft);
+  color: #b42318;
+}
+.adminux-app .text-bg-theme-1,
+.adminux-app .badge-light.text-bg-theme-1 {
+  background: var(--aux-theme-soft);
+  color: var(--aux-theme);
+}
+.adminux-app .text-bg-theme-accent-1 {
+  background: var(--aux-accent-soft);
+  color: #c11574;
+}
+.adminux-app .text-bg-primary {
+  background: rgba(79, 70, 229, 0.14);
+  color: var(--aux-primary);
+}
+.adminux-app .text-bg-info {
+  background: var(--aux-info-soft);
+  color: #026aa2;
+}
+.adminux-app .bg-danger {
+  background: var(--aux-danger) !important;
+  color: #fff;
+}
+
+/* Alerts */
+.aux-alert,
+.adminux-app .alert {
+  border-radius: 0.95rem;
+  padding: 0.9rem 1rem;
+  border: 1px solid transparent;
+  margin-bottom: 0.75rem;
+}
+
+.adminux-app .alert-theme,
+.aux-alert-theme {
+  background: var(--aux-theme-soft);
+  color: #183b8f;
+  border-color: rgba(59, 110, 245, 0.25);
+}
+.adminux-app .alert-theme-accent {
+  background: var(--aux-accent-soft);
+  color: #9e165f;
+  border-color: rgba(255, 107, 157, 0.28);
+}
+.adminux-app .alert-success {
+  background: var(--aux-success-soft);
+  color: #05603a;
+  border-color: rgba(18, 183, 106, 0.28);
+}
+.adminux-app .alert-danger {
+  background: var(--aux-danger-soft);
+  color: #912018;
+  border-color: rgba(240, 68, 56, 0.28);
+}
+.adminux-app .alert-warning {
+  background: var(--aux-warning-soft);
+  color: #93370d;
+  border-color: rgba(247, 144, 9, 0.3);
+}
+.adminux-app .alert-info {
+  background: var(--aux-info-soft);
+  color: #026aa2;
+  border-color: rgba(11, 165, 236, 0.28);
+}
+
+/* Progress */
+.aux-progress,
+.adminux-app .progress {
+  height: 10px;
+  border-radius: 999px;
+  background: rgba(59, 110, 245, 0.12);
+  overflow: hidden;
+}
+
+.aux-progress > span,
+.adminux-app .progress-bar {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--aux-theme-1), var(--aux-accent));
+}
+
+.adminux-app .progress-bar.bg-theme-1 {
+  background: linear-gradient(90deg, var(--aux-theme-1), var(--aux-theme-2));
+}
+.adminux-app .progress-bar.bg-theme-accent-1 {
+  background: linear-gradient(90deg, #ff6b9d, #ff8a65);
+}
+.adminux-app .progress-bar.bg-success,
+.adminux-app .progress-bar.bg-green {
+  background: linear-gradient(90deg, #12b76a, #32d583);
+}
+.adminux-app .progress-bar.bg-warning {
+  background: linear-gradient(90deg, #f79009, #fdb022);
+}
+.adminux-app .progress-bar.bg-danger {
+  background: linear-gradient(90deg, #f04438, #f97066);
+}
+.adminux-app .progress-bar.bg-info,
+.adminux-app .progress-bar.bg-teal {
+  background: linear-gradient(90deg, #0ba5ec, #15b8a6);
+}
+
+/* Lists / tables */
+.aux-list-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid rgba(16, 24, 40, 0.06);
+}
+.aux-list-row:last-child {
+  border-bottom: 0;
+}
+
+.aux-table-wrap {
+  overflow-x: auto;
+}
+
+table.aux-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+table.aux-table th {
+  text-align: left;
+  color: var(--aux-muted);
+  font-weight: 700;
+  padding: 0.7rem 0.5rem;
+  border-bottom: 1px solid var(--aux-border);
+  white-space: nowrap;
+}
+
+table.aux-table td {
+  padding: 0.8rem 0.5rem;
+  border-bottom: 1px solid rgba(16, 24, 40, 0.05);
+  vertical-align: middle;
+}
+
+table.aux-table tbody tr:hover {
+  background: rgba(59, 110, 245, 0.04);
+}
+
+/* AdminUX DataTable-style schedule grid */
+.adminux-app .table.aux-datatable {
+  width: 100%;
+  white-space: nowrap;
+}
+
+.adminux-app .aux-person-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-width: 12rem;
+}
+
+.adminux-app .avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  color: #1f2937;
+  overflow: hidden;
+  margin: 0;
+  flex-shrink: 0;
+  box-shadow: inset 0 0 0 1px rgba(16, 24, 40, 0.08);
+  vertical-align: middle;
+}
+
+.adminux-app .avatar.rounded-circle {
+  border-radius: 999px;
+}
+
+.adminux-app .avatar.rounded {
+  border-radius: 0.65rem;
+}
+
+/* AdminUX size scale: avatar-10 … avatar-150 */
+.adminux-app .avatar.avatar-10 { width: 10px; height: 10px; }
+.adminux-app .avatar.avatar-20 { width: 20px; height: 20px; }
+.adminux-app .avatar.avatar-30 { width: 30px; height: 30px; }
+.adminux-app .avatar.avatar-40 { width: 40px; height: 40px; border-radius: 999px; font-size: 0.78rem; }
+.adminux-app .avatar.avatar-50 { width: 50px; height: 50px; }
+.adminux-app .avatar.avatar-60 { width: 60px; height: 60px; }
+.adminux-app .avatar.avatar-70 { width: 70px; height: 70px; }
+.adminux-app .avatar.avatar-80 { width: 80px; height: 80px; }
+.adminux-app .avatar.avatar-90 { width: 90px; height: 90px; }
+.adminux-app .avatar.avatar-100 { width: 100px; height: 100px; }
+.adminux-app .avatar.avatar-110 { width: 110px; height: 110px; }
+.adminux-app .avatar.avatar-120 { width: 120px; height: 120px; }
+.adminux-app .avatar.avatar-130 { width: 130px; height: 130px; }
+.adminux-app .avatar.avatar-140 { width: 140px; height: 140px; }
+.adminux-app .avatar.avatar-150 { width: 150px; height: 150px; }
+
+/* coverimg — image fills the avatar frame */
+.adminux-app .avatar.coverimg {
+  position: relative;
+}
+
+.adminux-app .avatar.coverimg img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: inherit;
+}
+
+.adminux-app .avatar.coverimg img.w-auto {
+  width: 100%;
+}
+
+.adminux-app .me-2 {
+  margin-right: 0.5rem;
+}
+
+.adminux-app .fw-medium {
+  font-weight: 700;
+}
+
+.adminux-app .badge.rounded-pill {
+  border-radius: 999px;
+  padding: 0.28rem 0.7rem;
+}
+
+.adminux-app .text-bg-theme {
+  background: var(--aux-theme-soft);
+  color: var(--aux-theme);
+}
+.adminux-app .text-bg-accent {
+  background: var(--aux-accent-soft);
+  color: #c11574;
+}
+.adminux-app .text-bg-secondary {
+  background: rgba(100, 116, 139, 0.14);
+  color: #475569;
+}
+
+.adminux-app .btn-square.btn-link,
+.adminux-app .btn.btn-link {
+  width: 2.15rem;
+  height: 2.15rem;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.65rem;
+  background: transparent;
+  border: 0;
+  color: var(--aux-theme);
+  cursor: pointer;
+}
+
+.adminux-app .btn-square.btn-link:hover,
+.adminux-app .btn.btn-link:hover {
+  background: var(--aux-theme-soft);
+}
+
+.adminux-app .aux-actions-cell {
+  position: relative;
+  white-space: nowrap;
+}
+
+.adminux-app .dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.adminux-app .dropdown-menu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 0.25rem);
+  z-index: 20;
+  min-width: 10rem;
+  margin: 0;
+  padding: 0.35rem;
+  list-style: none;
+  background: #fff;
+  border: 1px solid var(--aux-border);
+  border-radius: 0.85rem;
+  box-shadow: 0 14px 34px rgba(16, 24, 40, 0.12);
+}
+
+.adminux-app .dropdown-menu.show {
+  display: block;
+}
+
+.adminux-app .dropdown-item {
+  display: block;
+  width: 100%;
+  text-align: left;
+  border: 0;
+  background: transparent;
+  border-radius: 0.55rem;
+  padding: 0.5rem 0.7rem;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--aux-text);
+  cursor: pointer;
+}
+
+.adminux-app .dropdown-item:hover {
+  background: var(--aux-theme-soft);
+  color: var(--aux-theme);
+}
+
+.adminux-app .dropdown-item.theme-red {
+  color: var(--aux-danger);
+}
+
+.adminux-app .aux-datatable-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.85rem 1.1rem 1.1rem;
+  border-top: 1px solid rgba(16, 24, 40, 0.06);
+}
+
+.adminux-app .pagination {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.adminux-app .page-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2.1rem;
+  height: 2.1rem;
+  padding: 0 0.65rem;
+  border-radius: 0.65rem;
+  border: 1px solid rgba(59, 110, 245, 0.18);
+  background: #fff;
+  color: var(--aux-muted);
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.adminux-app .page-item.active .page-link,
+.adminux-app .page-link.active {
+  background: linear-gradient(135deg, var(--aux-theme-1), var(--aux-theme-2));
+  border-color: transparent;
+  color: #fff;
+}
+
+.adminux-app .page-item.disabled .page-link {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+@media (max-width: 900px) {
+  .adminux-app .aux-datatable th.md,
+  .adminux-app .aux-datatable td:nth-child(3) {
+    display: none;
+  }
+}
+
+@media (max-width: 700px) {
+  .adminux-app .aux-datatable th.xs,
+  .adminux-app .aux-datatable td:nth-child(1),
+  .adminux-app .aux-datatable td:nth-child(4),
+  .adminux-app .aux-datatable td:nth-child(6) {
+    display: none;
+  }
+}
+
+/* Date Range Picker — AdminUX bright theme */
+.adminux-app .aux-daterange {
+  min-width: min(100%, 280px);
+}
+
+.adminux-app .aux-daterange__control {
+  position: relative;
+}
+
+.adminux-app .aux-daterange__icon {
+  position: absolute;
+  left: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--aux-theme);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.adminux-app .aux-daterange__control .form-control {
+  padding-left: 2.35rem;
+  cursor: pointer;
+  background: #fff;
+  font-weight: 600;
+}
+
+.daterangepicker {
+  border: 1px solid rgba(59, 110, 245, 0.16) !important;
+  border-radius: 1rem !important;
+  box-shadow: 0 18px 40px rgba(16, 24, 40, 0.14) !important;
+  font-family: "Open Sans", sans-serif !important;
+  z-index: 2000 !important;
+}
+
+.daterangepicker .ranges li.active,
+.daterangepicker td.active,
+.daterangepicker td.active:hover {
+  background: linear-gradient(135deg, #3b6ef5, #5b8cff) !important;
+  border-color: transparent !important;
+}
+
+.daterangepicker td.in-range {
+  background: rgba(59, 110, 245, 0.12) !important;
+  color: #183b8f !important;
+}
+
+.daterangepicker .drp-buttons .btn {
+  border-radius: 0.7rem !important;
+  font-weight: 700 !important;
+}
+
+.daterangepicker .drp-buttons .btn.btn-primary,
+.daterangepicker .applyBtn {
+  background: linear-gradient(135deg, #3b6ef5, #5b8cff) !important;
+  border: 0 !important;
+  color: #fff !important;
+}
+
+.daterangepicker .cancelBtn {
+  background: #f2f4f7 !important;
+  border: 0 !important;
+  color: #344054 !important;
+}
+
+/* Inline single-date calendar (AdminUX .inlinewrap1 pattern) */
+.adminux-app .aux-inline-calendar {
+  width: 100%;
+}
+
+.adminux-app .inline-calendar {
+  position: relative;
+  width: 100%;
+  min-height: 280px;
+}
+
+.adminux-app .inline-calendar .daterangepicker {
+  position: static !important;
+  display: block !important;
+  top: auto !important;
+  left: auto !important;
+  right: auto !important;
+  margin: 0 auto !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  box-shadow: none !important;
+  border: 1px solid rgba(59, 110, 245, 0.14) !important;
+  border-radius: 1rem !important;
+  background: #fff !important;
+}
+
+.adminux-app .inline-calendar .daterangepicker:before,
+.adminux-app .inline-calendar .daterangepicker:after {
+  display: none !important;
+}
+
+.adminux-app .inline-calendar .daterangepicker .drp-calendar {
+  max-width: none !important;
+  float: none !important;
+}
+
+.adminux-app .inline-calendar .daterangepicker .ranges {
+  display: none !important;
+}
+
+.adminux-app .inline-calendar .daterangepicker .drp-buttons {
+  display: none !important;
+}
+
+.adminux-app .d-none {
+  display: none !important;
+}
+
+.adminux-app .mx-auto {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Dragula shopping board */
+.adminux-app .aux-dragula-board {
+  display: grid;
+  gap: 0.85rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+@media (max-width: 700px) {
+  .adminux-app .aux-dragula-board {
+    grid-template-columns: 1fr;
+  }
+}
+
+.adminux-app .aux-dragula-col {
+  border-radius: 1rem;
+  padding: 0.75rem;
+  border: 1px solid rgba(59, 110, 245, 0.12);
+  min-height: 220px;
+}
+
+.adminux-app .aux-dragula-col__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.65rem;
+}
+
+.adminux-app .aux-dragula-col__list {
+  min-height: 140px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.adminux-app .aux-drag-card {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.7rem 0.75rem;
+  border-radius: 0.85rem;
+  background: #fff;
+  border: 1px solid rgba(16, 24, 40, 0.08);
+  box-shadow: 0 8px 18px rgba(16, 24, 40, 0.06);
+  cursor: grab;
+  user-select: none;
+}
+
+.adminux-app .aux-drag-card:active {
+  cursor: grabbing;
+}
+
+.adminux-app .aux-drag-handle {
+  color: #98a2b3;
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
+.adminux-app .aux-dragula-empty {
+  margin: 0.5rem 0 0;
+  font-size: 0.85rem;
+  text-align: center;
+}
+
+.adminux-app .gu-mirror {
+  position: fixed !important;
+  margin: 0 !important;
+  z-index: 9999 !important;
+  opacity: 0.92;
+  cursor: grabbing;
+  border-radius: 0.85rem;
+  box-shadow: 0 16px 36px rgba(59, 110, 245, 0.25);
+}
+
+.adminux-app .gu-hide {
+  display: none !important;
+}
+
+.adminux-app .gu-unselectable {
+  user-select: none !important;
+}
+
+.adminux-app .gu-transit {
+  opacity: 0.35;
+}
+
+/* FullCalendar — AdminUX bright theme */
+.adminux-app .aux-fullcalendar {
+  --fc-border-color: rgba(59, 110, 245, 0.14);
+  --fc-button-bg-color: #3b6ef5;
+  --fc-button-border-color: #3b6ef5;
+  --fc-button-hover-bg-color: #5b8cff;
+  --fc-button-hover-border-color: #5b8cff;
+  --fc-button-active-bg-color: #2f5ad4;
+  --fc-button-active-border-color: #2f5ad4;
+  --fc-today-bg-color: rgba(59, 110, 245, 0.08);
+  --fc-page-bg-color: transparent;
+  --fc-neutral-bg-color: rgba(255, 255, 255, 0.7);
+  font-family: var(--aux-body);
+}
+
+.adminux-app .aux-fullcalendar .fc {
+  background: #fff;
+  border-radius: 1rem;
+  padding: 0.5rem;
+  border: 1px solid rgba(59, 110, 245, 0.12);
+}
+
+.adminux-app .aux-fullcalendar .fc-toolbar-title {
+  font-family: var(--aux-title);
+  font-size: 1.25rem !important;
+  font-weight: 700;
+}
+
+.adminux-app .aux-fullcalendar .fc-button {
+  border-radius: 0.7rem !important;
+  font-weight: 700 !important;
+  text-transform: capitalize;
+  box-shadow: none !important;
+}
+
+.adminux-app .aux-fullcalendar .fc-event {
+  border: 0 !important;
+  border-radius: 0.65rem !important;
+  padding: 0.2rem 0.35rem !important;
+  margin-bottom: 0.2rem;
+  color: #183b8f !important;
+  cursor: pointer;
+}
+
+.adminux-app .aux-fullcalendar .fc-event p {
+  margin: 0;
+  line-height: 1.25;
+}
+
+.adminux-app .aux-fc-row {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-weight: 700;
+  font-size: 0.82rem;
+}
+
+.adminux-app .aux-fc-dot {
+  width: 0.45rem;
+  height: 0.45rem;
+  border-radius: 999px;
+  background: currentColor;
+  flex-shrink: 0;
+}
+
+.adminux-app .bg-success-subtle,
+.adminux-app .fc-event.bg-success-subtle,
+.adminux-app .fc-event.bg-green-subtle {
+  background: rgba(18, 183, 106, 0.16) !important;
+  color: #05603a !important;
+}
+.adminux-app .fc-event.bg-info-subtle,
+.adminux-app .fc-event.bg-cyan-subtle {
+  background: rgba(11, 165, 236, 0.16) !important;
+  color: #026aa2 !important;
+}
+.adminux-app .fc-event.bg-warning-subtle,
+.adminux-app .fc-event.bg-yellow-subtle,
+.adminux-app .fc-event.bg-orange-subtle {
+  background: rgba(247, 144, 9, 0.18) !important;
+  color: #93370d !important;
+}
+.adminux-app .fc-event.bg-danger-subtle {
+  background: rgba(240, 68, 56, 0.14) !important;
+  color: #912018 !important;
+}
+.adminux-app .fc-event.bg-purple-subtle,
+.adminux-app .fc-event.bg-primary-subtle {
+  background: rgba(122, 90, 248, 0.16) !important;
+  color: #4c1d95 !important;
+}
+.adminux-app .fc-event.bg-pink-subtle,
+.adminux-app .fc-event.bg-theme-subtle {
+  background: rgba(255, 107, 157, 0.16) !important;
+  color: #9e165f !important;
+}
+.adminux-app .fc-event.bg-theme-1-space {
+  background: linear-gradient(135deg, #3b6ef5, #5b8cff) !important;
+  color: #fff !important;
+}
+
+/* Dropzone — AdminUX bright theme */
+.adminux-app .aux-dropzone.dropzone {
+  border: 2px dashed rgba(59, 110, 245, 0.35) !important;
+  border-radius: 1.05rem !important;
+  background:
+    radial-gradient(circle at 20% 20%, rgba(91, 140, 255, 0.12), transparent 45%),
+    radial-gradient(circle at 80% 80%, rgba(18, 183, 106, 0.1), transparent 40%),
+    #fff !important;
+  min-height: 180px;
+  padding: 1.25rem !important;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.adminux-app .aux-dropzone.dropzone:hover,
+.adminux-app .aux-dropzone.dropzone.dz-drag-hover {
+  border-color: var(--aux-theme) !important;
+  box-shadow: 0 0 0 4px rgba(59, 110, 245, 0.12);
+}
+
+.adminux-app .aux-dropzone .dz-message {
+  margin: 1.5rem 0 !important;
+  text-align: center;
+  color: var(--aux-text);
+}
+
+.adminux-app .aux-dropzone .dz-preview {
+  border-radius: 0.85rem;
+}
+
+.adminux-app .aux-dropzone .dz-remove {
+  color: var(--aux-danger) !important;
+  font-weight: 700;
+}
+
+.adminux-app .aux-dropzone-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.adminux-app .aux-dropzone-list__item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.65rem 0.75rem;
+  border-radius: 0.85rem;
+  background: #fff;
+  border: 1px solid rgba(59, 110, 245, 0.12);
+}
+
+.adminux-app .aux-dropzone-thumb {
+  width: 44px;
+  height: 44px;
+  object-fit: cover;
+  border-radius: 0.65rem;
+  flex-shrink: 0;
+}
+
+.adminux-app .aux-dropzone-fileicon {
+  width: 44px;
+  height: 44px;
+  border-radius: 0.65rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--aux-theme-soft);
+  color: var(--aux-theme);
+  font-size: 1.25rem;
+  flex-shrink: 0;
+}
+
+/* Soften common rounded panels */
+.adminux-app .rounded-\[28px\],
+.adminux-app .rounded-\[22px\] {
+  background: #fff !important;
+  border-color: rgba(59, 110, 245, 0.12) !important;
+  color: var(--aux-text) !important;
+  box-shadow: 0 12px 34px rgba(16, 24, 40, 0.07) !important;
+  backdrop-filter: none !important;
+}
+
+/* Brighten guided-kiosk pages site-wide */
+.adminux-app .wd-guided-kiosk {
+  min-height: auto;
+  padding: 0;
+  color: var(--aux-text);
+  background: transparent;
+  overflow-x: clip;
+}
+
+.adminux-app .wd-guided-kiosk__hero {
+  border: 1px solid rgba(59, 110, 245, 0.14);
+  border-radius: var(--aux-radius);
+  background:
+    radial-gradient(ellipse at 82% 8%, rgba(91, 140, 255, 0.28), transparent 16rem),
+    radial-gradient(ellipse at 10% 90%, rgba(255, 107, 157, 0.16), transparent 14rem),
+    linear-gradient(135deg, #ffffff 0%, #eef4ff 55%, #fff1f6 100%);
+  box-shadow: 0 14px 40px rgba(59, 110, 245, 0.12);
+}
+
+.adminux-app .wd-guided-kiosk__eyebrow {
+  color: var(--aux-theme);
+}
+
+.adminux-app .wd-guided-kiosk__hero h1 {
+  color: var(--aux-text);
+  background: linear-gradient(120deg, var(--aux-theme-1), var(--aux-accent) 60%, #12b76a);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.adminux-app .wd-guided-kiosk__hero p:not(.wd-guided-kiosk__eyebrow) {
+  color: var(--aux-muted);
+}
+
+.adminux-app .wd-guided-kiosk__status span {
+  border: 1px solid rgba(59, 110, 245, 0.18);
+  background: rgba(255, 255, 255, 0.85);
+  color: var(--aux-text);
+  box-shadow: 0 4px 12px rgba(59, 110, 245, 0.08);
+}
+
+.adminux-app .wd-guided-kiosk__panel,
+.adminux-app .wd-guided-kiosk__card,
+.adminux-app .wd-guided-kiosk section,
+.adminux-app .wd-guided-kiosk .card {
+  background: #fff !important;
+  border: 1px solid var(--aux-border) !important;
+  color: var(--aux-text) !important;
+  box-shadow: 0 12px 34px rgba(16, 24, 40, 0.07) !important;
+}
+
+.adminux-app .wd-guided-kiosk a,
+.adminux-app .wd-guided-kiosk button {
+  color: inherit;
+}
+
+.adminux-app .wd-guided-kiosk .text-white,
+.adminux-app .wd-guided-kiosk [class*="text-white"] {
+  color: var(--aux-text) !important;
+}
+
+.adminux-app .wd-guided-kiosk [class*="rgba(255, 255, 255"],
+.adminux-app .wd-guided-kiosk [style*="color: #fff"],
+.adminux-app .wd-guided-kiosk [style*="color:#fff"] {
+  color: var(--aux-text);
+}
+
+/* Pagination / list accents */
+.adminux-app .page-link.active,
+.adminux-app .pagination .active .page-link {
+  background: var(--aux-theme);
+  border-color: var(--aux-theme);
+  color: #fff;
+}
+
+.adminux-app .list-group-item.active {
+  background: var(--aux-theme-soft);
+  border-color: rgba(59, 110, 245, 0.25);
+  color: var(--aux-theme);
+}
+
+/* Force light surfaces even if html.dark is set */
+.adminux-app.adminux-app {
+  color-scheme: light;
+}
+
+/* Brighten Grofast pantry/shopping shells */
+.adminux-app .gf-page,
+.adminux-app [class*="gf-shell"],
+.adminux-app .wd-shopping-page,
+.adminux-app .wd-pantry-page {
+  --gf-bg: transparent;
+  --lg-bg-0: transparent;
+  --lg-bg-1: transparent;
+  --lg-surface: #ffffff;
+  --gf-card: #ffffff;
+  background:
+    radial-gradient(circle at 10% 0%, rgba(91, 140, 255, 0.18), transparent 40%),
+    radial-gradient(circle at 90% 10%, rgba(255, 107, 157, 0.14), transparent 36%),
+    linear-gradient(165deg, #f5f8ff 0%, #ffffff 50%, #fff7fb 100%) !important;
+  color: var(--aux-text) !important;
+}
+
+.adminux-app .gf-card,
+.adminux-app [class*="gf-"][class*="card"] {
+  background: #fff !important;
+  border-color: rgba(59, 110, 245, 0.12) !important;
+  color: var(--aux-text) !important;
+  box-shadow: 0 10px 28px rgba(16, 24, 40, 0.06) !important;
+}
+
+/* ——— Nav tabs / pills / underline ——— */
+.adminux-app .nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.adminux-app .nav .nav-link {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.5rem 0.9rem;
+  border-radius: 0.7rem;
+  color: var(--aux-muted);
+  font-weight: 700;
+  font-size: 0.9rem;
+  text-decoration: none;
+  border: 1px solid transparent;
+  background: transparent;
+  cursor: pointer;
+}
+
+.adminux-app .nav .nav-link:hover {
+  color: var(--aux-theme);
+  background: var(--aux-theme-soft);
+}
+
+.adminux-app .nav .nav-link.active {
+  color: #fff;
+  background: linear-gradient(135deg, var(--aux-theme-1), var(--aux-theme-2));
+  box-shadow: 0 6px 16px rgba(59, 110, 245, 0.22);
+}
+
+.adminux-app .nav .nav-link:disabled,
+.adminux-app .nav .nav-link.disabled {
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+.adminux-app .nav-tabs {
+  border-bottom: 1px solid var(--aux-border);
+  gap: 0;
+}
+
+.adminux-app .nav-tabs .nav-link {
+  border-radius: 0.7rem 0.7rem 0 0;
+  border: 1px solid transparent;
+  margin-bottom: -1px;
+}
+
+.adminux-app .nav-tabs .nav-link.active {
+  color: var(--aux-theme);
+  background: #fff;
+  border-color: var(--aux-border) var(--aux-border) #fff;
+  box-shadow: none;
+}
+
+.adminux-app .nav-pills .nav-link.active {
+  color: #fff;
+  background: linear-gradient(135deg, var(--aux-theme-1), var(--aux-accent));
+}
+
+.adminux-app .nav-underline {
+  border-bottom: 1px solid var(--aux-border);
+}
+
+.adminux-app .nav-underline .nav-link {
+  border-radius: 0;
+  border-bottom: 2px solid transparent;
+}
+
+.adminux-app .nav-underline .nav-link.active {
+  color: var(--aux-theme);
+  background: transparent;
+  border-bottom-color: var(--aux-theme);
+  box-shadow: none;
+}
+
+.adminux-app .breadcrumb {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  list-style: none;
+  margin: 0 0 0.75rem;
+  padding: 0;
+  color: var(--aux-muted);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.adminux-app .breadcrumb-item + .breadcrumb-item::before {
+  content: var(--bs-breadcrumb-divider, "/");
+  margin-right: 0.35rem;
+  color: #98a2b3;
+}
+
+.adminux-app .breadcrumb-item a {
+  color: var(--aux-theme);
+  text-decoration: none;
+  font-weight: 700;
+}
+
+.adminux-app .breadcrumb-item.active {
+  color: var(--aux-text);
+}
+
+/* ——— Forms: controls, checks, switches, ranges ——— */
+.adminux-app .form-label {
+  display: block;
+  margin-bottom: 0.35rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--aux-text);
+}
+
+.adminux-app .form-text {
+  margin-top: 0.3rem;
+  font-size: 0.78rem;
+  color: var(--aux-muted);
+}
+
+.adminux-app .form-control,
+.adminux-app .form-select,
+.adminux-app main input[type="text"],
+.adminux-app main input[type="email"],
+.adminux-app main input[type="password"],
+.adminux-app main input[type="search"],
+.adminux-app main input[type="number"],
+.adminux-app main input[type="url"],
+.adminux-app main input[type="tel"],
+.adminux-app main input[type="date"],
+.adminux-app main select,
+.adminux-app main textarea {
+  border-radius: 0.8rem;
+  border: 1px solid rgba(59, 110, 245, 0.2);
+  background: #fff;
+  color: var(--aux-text);
+  padding: 0.65rem 0.85rem;
+  font-size: 0.92rem;
+  font-family: var(--aux-body);
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.adminux-app .form-control:focus,
+.adminux-app .form-select:focus,
+.adminux-app main input[type="text"]:focus,
+.adminux-app main input[type="email"]:focus,
+.adminux-app main input[type="password"]:focus,
+.adminux-app main input[type="search"]:focus,
+.adminux-app main input[type="number"]:focus,
+.adminux-app main select:focus,
+.adminux-app main textarea:focus {
+  border-color: var(--aux-theme);
+  box-shadow: 0 0 0 3px rgba(59, 110, 245, 0.18);
+}
+
+.adminux-app .form-control-sm {
+  padding: 0.4rem 0.65rem;
+  font-size: 0.82rem;
+}
+
+.adminux-app .form-control-lg {
+  padding: 0.85rem 1rem;
+  font-size: 1.05rem;
+}
+
+.adminux-app .form-select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23667085' d='M2.5 4.5L6 8l3.5-3.5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.85rem center;
+  padding-right: 2.2rem;
+}
+
+.adminux-app .input-group {
+  display: flex;
+  align-items: stretch;
+  width: 100%;
+}
+
+.adminux-app .input-group .form-control {
+  flex: 1 1 auto;
+  width: 1%;
+  border-radius: 0;
+}
+
+.adminux-app .input-group .form-control:first-child,
+.adminux-app .input-group-text:first-child,
+.adminux-app .input-group > .btn:first-child {
+  border-radius: 0.8rem 0 0 0.8rem;
+}
+
+.adminux-app .input-group .form-control:last-child,
+.adminux-app .input-group-text:last-child,
+.adminux-app .input-group > .btn:last-child {
+  border-radius: 0 0.8rem 0.8rem 0;
+}
+
+.adminux-app .input-group-text {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.65rem 0.85rem;
+  background: var(--aux-theme-soft);
+  border: 1px solid rgba(59, 110, 245, 0.2);
+  color: var(--aux-theme);
+  font-weight: 700;
+  font-size: 0.88rem;
+  white-space: nowrap;
+}
+
+.adminux-app .form-check {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  margin-bottom: 0.55rem;
+  min-height: 1.4rem;
+}
+
+.adminux-app .form-check-input {
+  width: 1.15rem;
+  height: 1.15rem;
+  margin: 0;
+  accent-color: var(--aux-theme);
+  border: 1.5px solid rgba(59, 110, 245, 0.35);
+  border-radius: 0.3rem;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.adminux-app .form-check-input[type="radio"] {
+  border-radius: 999px;
+}
+
+.adminux-app .form-check-input:checked {
+  background-color: var(--aux-theme);
+  border-color: var(--aux-theme);
+}
+
+.adminux-app .form-check-label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--aux-text);
+  cursor: pointer;
+}
+
+.adminux-app .form-check.theme-pink .form-check-input,
+.adminux-app .form-check[style*="accent"] .form-check-input {
+  accent-color: var(--aux-accent);
+}
+
+.adminux-app .form-check.theme-red .form-check-input {
+  accent-color: var(--aux-danger);
+}
+.adminux-app .form-check.theme-orange .form-check-input {
+  accent-color: var(--aux-warning);
+}
+.adminux-app .form-check.theme-yellow .form-check-input {
+  accent-color: #fdb022;
+}
+.adminux-app .form-check.theme-green .form-check-input,
+.adminux-app .form-check.theme-teal .form-check-input {
+  accent-color: var(--aux-success);
+}
+.adminux-app .form-check.theme-indigo .form-check-input,
+.adminux-app .form-check.theme-brown .form-check-input {
+  accent-color: var(--aux-primary);
+}
+
+.adminux-app .form-switch .form-check-input {
+  width: 2.5rem;
+  height: 1.35rem;
+  border-radius: 999px;
+  background-color: #d0d5dd;
+  border: 0;
+  appearance: none;
+  position: relative;
+  transition: background 0.2s ease;
+}
+
+.adminux-app .form-switch .form-check-input::after {
+  content: "";
+  position: absolute;
+  top: 0.15rem;
+  left: 0.18rem;
+  width: 1.05rem;
+  height: 1.05rem;
+  border-radius: 999px;
+  background: #fff;
+  box-shadow: 0 1px 4px rgba(16, 24, 40, 0.2);
+  transition: transform 0.2s ease;
+}
+
+.adminux-app .form-switch .form-check-input:checked {
+  background: linear-gradient(135deg, var(--aux-theme-1), var(--aux-theme-2));
+}
+
+.adminux-app .form-switch .form-check-input:checked::after {
+  transform: translateX(1.1rem);
+}
+
+.adminux-app .form-switch.theme-pink .form-check-input:checked {
+  background: linear-gradient(135deg, #ff6b9d, #ff8a65);
+}
+.adminux-app .form-switch.theme-red .form-check-input:checked {
+  background: var(--aux-danger);
+}
+.adminux-app .form-switch.theme-orange .form-check-input:checked {
+  background: var(--aux-warning);
+}
+.adminux-app .form-switch.theme-yellow .form-check-input:checked {
+  background: #fdb022;
+}
+.adminux-app .form-switch.theme-green .form-check-input:checked,
+.adminux-app .form-switch.theme-teal .form-check-input:checked {
+  background: var(--aux-success);
+}
+.adminux-app .form-switch.theme-indigo .form-check-input:checked {
+  background: var(--aux-primary);
+}
+
+.adminux-app .form-check-md .form-check-input {
+  width: 3rem;
+  height: 1.55rem;
+}
+.adminux-app .form-check-md .form-check-input::after {
+  width: 1.2rem;
+  height: 1.2rem;
+}
+.adminux-app .form-check-md .form-check-input:checked::after {
+  transform: translateX(1.3rem);
+}
+
+.adminux-app .form-check-lg .form-check-input {
+  width: 3.5rem;
+  height: 1.75rem;
+}
+.adminux-app .form-check-lg .form-check-input::after {
+  width: 1.35rem;
+  height: 1.35rem;
+}
+.adminux-app .form-check-lg .form-check-input:checked::after {
+  transform: translateX(1.55rem);
+}
+
+.adminux-app .form-range,
+.adminux-app input[type="range"] {
+  width: 100%;
+  accent-color: var(--aux-theme);
+  height: 0.45rem;
+  cursor: pointer;
+}
+
+.adminux-app .range.theme-red input[type="range"] {
+  accent-color: var(--aux-danger);
+}
+.adminux-app .range.theme-purple input[type="range"],
+.adminux-app .range.theme-indigo input[type="range"] {
+  accent-color: var(--aux-primary);
+}
+.adminux-app .range.theme-green input[type="range"],
+.adminux-app .range.theme-teal input[type="range"] {
+  accent-color: var(--aux-success);
+}
+.adminux-app .range.theme-yellow input[type="range"],
+.adminux-app .range.theme-orange input[type="range"] {
+  accent-color: var(--aux-warning);
+}
+.adminux-app .range.theme-pink input[type="range"] {
+  accent-color: var(--aux-accent);
+}
+
+.adminux-app .btn-check {
+  position: absolute;
+  clip: rect(0, 0, 0, 0);
+  pointer-events: none;
+}
+
+.adminux-app .btn-check:checked + .btn {
+  filter: brightness(1.05);
+  box-shadow: 0 0 0 3px rgba(59, 110, 245, 0.22);
+}
+
+.adminux-app .btn-outline-secondary {
+  background: #fff;
+  border: 1px solid #d0d5dd;
+  color: #344054;
+}
+
+/* ——— Floating labels ——— */
+.adminux-app .form-floating {
+  position: relative;
+}
+
+.adminux-app .form-floating > .form-control,
+.adminux-app .form-floating > .form-select,
+.adminux-app .form-floating > input,
+.adminux-app .form-floating > select,
+.adminux-app .form-floating > textarea {
+  height: calc(3.5rem + 2px);
+  min-height: calc(3.5rem + 2px);
+  padding: 1.1rem 0.9rem 0.45rem;
+  line-height: 1.25;
+}
+
+.adminux-app .form-floating > textarea.form-control,
+.adminux-app .form-floating > textarea {
+  height: auto;
+  min-height: 6.5rem;
+  padding-top: 1.35rem;
+}
+
+.adminux-app .form-floating > label {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 2;
+  height: 100%;
+  padding: 1rem 0.95rem;
+  overflow: hidden;
+  text-align: start;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  pointer-events: none;
+  border: 1px solid transparent;
+  transform-origin: 0 0;
+  transition: opacity 0.12s ease, transform 0.12s ease;
+  color: var(--aux-muted);
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.adminux-app .form-floating > .form-control::placeholder,
+.adminux-app .form-floating > input::placeholder,
+.adminux-app .form-floating > textarea::placeholder {
+  color: transparent;
+}
+
+.adminux-app .form-floating > .form-control:focus,
+.adminux-app .form-floating > .form-select:focus,
+.adminux-app .form-floating > input:focus,
+.adminux-app .form-floating > select:focus,
+.adminux-app .form-floating > textarea:focus {
+  padding-top: 1.25rem;
+  padding-bottom: 0.35rem;
+}
+
+.adminux-app .form-floating > .form-control:focus ~ label,
+.adminux-app .form-floating > .form-control:not(:placeholder-shown) ~ label,
+.adminux-app .form-floating > .form-select ~ label,
+.adminux-app .form-floating > input:focus ~ label,
+.adminux-app .form-floating > input:not(:placeholder-shown) ~ label,
+.adminux-app .form-floating > select ~ label,
+.adminux-app .form-floating > textarea:focus ~ label,
+.adminux-app .form-floating > textarea:not(:placeholder-shown) ~ label {
+  transform: scale(0.82) translateY(-0.35rem) translateX(0.1rem);
+  opacity: 0.85;
+  color: var(--aux-theme);
+}
+
+.adminux-app .form-floating > .form-control:disabled ~ label,
+.adminux-app .form-floating > .form-select:disabled ~ label,
+.adminux-app .form-floating > input:disabled ~ label,
+.adminux-app .form-floating > select:disabled ~ label,
+.adminux-app .form-floating > textarea:disabled ~ label {
+  opacity: 0.5;
+  color: var(--aux-muted);
+}
+
+.adminux-app .form-control:disabled,
+.adminux-app .form-select:disabled,
+.adminux-app main input:disabled,
+.adminux-app main select:disabled,
+.adminux-app main textarea:disabled {
+  background: #f2f4f7;
+  color: #98a2b3;
+  cursor: not-allowed;
+}
+
+.adminux-app .input-group > .form-floating {
+  flex: 1 1 auto;
+  width: 1%;
+}
+
+.adminux-app .input-group > .form-floating > .form-control,
+.adminux-app .input-group > .form-floating > input {
+  border-radius: 0 0.8rem 0.8rem 0;
+}
+
+.adminux-app .input-group > .input-group-text + .form-floating > .form-control,
+.adminux-app .input-group > .input-group-text + .form-floating > input {
+  border-left: 0;
+}
+
+/* ——— Validation feedback / tooltips ——— */
+.adminux-app .valid-feedback,
+.adminux-app .invalid-feedback {
+  display: none;
+  width: 100%;
+  margin-top: 0.35rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.adminux-app .valid-feedback {
+  color: #027a48;
+}
+
+.adminux-app .invalid-feedback {
+  color: #b42318;
+}
+
+.adminux-app .was-validated .form-control:valid,
+.adminux-app .was-validated .form-select:valid,
+.adminux-app .form-control.is-valid,
+.adminux-app .form-select.is-valid {
+  border-color: var(--aux-success);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='%2312b76a' d='M13.4 3.5 6.2 10.7 2.6 7.1 1.5 8.2l4.7 4.7L14.5 4.6z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 1rem;
+  padding-right: 2.4rem;
+}
+
+.adminux-app .was-validated .form-control:invalid,
+.adminux-app .was-validated .form-select:invalid,
+.adminux-app .form-control.is-invalid,
+.adminux-app .form-select.is-invalid {
+  border-color: var(--aux-danger);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='%23f04438' d='M8 1.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13zm.75 3.25v4.5h-1.5v-4.5h1.5zM8 12a1 1 0 1 1 0-2 1 1 0 0 1 0 2z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 1rem;
+  padding-right: 2.4rem;
+}
+
+.adminux-app .was-validated .form-control:valid:focus,
+.adminux-app .form-control.is-valid:focus {
+  box-shadow: 0 0 0 3px rgba(18, 183, 106, 0.2);
+}
+
+.adminux-app .was-validated .form-control:invalid:focus,
+.adminux-app .form-control.is-invalid:focus {
+  box-shadow: 0 0 0 3px rgba(240, 68, 56, 0.2);
+}
+
+.adminux-app .was-validated .form-control:valid ~ .valid-feedback,
+.adminux-app .was-validated .form-select:valid ~ .valid-feedback,
+.adminux-app .form-control.is-valid ~ .valid-feedback,
+.adminux-app .form-select.is-valid ~ .valid-feedback,
+.adminux-app .was-validated .form-check-input:valid ~ .valid-feedback,
+.adminux-app .form-check-input.is-valid ~ .valid-feedback {
+  display: block;
+}
+
+.adminux-app .was-validated .form-control:invalid ~ .invalid-feedback,
+.adminux-app .was-validated .form-select:invalid ~ .invalid-feedback,
+.adminux-app .form-control.is-invalid ~ .invalid-feedback,
+.adminux-app .form-select.is-invalid ~ .invalid-feedback,
+.adminux-app .was-validated .form-check-input:invalid ~ .invalid-feedback,
+.adminux-app .form-check-input.is-invalid ~ .invalid-feedback,
+.adminux-app .input-group.has-validation .form-control:invalid ~ .invalid-feedback,
+.adminux-app .was-validated .input-group .form-control:invalid ~ .invalid-feedback {
+  display: block;
+}
+
+.adminux-app .was-validated .form-check-input:valid {
+  border-color: var(--aux-success);
+  accent-color: var(--aux-success);
+}
+
+.adminux-app .was-validated .form-check-input:invalid {
+  border-color: var(--aux-danger);
+  accent-color: var(--aux-danger);
+}
+
+.adminux-app .valid-tooltip,
+.adminux-app .invalid-tooltip {
+  position: absolute;
+  top: 100%;
+  z-index: 5;
+  display: none;
+  max-width: 100%;
+  padding: 0.35rem 0.6rem;
+  margin-top: 0.2rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #fff;
+  border-radius: 0.5rem;
+  white-space: nowrap;
+}
+
+.adminux-app .valid-tooltip {
+  background: var(--aux-success);
+}
+
+.adminux-app .invalid-tooltip {
+  background: var(--aux-danger);
+}
+
+.adminux-app .was-validated .form-control:valid ~ .valid-tooltip,
+.adminux-app .form-control.is-valid ~ .valid-tooltip,
+.adminux-app .was-validated .form-select:valid ~ .valid-tooltip {
+  display: block;
+}
+
+.adminux-app .was-validated .form-control:invalid ~ .invalid-tooltip,
+.adminux-app .form-control.is-invalid ~ .invalid-tooltip,
+.adminux-app .was-validated .form-select:invalid ~ .invalid-tooltip,
+.adminux-app .input-group .form-control:invalid ~ .invalid-tooltip {
+  display: block;
+}
+
+.adminux-app .position-relative {
+  position: relative;
+}
+
+.adminux-app .needs-validation .row,
+.adminux-app form.row.g-3 {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.85rem;
+}
+
+.adminux-app .g-3 > [class*="col-"] {
+  flex: 1 1 100%;
+}
+
+@media (min-width: 768px) {
+  .adminux-app .col-md-3 {
+    flex: 1 1 calc(25% - 0.85rem);
+    max-width: calc(25% - 0.85rem);
+  }
+  .adminux-app .col-md-4 {
+    flex: 1 1 calc(33.333% - 0.85rem);
+    max-width: calc(33.333% - 0.85rem);
+  }
+  .adminux-app .col-md-6 {
+    flex: 1 1 calc(50% - 0.85rem);
+    max-width: calc(50% - 0.85rem);
+  }
+}
+
+.adminux-app .col-12 {
+  flex: 1 1 100%;
+  max-width: 100%;
+}
+
+/* Bootstrap Icons accent helpers */
+.adminux-app .bi {
+  line-height: 1;
+  vertical-align: -0.125em;
+}
+
+.adminux-app .btn .bi {
+  margin-right: 0.3rem;
+}
+
+/* —— SmartWizard (AdminUX dots theme) —— */
+.adminux-app .aux-smartwizard.card,
+.adminux-app .aux-smartwizard {
+  background: #fff;
+  border: 1px solid var(--aux-border);
+  border-radius: 1.1rem;
+  box-shadow: 0 10px 28px rgba(16, 24, 40, 0.06);
+}
+
+.adminux-app .aux-smartwizard .card-body {
+  padding: 1.25rem 1.35rem 0.5rem;
+}
+
+.adminux-app .aux-smartwizard .overflow-hidden {
+  overflow: hidden;
+}
+
+.adminux-app .aux-smartwizard.mb-4 {
+  margin-bottom: 1.25rem;
+}
+
+.adminux-app .aux-sw-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0;
+  list-style: none;
+  margin: 0;
+  padding: 1.1rem 1rem 0.85rem;
+  border-bottom: 1px solid rgba(16, 24, 40, 0.06);
+  position: relative;
+}
+
+.adminux-app .aux-sw-nav::before {
+  content: "";
+  position: absolute;
+  left: 2.4rem;
+  right: 2.4rem;
+  top: calc(1.1rem + 1.15rem);
+  height: 2px;
+  background: rgba(59, 110, 245, 0.14);
+  z-index: 0;
+}
+
+.adminux-app .aux-sw-nav .nav-item {
+  flex: 1 1 0;
+  min-width: 9rem;
+  z-index: 1;
+}
+
+.adminux-app .aux-sw-nav .nav-link {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.7rem;
+  width: 100%;
+  padding: 0.35rem 0.6rem;
+  border: 0;
+  background: transparent;
+  text-align: left;
+  color: var(--aux-muted);
+  cursor: pointer;
+}
+
+.adminux-app .aux-sw-nav .nav-link .num {
+  width: 2.3rem;
+  height: 2.3rem;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 0.95rem;
+  color: #fff;
+  background: #9bb6f8;
+  box-shadow: 0 0 0 4px #fff;
+  flex-shrink: 0;
+}
+
+.adminux-app .aux-sw-nav .nav-link.active .num,
+.adminux-app .aux-sw-nav .nav-link.done .num {
+  background: linear-gradient(145deg, var(--aux-theme-1), var(--aux-theme-2));
+}
+
+.adminux-app .aux-sw-nav .nav-link .h5 {
+  font-size: 1rem;
+  font-weight: 800;
+  color: #101828;
+  margin: 0;
+}
+
+.adminux-app .aux-sw-nav .nav-link .small {
+  font-size: 0.78rem;
+  margin: 0.1rem 0 0;
+  line-height: 1.25;
+}
+
+.adminux-app .aux-sw-nav .nav-link.active .h5 {
+  color: var(--aux-theme-1);
+}
+
+.adminux-app .aux-smartwizard .avatar.avatar-140 {
+  width: 140px;
+  height: 140px;
+  margin-inline: auto;
+  position: relative;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(145deg, #dbe7ff, #f3e8ff);
+  overflow: visible;
+}
+
+.adminux-app .aux-smartwizard .avatar.avatar-140 img,
+.adminux-app .aux-sw-avatar-fallback {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--aux-theme-1);
+}
+
+.adminux-app .aux-smartwizard .avatar .btn-square {
+  position: absolute;
+  right: 0.15rem;
+  bottom: 0.15rem;
+  width: 2.2rem;
+  height: 2.2rem;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+}
+
+.adminux-app .aux-smartwizard .avatar .btn-square .bi {
+  margin: 0;
+}
+
+.adminux-app .aux-smartwizard .rounded-circle {
+  border-radius: 999px !important;
+}
+
+.adminux-app .aux-smartwizard .height-150 {
+  min-height: 150px;
+  height: 150px;
+}
+
+.adminux-app .aux-smartwizard .h5,
+.adminux-app .aux-smartwizard .h6 {
+  font-weight: 800;
+  color: #101828;
+}
+
+.adminux-app .aux-smartwizard .h6 {
+  font-size: 0.95rem;
+}
+
+.adminux-app .aux-smartwizard .row {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 0 -0.5rem;
+}
+
+.adminux-app .aux-smartwizard .row > [class*="col"] {
+  padding: 0 0.5rem;
+  box-sizing: border-box;
+}
+
+.adminux-app .aux-smartwizard .col {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.adminux-app .aux-smartwizard .col-auto {
+  flex: 0 0 auto;
+  width: auto;
+}
+
+.adminux-app .aux-smartwizard .col-12 {
+  flex: 0 0 100%;
+  max-width: 100%;
+}
+
+@media (min-width: 768px) {
+  .adminux-app .aux-smartwizard .col-md-6 {
+    flex: 0 0 50%;
+    max-width: 50%;
+  }
+}
+
+@media (min-width: 992px) {
+  .adminux-app .aux-smartwizard .col-lg-3 {
+    flex: 0 0 25%;
+    max-width: 25%;
+  }
+  .adminux-app .aux-smartwizard .col-lg-6 {
+    flex: 0 0 50%;
+    max-width: 50%;
+  }
+}
+
+@media (min-width: 1200px) {
+  .adminux-app .aux-smartwizard .col-xl-3 {
+    flex: 0 0 25%;
+    max-width: 25%;
+  }
+  .adminux-app .aux-smartwizard .col-xl-4 {
+    flex: 0 0 33.333%;
+    max-width: 33.333%;
+  }
+}
+
+.adminux-app .aux-smartwizard .align-items-center {
+  align-items: center;
+}
+
+.adminux-app .aux-smartwizard .text-center {
+  text-align: center;
+}
+
+.adminux-app .aux-smartwizard .mb-2 {
+  margin-bottom: 0.5rem;
+}
+.adminux-app .aux-smartwizard .mb-3 {
+  margin-bottom: 1rem;
+}
+.adminux-app .aux-smartwizard .mt-2 {
+  margin-top: 0.5rem;
+}
+.adminux-app .aux-smartwizard .mt-3 {
+  margin-top: 1rem;
+}
+.adminux-app .aux-smartwizard .py-2 {
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+.adminux-app .aux-smartwizard .px-0 {
+  padding-left: 0;
+  padding-right: 0;
+}
+.adminux-app .aux-smartwizard .pb-0 {
+  padding-bottom: 0;
+}
+.adminux-app .aux-smartwizard .rounded {
+  border-radius: 0.85rem;
+}
+.adminux-app .aux-smartwizard .rounded-0 {
+  border-radius: 0 !important;
+}
+
+.adminux-app .btn-outline-accent {
+  color: var(--aux-accent);
+  border: 1px solid rgba(255, 107, 157, 0.45);
+  background: #fff;
+  font-weight: 700;
+}
+.adminux-app .btn-outline-accent:hover {
+  background: rgba(255, 107, 157, 0.1);
+}
+
+.adminux-app .bg-theme-1-subtle {
+  background: rgba(59, 110, 245, 0.1);
+}
+
+.adminux-app .bg-theme-accent-l-gradient {
+  background: linear-gradient(90deg, #7c5cff, #ff4fd8) !important;
+}
+
+.adminux-app .aux-sw-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.85rem 1.25rem 1rem;
+  border-top: 1px solid rgba(16, 24, 40, 0.06);
+}
+
+.adminux-app .aux-sw-toolbar .float-start {
+  float: none;
+}
+
+.adminux-app .aux-sw-toolbar-end {
+  display: flex;
+  gap: 0.55rem;
+  margin-left: auto;
+}
+
+.adminux-app .aux-smartwizard > .progress {
+  height: 6px;
+  border-radius: 0;
+  background: rgba(124, 92, 255, 0.12);
+}
+
+.adminux-app .aux-smartwizard > .progress .progress-bar {
+  border-radius: 0;
+  transition: width 0.35s ease;
+}
+
+.adminux-app .aux-sw-service {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+  padding: 0.9rem 1rem;
+  margin-bottom: 0.75rem;
+  border-radius: 0.9rem;
+  border: 1px solid rgba(16, 24, 40, 0.08);
+  background: #f8fafc;
+  cursor: pointer;
+}
+
+.adminux-app .aux-sw-service.is-on {
+  background: rgba(59, 110, 245, 0.08);
+  border-color: rgba(59, 110, 245, 0.28);
+}
+
+.adminux-app .aux-sw-service strong {
+  display: block;
+  font-size: 0.95rem;
+}
+
+.adminux-app .aux-sw-service small {
+  display: block;
+  color: var(--aux-muted);
+  margin-top: 0.15rem;
+}
+
+.adminux-app .aux-sw-saved {
+  color: var(--aux-success);
+  font-weight: 700;
+}
+
+/* progressbar.js wrappers */
+.adminux-app .aux-pb-circle {
+  width: 110px;
+  height: 110px;
+  margin: 0 auto;
+}
+
+.adminux-app .aux-pb-circle svg {
+  height: 100%;
+  width: 100%;
+}
+
+.adminux-app .aux-pb-circle .progressbar-text {
+  font-weight: 800;
+  font-size: 1.15rem;
+  color: #101828 !important;
+}
+
+.adminux-app .aux-pb-label {
+  text-align: center;
+  margin: 0.55rem 0 0;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--aux-muted);
+}
+
+.adminux-app .aux-pb-label--left {
+  text-align: left;
+  margin-bottom: 0.35rem;
+}
+
+.adminux-app .aux-pb-line-wrap {
+  position: relative;
+  padding-top: 0.35rem;
+}
+
+.adminux-app .aux-pb-line {
+  height: 8px;
+  position: relative;
+}
+
+.adminux-app .aux-pb-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+@media (max-width: 640px) {
+  .adminux-app .aux-sw-nav::before {
+    display: none;
+  }
+  .adminux-app .aux-pb-grid {
+    grid-template-columns: 1fr;
+  }
+}

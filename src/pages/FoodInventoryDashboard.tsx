@@ -184,11 +184,14 @@ export function FoodInventoryDashboard() {
   }, []);
 
   const kioskShell = useKioskShell();
+  const setKioskShellActions = kioskShell?.setActions;
+  const clearKioskShellActions = kioskShell?.clearActions;
+
   useEffect(() => {
-    if (!kioskShell) {
+    if (!setKioskShellActions || !clearKioskShellActions) {
       return;
     }
-    kioskShell.setActions({
+    setKioskShellActions({
       searchPlaceholder: "Search pantry…",
       searchValue: search,
       onSearchChange: setSearch,
@@ -198,8 +201,8 @@ export function FoodInventoryDashboard() {
       addLabel: "Add item",
       onAdd: () => document.getElementById("food-inv-add-trigger")?.click(),
     });
-    return () => kioskShell.clearActions();
-  }, [kioskShell, search]);
+    return () => clearKioskShellActions();
+  }, [clearKioskShellActions, search, setKioskShellActions]);
 
   useEffect(() => {
     trackCardFilter("pantry:food-inventory", boardChip);
@@ -222,32 +225,8 @@ export function FoodInventoryDashboard() {
         </p>
       ) : null}
 
-      <AIInsights
-        surface="pantry:food-inventory"
-        suggestions={pantryAi.suggestions}
-        smartGroceryList={pantryAi.smartGroceryList}
-        aiFilter={aiFilter}
-        onAiFilterChange={(f) => {
-          if (f === "expiring") {
-            setBoardChip("use_first");
-          } else if (f === "low_stock") {
-            setBoardChip("low_stock");
-          } else if (f === "expired") {
-            setBoardChip("expired");
-          } else {
-            setBoardChip("all");
-          }
-        }}
-        categories={categories}
-        categoryFilter={categoryFilter}
-        onCategoryFilterChange={setCategoryFilter}
-        onMarkItemUsed={handleMarkUsed}
-        onCopyGroceryList={pantryAi.formatGroceryListText}
-        onSuggestionActed={pantryAi.onSuggestionActed}
-      />
-
-      <div className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,280px)_1fr]">
-        <div className="min-w-0">
+      <div className="gf-food-inv-layout">
+        <div className="gf-food-inv-layout__tools min-w-0">
           <InventoryActions
             search={search}
             onSearchChange={setSearch}
@@ -276,7 +255,7 @@ export function FoodInventoryDashboard() {
           />
         </div>
 
-        <div className="min-w-0">
+        <div className="gf-food-inv-layout__inventory min-w-0">
           <PantryFilterBar active={boardChip} onChange={setBoardChip} />
           <PantryGrid
             items={items}
@@ -287,8 +266,36 @@ export function FoodInventoryDashboard() {
             onReorder={handleReorder}
             onAddToShopping={handleAddToShopping}
             onScanRequest={() => setShowScan(true)}
+            variant="inventory"
+            groupByCategory
           />
         </div>
+
+        <aside className="gf-food-inv-layout__insights min-w-0" aria-label="Pantry insights">
+          <AIInsights
+            surface="pantry:food-inventory"
+            suggestions={pantryAi.suggestions}
+            smartGroceryList={pantryAi.smartGroceryList}
+            aiFilter={aiFilter}
+            onAiFilterChange={(f) => {
+              if (f === "expiring") {
+                setBoardChip("use_first");
+              } else if (f === "low_stock") {
+                setBoardChip("low_stock");
+              } else if (f === "expired") {
+                setBoardChip("expired");
+              } else {
+                setBoardChip("all");
+              }
+            }}
+            categories={categories}
+            categoryFilter={categoryFilter}
+            onCategoryFilterChange={setCategoryFilter}
+            onMarkItemUsed={handleMarkUsed}
+            onCopyGroceryList={pantryAi.formatGroceryListText}
+            onSuggestionActed={pantryAi.onSuggestionActed}
+          />
+        </aside>
       </div>
 
       <PantryBoardEditSheet

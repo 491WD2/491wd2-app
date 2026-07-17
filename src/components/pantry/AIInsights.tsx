@@ -1,4 +1,12 @@
-import { Brain, ClipboardCopy, PackageMinus, ShoppingCart, Sparkles } from "lucide-react";
+import {
+  AlertTriangle,
+  Brain,
+  ClipboardCopy,
+  ListChecks,
+  PackageMinus,
+  ShoppingCart,
+  Sparkles,
+} from "lucide-react";
 import { useEffect, useState } from "react";
 import type { PantryAIFilter, PantryAISuggestion, SmartGroceryLine } from "../../types/pantryInsights";
 import { cn } from "../../lib/utils";
@@ -87,68 +95,94 @@ export function AIInsights({
   }
 
   return (
-    <section
-      className="wd-food-inv-ai rounded-[10px] border border-[#ededed] bg-white p-4 shadow-[0_1px_1px_rgba(0,0,0,0.08)]"
-      aria-label="Pantry AI insights"
-    >
-      <div className="flex items-start gap-3">
-        <span
-          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[8px] bg-gradient-to-br from-[#735DFF]/15 to-[#FF4B6C]/10 text-[#735DFF]"
-          aria-hidden
-        >
-          <Brain className="h-5 w-5" />
-        </span>
-        <div className="min-w-0 flex-1">
-          <h2 className="text-[15px] font-bold text-[#1f1f1f]">AI insights</h2>
-          <p className="mt-0.5 text-[12px] text-[#637381]">
-            Use-first ordering, low-stock alerts, and a smart grocery list from usage patterns.
-          </p>
+    <section className="wd-food-inv-ai" aria-label="Pantry AI insights">
+      <div className="wd-food-inv-ai__hero">
+        <div className="wd-food-inv-ai__hero-head">
+          <span className="wd-food-inv-ai__icon" aria-hidden>
+            <Brain className="h-4 w-4" />
+          </span>
+          <div className="min-w-0 flex-1">
+            <p className="wd-food-inv-ai__eyebrow">Support rail</p>
+            <h2 className="wd-food-inv-ai__title">Pantry health</h2>
+          </div>
+        </div>
+        <p className="wd-food-inv-ai__summary">
+          Use-first ordering, low-stock alerts, and smart grocery reminders.
+        </p>
+      </div>
+
+      <div className="wd-food-inv-ai__stats" aria-label="Pantry insight summary">
+        <div className="wd-food-inv-ai__stat">
+          <span className="wd-food-inv-ai__stat-icon wd-food-inv-ai__stat-icon--warm" aria-hidden>
+            <AlertTriangle className="h-3.5 w-3.5" />
+          </span>
+          <span>
+            <span className="wd-food-inv-ai__stat-value">
+              {visible.filter((s) => s.priority === "high").length}
+            </span>
+            <span className="wd-food-inv-ai__stat-label">Need attention</span>
+          </span>
+        </div>
+        <div className="wd-food-inv-ai__stat">
+          <span className="wd-food-inv-ai__stat-icon wd-food-inv-ai__stat-icon--cool" aria-hidden>
+            <ListChecks className="h-3.5 w-3.5" />
+          </span>
+          <span>
+            <span className="wd-food-inv-ai__stat-value">{smartGroceryList.length}</span>
+            <span className="wd-food-inv-ai__stat-label">Smart list</span>
+          </span>
         </div>
       </div>
 
-      <div className="mt-4 flex flex-wrap gap-2" role="toolbar" aria-label="Inventory filters">
-        {FILTER_CHIPS.map((chip) => (
-          <button
-            key={chip.id}
-            type="button"
-            className={cn(
-              "rounded-full border px-3 py-1 text-[12px] font-semibold transition",
-              aiFilter === chip.id
-                ? "border-[#735DFF] bg-[#735DFF]/10 text-[#4c3d99]"
-                : "border-[#ededed] bg-[#f8f9fa] text-[#637381] hover:bg-white",
-            )}
-            aria-pressed={aiFilter === chip.id}
-            onClick={() => onAiFilterChange(chip.id)}
-          >
-            {chip.label}
-          </button>
-        ))}
-        {categories.length > 0 ? (
-          <select
-            className="min-h-8 rounded-full border border-[#ededed] bg-white px-3 text-[12px] font-medium text-[#1f1f1f]"
-            value={categoryFilter ?? ""}
-            onChange={(e) => onCategoryFilterChange(e.target.value || null)}
-            aria-label="Filter by category"
-          >
-            <option value="">All categories</option>
-            {categories.map((cat) => (
-              <option key={cat} value={cat}>
-                {cat}
-              </option>
-            ))}
-          </select>
-        ) : null}
+      <div className="wd-food-inv-ai__filter-card">
+        <p className="wd-food-inv-ai__section-label">Focus</p>
+        <div className="wd-food-inv-ai__filters" role="toolbar" aria-label="Inventory filters">
+          {FILTER_CHIPS.map((chip) => (
+            <button
+              key={chip.id}
+              type="button"
+              className={cn(
+                "wd-food-inv-ai__filter-chip",
+                aiFilter === chip.id && "wd-food-inv-ai__filter-chip--active",
+              )}
+              aria-pressed={aiFilter === chip.id}
+              onClick={() => onAiFilterChange(chip.id)}
+            >
+              {chip.label}
+            </button>
+          ))}
+          {categories.length > 0 ? (
+            <select
+              className="wd-food-inv-ai__category-select"
+              value={categoryFilter ?? ""}
+              onChange={(e) => onCategoryFilterChange(e.target.value || null)}
+              aria-label="Filter by category"
+            >
+              <option value="">All categories</option>
+              {categories.map((cat) => (
+                <option key={cat} value={cat}>
+                  {cat}
+                </option>
+              ))}
+            </select>
+          ) : null}
+        </div>
       </div>
 
       {copyMsg ? (
-        <p className="mt-3 text-[12px] font-semibold text-emerald-700" role="status">
+        <p className="wd-food-inv-ai__copy-status" role="status">
           {copyMsg}
         </p>
       ) : null}
 
-      <ul className="mt-4 space-y-2">
+      <div className="wd-food-inv-ai__section-head">
+        <p className="wd-food-inv-ai__section-label">Insights</p>
+        <span className="wd-food-inv-ai__count-pill">{visible.length}</span>
+      </div>
+
+      <ul className="wd-food-inv-ai__suggestions">
         {visible.length === 0 ? (
-          <li className="rounded-[8px] border border-dashed border-[#ededed] px-3 py-4 text-center text-[13px] text-[#637381]">
+          <li className="wd-food-inv-ai__empty">
             No suggestions right now — stock looks good.
           </li>
         ) : (
@@ -158,24 +192,24 @@ export function AIInsights({
               <li
                 key={suggestion.id}
                 className={cn(
-                  "rounded-[8px] border p-3",
-                  suggestion.priority === "high"
-                    ? "border-[#fecaca] bg-[#fffbfb]"
-                    : "border-[#ededed] bg-[#fafafa]",
+                  "wd-food-inv-ai__suggestion",
+                  suggestion.priority === "high" && "wd-food-inv-ai__suggestion--high",
                 )}
               >
-                <div className="flex items-start gap-2">
-                  <Icon className="mt-0.5 h-4 w-4 shrink-0 text-[#735DFF]" aria-hidden />
-                  <div className="min-w-0 flex-1">
-                    <p className="text-[13px] font-semibold text-[#1f1f1f]">{suggestion.title}</p>
-                    <p className="mt-0.5 text-[12px] leading-snug text-[#637381]">
+                <div className="wd-food-inv-ai__suggestion-row">
+                  <span className="wd-food-inv-ai__suggestion-icon" aria-hidden>
+                    <Icon className="h-3.5 w-3.5" />
+                  </span>
+                  <div className="wd-food-inv-ai__suggestion-body">
+                    <p className="wd-food-inv-ai__suggestion-title">{suggestion.title}</p>
+                    <p className="wd-food-inv-ai__suggestion-detail">
                       {suggestion.detail}
                     </p>
-                    <div className="mt-2 flex flex-wrap gap-2">
+                    <div className="wd-food-inv-ai__actions">
                       {suggestion.actionLabel ? (
                         <button
                           type="button"
-                          className="rounded-[6px] bg-[#735DFF] px-2.5 py-1 text-[11px] font-semibold text-white hover:brightness-105"
+                          className="wd-food-inv-ai__action wd-food-inv-ai__action--primary"
                           onClick={() => handleAction(suggestion)}
                         >
                           {suggestion.actionLabel}
@@ -183,7 +217,7 @@ export function AIInsights({
                       ) : null}
                       <button
                         type="button"
-                        className="rounded-[6px] border border-[#ededed] px-2.5 py-1 text-[11px] font-medium text-[#637381] hover:bg-white"
+                        className="wd-food-inv-ai__action"
                         onClick={() => dismiss(suggestion.id, suggestion.kind)}
                       >
                         Dismiss
@@ -198,14 +232,14 @@ export function AIInsights({
       </ul>
 
       {smartGroceryList.length > 0 ? (
-        <div className="mt-4 border-t border-[#ededed] pt-4">
-          <div className="flex items-center justify-between gap-2">
-            <h3 className="text-[12px] font-bold uppercase tracking-wide text-[#637381]">
+        <div className="wd-food-inv-ai__smart-card">
+          <div className="wd-food-inv-ai__smart-head">
+            <h3 className="wd-food-inv-ai__section-label">
               Smart grocery list
             </h3>
             <button
               type="button"
-              className="inline-flex items-center gap-1 rounded-[6px] border border-[#ededed] px-2 py-1 text-[11px] font-semibold text-[#1f1f1f] hover:bg-[#f8f9fa]"
+              className="wd-food-inv-ai__copy-btn"
               onClick={() => {
                 const text = onCopyGroceryList();
                 void navigator.clipboard?.writeText(text);
@@ -217,11 +251,11 @@ export function AIInsights({
               Copy
             </button>
           </div>
-          <ul className="mt-2 max-h-36 space-y-1 overflow-y-auto text-[12px] text-[#1f1f1f]">
+          <ul className="wd-food-inv-ai__smart-list">
             {smartGroceryList.map((line) => (
-              <li key={line.id} className="flex justify-between gap-2 border-b border-[#f1f5f9] py-1">
+              <li key={line.id}>
                 <span>{line.name}</span>
-                <span className="shrink-0 text-[#637381]">
+                <span>
                   {line.suggestedQty} {line.unit}
                 </span>
               </li>

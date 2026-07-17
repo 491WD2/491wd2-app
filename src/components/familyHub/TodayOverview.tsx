@@ -2,29 +2,27 @@ import { KioskCardGrid, KioskStatCard } from "../cards/Card";
 import "../cards/kiosk.css";
 import type { FamilyHubTodayOverview } from "../../lib/familyHubDashboardData";
 import { FAMILY_HUB_ANALYTICS_SURFACE } from "../../lib/familyHubDashboardAnalytics";
-import { WidgetCard, WidgetHeader } from "../widgets";
+import { WidgetCard } from "../widgets";
 
 export type TodayOverviewProps = {
   overview: FamilyHubTodayOverview;
   householdName: string;
-  greeting: string;
 };
 
-export function TodayOverview({ overview, householdName, greeting }: TodayOverviewProps) {
+export function TodayOverview({ overview, householdName }: TodayOverviewProps) {
   return (
-    <WidgetCard
-      aria-label="Today's overview"
-      header={
-        <WidgetHeader
-          emoji="☀️"
-          title={greeting}
-          subtitle={`${householdName} · ${overview.dateLabel}`}
-        />
-      }
-    >
-      <KioskCardGrid columns={4} aria-label="Today at a glance">
+    <WidgetCard className="fh-family-hub__today-card fh-family-hub__surface-card" aria-label="Today's overview">
+      <div className="fh-family-hub__snapshot-head">
+        <div>
+          <p className="fh-family-hub__snapshot-eyebrow">Today snapshot</p>
+          <h2>Household pulse</h2>
+        </div>
+        <p>{householdName} · {overview.dateLabel}</p>
+      </div>
+      <KioskCardGrid columns={4} className="fh-family-hub__snapshot-grid" aria-label="Today at a glance">
         <li>
           <KioskStatCard
+            className="fh-family-hub__stat-card"
             label="Chores today"
             value={overview.choresDueToday}
             emoji="🧹"
@@ -34,6 +32,7 @@ export function TodayOverview({ overview, householdName, greeting }: TodayOvervi
         </li>
         <li>
           <KioskStatCard
+            className="fh-family-hub__stat-card"
             label="Overdue"
             value={overview.choresOverdue}
             emoji="⚠️"
@@ -43,35 +42,7 @@ export function TodayOverview({ overview, householdName, greeting }: TodayOvervi
         </li>
         <li>
           <KioskStatCard
-            label="Expiring"
-            value={overview.expiringFood}
-            emoji="⏳"
-            category="pantry"
-            analyticsSurface={FAMILY_HUB_ANALYTICS_SURFACE}
-          />
-        </li>
-        <li>
-          <KioskStatCard
-            label="Low stock"
-            value={overview.lowStock}
-            emoji="📦"
-            category="pantry"
-            analyticsSurface={FAMILY_HUB_ANALYTICS_SURFACE}
-          />
-        </li>
-      </KioskCardGrid>
-      <KioskCardGrid columns={3} className="mt-4" aria-label="Household pulse">
-        <li>
-          <KioskStatCard
-            label="Events ahead"
-            value={overview.upcomingEvents}
-            emoji="📅"
-            category="events"
-            analyticsSurface={FAMILY_HUB_ANALYTICS_SURFACE}
-          />
-        </li>
-        <li>
-          <KioskStatCard
+            className="fh-family-hub__stat-card"
             label="Shopping list"
             value={overview.shoppingOpen}
             emoji="🛒"
@@ -81,6 +52,17 @@ export function TodayOverview({ overview, householdName, greeting }: TodayOvervi
         </li>
         <li>
           <KioskStatCard
+            className="fh-family-hub__stat-card"
+            label="Events ahead"
+            value={overview.upcomingEvents}
+            emoji="📅"
+            category="events"
+            analyticsSurface={FAMILY_HUB_ANALYTICS_SURFACE}
+          />
+        </li>
+        <li>
+          <KioskStatCard
+            className="fh-family-hub__stat-card"
             label="Alerts"
             value={overview.notifications}
             emoji="🔔"

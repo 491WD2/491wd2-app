@@ -1,24 +1,23 @@
-import { LayoutDashboard, PanelLeftClose, PanelLeftOpen, Sparkles } from "lucide-react";
+import { PanelLeftClose, PanelLeftOpen } from "lucide-react";
 import type { AdminSettings, ModuleKey } from "../../data/familyData";
+import {
+  FeatherIconTile,
+  ROUTE_FEATHER_ICONS,
+  ROUTE_FEATHER_TONES,
+} from "../icons/FeatherIcon";
 import { ThemeToggle } from "../theme/ThemeToggle";
 import { cn } from "../../lib/utils";
 import {
   SMARTHR_SIDEBAR_ACTIVE_ROW,
-  SMARTHR_SIDEBAR_ACTIVE_TEXT,
   SMARTHR_SIDEBAR_ASIDE,
   SMARTHR_SIDEBAR_BRAND_CARD,
   SMARTHR_SIDEBAR_COLLAPSED_RULE,
   SMARTHR_SIDEBAR_DIVIDER,
   SMARTHR_SIDEBAR_GROUP_LABEL,
-  SMARTHR_SIDEBAR_ICON_GROUP_HOVER,
-  SMARTHR_SIDEBAR_ICON_MUTED,
   SMARTHR_SIDEBAR_LOGO_TILE,
   SMARTHR_SIDEBAR_NAV_ROW_BASE,
   SMARTHR_SIDEBAR_ROW_HOVER,
   SMARTHR_SIDEBAR_ROW_LABEL_IDLE,
-  SMARTHR_SIDEBAR_TEXT_HOUSEHOLD,
-  SMARTHR_SIDEBAR_TEXT_PRIMARY,
-  SMARTHR_SIDEBAR_TEXT_TAGLINE,
   SMARTHR_SIDEBAR_TOGGLE_BTN,
 } from "../../lib/smarthrUi";
 import {
@@ -44,10 +43,10 @@ type Props = {
 
 const NAV_LABEL: Partial<Record<RouteKey, string>> = {
   dashboard: "Home",
+  adminux: "Command Center",
   shopping: "Shopping",
-  pantry: "Pantry & Inventory",
+  pantry: "Inventory",
   calendar: "Calendar",
-  messages: "Messages",
   notifications: "Notifications",
   subscriptions: "Subscriptions",
   tasks: "Cleaning",
@@ -73,7 +72,7 @@ function routeVisible(
   }
   return (
     key === "dashboard" ||
-    key === "messages" ||
+    key === "adminux" ||
     key === "settings" ||
     moduleVisibility?.[key as ModuleKey] !== false
   );
@@ -100,19 +99,10 @@ export function SidebarNav({
       collapsed
         ? isActive
           ? SMARTHR_SIDEBAR_ACTIVE_ROW
-          : cn(SMARTHR_SIDEBAR_ICON_MUTED, SMARTHR_SIDEBAR_ROW_HOVER)
+          : cn(SMARTHR_SIDEBAR_ROW_LABEL_IDLE, SMARTHR_SIDEBAR_ROW_HOVER)
         : isActive
           ? cn("border-transparent", SMARTHR_SIDEBAR_ACTIVE_ROW)
           : cn("border-transparent", SMARTHR_SIDEBAR_ROW_LABEL_IDLE, SMARTHR_SIDEBAR_ROW_HOVER),
-    );
-  }
-
-  function iconClass(isActive: boolean) {
-    return cn(
-      "h-4 w-4 shrink-0 transition-colors",
-      isActive
-        ? SMARTHR_SIDEBAR_ACTIVE_TEXT
-        : cn(SMARTHR_SIDEBAR_ICON_MUTED, SMARTHR_SIDEBAR_ICON_GROUP_HOVER),
     );
   }
 
@@ -120,9 +110,10 @@ export function SidebarNav({
     const route = routes.find((r) => r.key === key);
     if (!route || !isSidebarRoute(key) || !routeVisible(key, moduleVisibility)) return null;
     if (restrictChildNavigation && (key === "settings" || key === "subscriptions")) return null;
-    const Icon = route.icon;
     const label = NAV_LABEL[key] ?? routeLabels?.[key] ?? route.label;
     const isActive = activeRoute === key;
+    const feather = ROUTE_FEATHER_ICONS[key] ?? "grid";
+    const tone = ROUTE_FEATHER_TONES[key] ?? "cyan";
     return (
       <button
         key={key}
@@ -132,7 +123,7 @@ export function SidebarNav({
         onClick={() => onRouteChange(key)}
         className={navRowClass(Boolean(isActive))}
       >
-        <Icon className={iconClass(Boolean(isActive))} aria-hidden />
+        <FeatherIconTile name={feather} tone={tone} size={16} />
         <span className={cn(!collapsed ? "truncate" : "sr-only")}>{label}</span>
       </button>
     );
@@ -165,20 +156,22 @@ export function SidebarNav({
     >
       <div
         className={cn(
+          "adminux-brand-card flex",
           SMARTHR_SIDEBAR_BRAND_CARD,
           collapsed ? "flex-col items-center gap-2 px-2 py-3" : "items-center gap-3 px-3 py-3",
         )}
       >
-        <span className={SMARTHR_SIDEBAR_LOGO_TILE}>
-          <Sparkles className="h-5 w-5" aria-hidden />
+        <span className={cn(SMARTHR_SIDEBAR_LOGO_TILE, "overflow-visible bg-transparent p-0 shadow-none")} aria-hidden>
+          <FeatherIconTile name="home" tone="cyan" size={18} />
         </span>
         {!collapsed ? (
-          <div className="min-w-0 flex-1">
-            <p className={SMARTHR_SIDEBAR_TEXT_PRIMARY}>Household</p>
-            <p className={SMARTHR_SIDEBAR_TEXT_TAGLINE}>Family Hub</p>
-            {householdName ? (
-              <p className={SMARTHR_SIDEBAR_TEXT_HOUSEHOLD}>{householdName}</p>
-            ) : null}
+          <div className="min-w-0 flex-1 d-inline-block">
+            <p className="company-name">
+              <b>Family</b>Hub
+            </p>
+            <p className="company-tagline">
+              {householdName ? householdName : "Household command center"}
+            </p>
           </div>
         ) : null}
       </div>
@@ -205,9 +198,9 @@ export function SidebarNav({
         className="flex flex-1 flex-col gap-6 pb-4"
         aria-label="Primary sidebar"
       >
-        {renderGroup("Home", ["dashboard"], { isFirst: true })}
+        {renderGroup("Home", ["adminux", "dashboard"], { isFirst: true })}
         {renderGroup("Household", ["shopping", "pantry", "calendar"])}
-        {renderGroup("Messages", ["messages", "notifications", "subscriptions"])}
+        {renderGroup("Updates", ["notifications", "subscriptions"])}
         {renderGroup("Cleaning", ["tasks", "pets"])}
         {renderGroup("System", ["settings"])}
 
@@ -220,10 +213,7 @@ export function SidebarNav({
               onClick={() => onRouteChange("kiosk")}
               className={navRowClass((activeRoute as ShellRoute) === "kiosk")}
             >
-              <LayoutDashboard
-                className={iconClass((activeRoute as ShellRoute) === "kiosk")}
-                aria-hidden
-              />
+              <FeatherIconTile name="monitor" tone="cyan" size={16} />
               <span className={cn(!collapsed ? "truncate" : "sr-only")}>Wall display</span>
             </button>
           </div>

@@ -59,8 +59,6 @@ function shellRouteToLayoutKey(route: ShellRoute | string): PageLayoutRouteKey |
   switch (route) {
     case "dashboard":
       return "home";
-    case "messages":
-      return "messages";
     case "calendar":
     case "planner":
       return "calendar";

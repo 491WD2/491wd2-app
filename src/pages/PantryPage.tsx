@@ -1,100 +1,59 @@
-import { lazy, Suspense, useCallback } from "react";
-import { WidgetPageShell } from "../components/widgets";
 import PantryTabPage from "./PantryTabPage";
 import type { PageProps } from "./pageTypes";
 
-type PantrySurface = "kiosk" | "advanced";
+type PantryInitialScreen =
+  | "home"
+  | "inventory"
+  | "fridges"
+  | "freezers"
+  | "pantryLocation"
+  | "homeLocation"
+  | "foodStorage"
+  | "settings";
 
-const FoodInventoryDashboardLazy = lazy(() =>
-  import("./FoodInventoryDashboard").then((m) => ({
-    default: m.FoodInventoryDashboard,
-  })),
-);
-
-function PantryAdvancedFallback() {
-  return (
-    <div className="wd-pantry-empty" role="status">
-      <p className="wd-pantry-empty__title">Loading food inventory…</p>
-    </div>
-  );
-}
-
-function resolvePantrySurface(search: string | undefined): PantrySurface {
+function resolvePantryInitialScreen(search: string | undefined): PantryInitialScreen {
   const raw = search?.startsWith("?") ? search.slice(1) : search ?? "";
   const params = new URLSearchParams(raw);
-  return params.get("view") === "pantry" ? "advanced" : "kiosk";
-}
-
-function pantrySurfaceHref(surface: PantrySurface, search: string | undefined): string {
-  const raw = search?.startsWith("?") ? search.slice(1) : search ?? "";
-  const params = new URLSearchParams(raw);
-  params.delete("view");
-  if (surface === "advanced") {
-    params.set("view", "pantry");
+  const view = params.get("view");
+  if (view === "pantry") {
+    return "pantryLocation";
   }
-  const query = params.toString();
-  return query ? `/pantry?${query}` : "/pantry";
+  if (view === "fridges") {
+    return "fridges";
+  }
+  if (view === "freezers") {
+    return "freezers";
+  }
+  if (view === "home") {
+    return "homeLocation";
+  }
+  if (view === "inventory") {
+    return "inventory";
+  }
+  if (view === "food-storage") {
+    return "foodStorage";
+  }
+  if (view === "settings") {
+    return "settings";
+  }
+  return "inventory";
 }
 
 /**
- * `/pantry` entry for CurrentBuild — kiosk inventory by default, advanced module optional.
+ * `/pantry` entry for CurrentBuild.
+ * The default `/pantry` route opens the Inventory hub. Legacy location routes
+ * such as `/pantry?view=pantry` continue to deep-link into inventory sections.
  */
 export function PantryPage(props: PageProps) {
-  const surface = resolvePantrySurface(props.inventorySearch);
-
-  const setSurface = useCallback(
-    (next: PantrySurface) => {
-      props.navigateWithinApp?.(pantrySurfaceHref(next, props.inventorySearch));
-    },
-    [props.inventorySearch, props.navigateWithinApp],
-  );
+  const initialScreen = resolvePantryInitialScreen(props.inventorySearch);
 
   return (
-    <div
-      className={
-        surface === "kiosk"
-          ? "wd-pantry-route wd-pantry-route--kiosk"
-          : "wd-pantry-route wd-pantry-route--advanced"
-      }
-    >
-      <div className="wd-pantry-surface-toggle" role="tablist" aria-label="Pantry view">
-        <button
-          type="button"
-          role="tab"
-          className={
-            surface === "kiosk"
-              ? "wd-pantry-surface-toggle__btn wd-pantry-surface-toggle__btn--active"
-              : "wd-pantry-surface-toggle__btn"
-          }
-          aria-selected={surface === "kiosk"}
-          onClick={() => setSurface("kiosk")}
-        >
-          Inventory Kiosk
-        </button>
-        <button
-          type="button"
-          role="tab"
-          className={
-            surface === "advanced"
-              ? "wd-pantry-surface-toggle__btn wd-pantry-surface-toggle__btn--active"
-              : "wd-pantry-surface-toggle__btn"
-          }
-          aria-selected={surface === "advanced"}
-          onClick={() => setSurface("advanced")}
-        >
-          Food inventory
-        </button>
-      </div>
-
-      {surface === "kiosk" ? (
-        <WidgetPageShell className="!min-h-0 !p-0 !bg-transparent">
-          <PantryTabPage onOpenShopping={props.onOpenShopping} />
-        </WidgetPageShell>
-      ) : (
-        <Suspense fallback={<PantryAdvancedFallback />}>
-          <FoodInventoryDashboardLazy />
-        </Suspense>
-      )}
+    <div className="wd-pantry-route wd-pantry-route--kiosk">
+      <PantryTabPage
+        onOpenShopping={props.onOpenShopping}
+        navigateWithinApp={props.navigateWithinApp}
+        initialScreen={initialScreen}
+      />
     </div>
   );
 }

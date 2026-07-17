@@ -125,6 +125,30 @@ export const HOUSEHOLD_CHORE_DEFINITIONS: ChoreDefinition[] = [
     category: "deep-clean",
   },
   {
+    id: "rule-nox-monthly-entry-reset",
+    title: "Monthly entry deep clean",
+    room: "Entry",
+    frequency: "Monthly",
+    dayPattern: "monthly",
+    assignRule: "fixed",
+    fixedAssignee: "Nox",
+    category: "deep-clean",
+    notes: "Monthly owner clean when Nox does not have weekend kitchen duty.",
+    photoExampleUrl: "photo-example://entry-reset",
+  },
+  {
+    id: "rule-jeremiah-monthly-laundry-reset",
+    title: "Monthly laundry room deep clean",
+    room: "Laundry Room",
+    frequency: "Monthly",
+    dayPattern: "monthly",
+    assignRule: "fixed",
+    fixedAssignee: "Jeremiah",
+    category: "deep-clean",
+    notes: "Monthly owner clean when Jeremiah does not have weekend kitchen duty.",
+    photoExampleUrl: "photo-example://laundry-room-reset",
+  },
+  {
     id: "rule-dining-weekly",
     title: "Dining room clean",
     room: "Dining Room",
@@ -218,6 +242,21 @@ export const HOUSEHOLD_CHECKLISTS: Checklist[] = [
     notes: "Applies to all household members every day.",
   },
   {
+    id: "checklist-bedtime-double-check",
+    title: "Bedtime double check",
+    room: "Whole house",
+    items: [
+      "Kitchen counters are wiped if anyone made food",
+      "Sink and dishwasher are handled or clearly queued",
+      "Shared rooms are reset enough for morning",
+      "Doors, lights, and pet/household needs are checked",
+      "Anything left out is picked up, even if it is not yours",
+    ],
+    supplies: ["Phone/camera for examples", "Shared notes board"],
+    photoExamples: ["photo-example://bedtime-reset"],
+    notes: "A final family check so small misses do not become tomorrow's problem.",
+  },
+  {
     id: "checklist-kitchen-duty",
     title: "Kitchen duty checklist",
     room: "Kitchen",
@@ -231,6 +270,48 @@ export const HOUSEHOLD_CHECKLISTS: Checklist[] = [
     supplies: ["All-purpose cleaner", "Dish soap", "Trash bags"],
     photoExamples: [],
     notes: "Kitchen duty has priority over other chores that day.",
+  },
+  {
+    id: "checklist-stella-deep-mopping",
+    title: "Stella deep-clean mopping standard",
+    room: "Floors",
+    items: [
+      "Sweep or vacuum before mopping",
+      "Mop high-traffic areas weekly",
+      "Spot mop as needed",
+      "Take example photos when a floor is finished well",
+    ],
+    supplies: ["Mop", "Floor cleaner", "Vacuum or broom"],
+    photoExamples: ["photo-example://deep-mop-before", "photo-example://deep-mop-after"],
+    notes: "Stella owns deep-clean mopping weekly or as needed.",
+  },
+  {
+    id: "checklist-lorraine-pantry-organization",
+    title: "Lorraine pantry organization standard",
+    room: "Pantry",
+    items: [
+      "Group like items together",
+      "Check expired or nearly empty items",
+      "Make a note for improvements",
+      "Take example photos of the expected shelf layout",
+    ],
+    supplies: ["Labels", "Bins", "Phone/camera"],
+    photoExamples: ["photo-example://pantry-shelf-standard"],
+    notes: "Lorraine owns pantry organization.",
+  },
+  {
+    id: "checklist-herschel-family-room",
+    title: "Herschel family room standard",
+    room: "Family Room",
+    items: [
+      "Reset seating and blankets",
+      "Pick up personal items and dishes",
+      "Wipe surfaces as needed",
+      "Take example photos of the expected reset",
+    ],
+    supplies: ["Microfiber cloth", "All-purpose cleaner", "Phone/camera"],
+    photoExamples: ["photo-example://family-room-reset"],
+    notes: "Herschel owns the family room.",
   },
 ];
 
@@ -454,6 +535,13 @@ function isDefinitionDueOnDate(def: ChoreDefinition, iso: string): boolean {
   if (pattern === "alternating-living-bath") {
     return true;
   }
+  if (pattern === "monthly") {
+    const assignee = resolveAssignee(def, iso);
+    if (!assignee) {
+      return false;
+    }
+    return isFirstAvailableWeekendForMemberThisMonth(iso, assignee);
+  }
   if (pattern === "weekday-kitchen-rotation" || pattern === "weekend-kitchen-cycle") {
     return false;
   }
@@ -468,6 +556,30 @@ function isDefinitionDueOnDate(def: ChoreDefinition, iso: string): boolean {
   }
   if (def.assignRule === "stella-deep-mop" || def.assignRule === "lorraine-pantry" || def.assignRule === "herschel-family-room") {
     return dayOfWeek(iso) === 0;
+  }
+  return false;
+}
+
+function isFirstAvailableWeekendForMemberThisMonth(iso: string, member: HouseholdMember): boolean {
+  if (!isSaturday(iso) && !isSunday(iso)) {
+    return false;
+  }
+  if (getKitchenDutyAssignee(iso) === member) {
+    return false;
+  }
+
+  const current = parseIso(iso);
+  const firstOfMonth = new Date(current.getFullYear(), current.getMonth(), 1, 12);
+  for (let day = 1; day <= current.getDate(); day += 1) {
+    const candidate = new Date(current.getFullYear(), current.getMonth(), day, 12);
+    const candidateIso = candidate.toISOString().slice(0, 10);
+    if (
+      candidate >= firstOfMonth &&
+      (isSaturday(candidateIso) || isSunday(candidateIso)) &&
+      getKitchenDutyAssignee(candidateIso) !== member
+    ) {
+      return candidateIso === iso;
+    }
   }
   return false;
 }
@@ -529,7 +641,7 @@ export function applyKitchenDutyConflict(tasks: ChoreTask[], _iso: string): Chor
   }
 
   return tasks.map((task) => {
-    if (task.assignedTo !== kitchenAssignee || task.isKitchenDuty) {
+    if (task.assignedTo !== kitchenAssignee || task.isKitchenDuty || task.source === "personal") {
       return task;
     }
     if (task.status === "Done" || task.status === "Skipped") {

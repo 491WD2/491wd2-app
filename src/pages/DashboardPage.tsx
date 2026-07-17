@@ -1,10 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import type { MessageBoardItem, PantryItem, PlannerEvent } from "../data/familyData";
-import { MessageBoardDrawer } from "../components/messageBoard/MessageBoardDrawer";
-import { createEmptyMessageBoardItem } from "../lib/messageBoardUtils";
+import type { PantryItem, PlannerEvent } from "../data/familyData";
 import { dedupeNotificationsForDisplay } from "../lib/householdNotify";
-import { resolveSessionMemberIdForUi } from "../lib/familyDataSelectors";
-import { buildPersonalizedHomeGreeting } from "../lib/kioskGreeting";
 import { cn, findMemberById, getMemberFullName } from "../lib/utils";
 import {
   buildKitchenDutyReminderNotifications,
@@ -12,7 +8,7 @@ import {
   isKitchenDutyCompleteForDate,
 } from "../lib/kitchenDuty";
 import { prependNotifications } from "../lib/householdNotify";
-import { getAppDisplayName, getMessageBoardCategoryDefinitions } from "../lib/customization";
+import { getAppDisplayName } from "../lib/customization";
 import { DashboardHomeTopBar } from "../components/dashboard/DashboardHomeTopBar";
 import { DashboardHomeTodaySnapshot } from "../components/dashboard/DashboardHomeTodaySnapshot";
 import { DashboardHomeKitchenDutyCard } from "../components/dashboard/DashboardHomeKitchenDutyCard";
@@ -24,7 +20,6 @@ import { DashboardHomeCleaningCard } from "../components/dashboard/DashboardHome
 import { DashboardChoresDueTodayCard } from "../components/dashboard/DashboardChoresDueTodayCard";
 import { DashboardWeeklyResetCard } from "../components/dashboard/DashboardWeeklyResetCard";
 import { DashboardHubWeekCard } from "../components/dashboard/hub/DashboardHubWeekCard";
-import { DashboardHomeMessagesCard } from "../components/dashboard/DashboardHomeMessagesCard";
 import type { PageProps } from "./pageTypes";
 import { useKioskShell } from "../components/layout/KioskShellContext";
 import { FamilyHubDashboard } from "./FamilyHubDashboard";
@@ -46,10 +41,10 @@ import {
   dashboardWidgetLgSpanClass,
 } from "../lib/dashboardLayoutPreferences";
 import {
-  readDashboardHomeViewScope,
   writeDashboardHomeViewScope,
   type DashboardHomeViewScope,
 } from "../lib/dashboardHomeViewStorage";
+import { setDashboardMemberScopeExplicitThisSession } from "../hooks/useActiveDashboardViewMemberId";
 import { getMemberColor } from "../lib/memberColors";
 import { DashboardLayoutControls } from "../components/dashboard/DashboardLayoutControls";
 import { useUiCustomization } from "../context/UiCustomizationContext";
@@ -59,7 +54,6 @@ import {
   plannerEventVisibleForMemberView,
   type DashboardViewMemberId,
 } from "../lib/dashboardCommandCenterFilters";
-import { selectImportantMessagesForHome } from "../lib/familyDataSelectors";
 import { applyCalendarTodayReminderSync } from "../lib/calendarTodayNotifications";
 import { applyChoreReminderSync } from "../lib/choreAlertNotifications";
 import { prependChoreDigestIfNeeded } from "../lib/choreDueReminders";
@@ -98,16 +92,8 @@ export function DashboardPage({
 }: PageProps) {
   const kioskShell = useKioskShell();
   const today = new Date().toISOString().slice(0, 10);
-  const sessionMemberId = resolveSessionMemberIdForUi(data);
-  const activeMember = sessionMemberId ? findMemberById(data, sessionMemberId) : undefined;
-
-  const greeting = useMemo(() => {
-    if (!activeMember) {
-      return "Family Dashboard";
-    }
-    const first = activeMember.name.trim().split(/\s+/)[0] || activeMember.name;
-    return buildPersonalizedHomeGreeting(first);
-  }, [activeMember]);
+  const sessionMemberId: string | undefined = undefined;
+  const greeting = "Family Dashboard";
 
   const notificationCount = useMemo(() => {
     const mid = sessionMemberId;
@@ -333,18 +319,14 @@ export function DashboardPage({
     data.adminSettings.siteNotificationDefaults?.choresOverdue,
   ]);
 
-  const [msgDrawerOpen, setMsgDrawerOpen] = useState(false);
-  const [msgDrawerMode, setMsgDrawerMode] = useState<"create" | "edit">("create");
-  const [msgDraft, setMsgDraft] = useState<MessageBoardItem | null>(null);
+  const [dashboardScope, setDashboardScopeState] =
+    useState<DashboardHomeViewScope>(DASHBOARD_LAYOUT_SCOPE_FAMILY);
 
-  const messageCategories = useMemo(
-    () => getMessageBoardCategoryDefinitions(data.adminSettings, data.messageBoard),
-    [data.adminSettings, data.messageBoard],
-  );
-
-  const [dashboardScope, setDashboardScopeState] = useState<DashboardHomeViewScope>(() =>
-    readDashboardHomeViewScope(),
-  );
+  useEffect(() => {
+    setDashboardScopeState(DASHBOARD_LAYOUT_SCOPE_FAMILY);
+    writeDashboardHomeViewScope(DASHBOARD_LAYOUT_SCOPE_FAMILY);
+    setDashboardMemberScopeExplicitThisSession(false);
+  }, []);
 
   const validMemberIds = useMemo(
     () => new Set(data.familyMembers.map((m) => m.id)),
@@ -364,6 +346,7 @@ export function DashboardPage({
   const setDashboardScope = useCallback((scope: DashboardHomeViewScope) => {
     setDashboardScopeState(scope);
     writeDashboardHomeViewScope(scope);
+    setDashboardMemberScopeExplicitThisSession(scope !== DASHBOARD_LAYOUT_SCOPE_FAMILY);
   }, []);
 
   const layoutViewLabel = useMemo(() => {
@@ -417,11 +400,6 @@ export function DashboardPage({
       (t) => t.type === "chore" && !isChoreDone(t) && getChoreDueDate(t) < today,
     ).length;
   }, [data.tasks, today]);
-
-  const importantMessageCount = useMemo(
-    () => selectImportantMessagesForHome(data, 24).length,
-    [data],
-  );
 
   const snapshotNotificationCount = useMemo(
     () =>
@@ -502,64 +480,12 @@ export function DashboardPage({
   const { pageLayout } = useUiCustomization();
   const showTodaySnapshot = isPageSectionVisible(pageLayout, "home", "todaySnapshot");
   const showLayoutControls = isPageSectionVisible(pageLayout, "home", "layoutControls");
-  const showPostMessage = isPageSectionVisible(pageLayout, "home", "postMessage");
 
   const mainCells = useMemo(
     () =>
       sortedGridWidgets.filter((w) => DASHBOARD_GRID_WIDGET_IDS.has(w.id) && w.visible),
     [sortedGridWidgets],
   );
-
-  function saveDashboardMessage(item: MessageBoardItem, isNew: boolean) {
-    const now = new Date().toISOString();
-    if (isNew) {
-      setData((current) =>
-        createActivity(
-          {
-            ...current,
-            messageBoard: [{ ...item, createdAt: now, updatedAt: now }, ...current.messageBoard],
-          },
-          {
-            type: "updated",
-            entityType: "messageBoard",
-            entityId: "message-board",
-            entityTitle: "Message Board",
-            message: "Message posted.",
-          },
-        ),
-      );
-    } else {
-      setData((current) =>
-        createActivity(
-          {
-            ...current,
-            messageBoard: current.messageBoard.map((m) =>
-              m.id === item.id ? { ...item, updatedAt: now } : m,
-            ),
-          },
-          {
-            type: "updated",
-            entityType: "messageBoard",
-            entityId: "message-board",
-            entityTitle: "Message Board",
-            message: "Saved.",
-          },
-        ),
-      );
-    }
-    setMsgDrawerOpen(false);
-    setMsgDraft(null);
-  }
-
-  function openDashboardMessageCreate() {
-    setMsgDrawerMode("create");
-    setMsgDraft(
-      createEmptyMessageBoardItem({
-        authorMemberId: sessionMemberId ?? undefined,
-      }),
-    );
-    setMsgDrawerOpen(true);
-  }
 
   function markShoppingPurchased(id: string) {
     setData((current) => {
@@ -593,14 +519,6 @@ export function DashboardPage({
 
   function renderMainCell(widgetId: string) {
     switch (widgetId) {
-      case "messages":
-        return (
-          <DashboardHomeMessagesCard
-            data={data}
-            navigateWithinApp={navigateWithinApp}
-            filterMemberId={viewMemberId ?? undefined}
-          />
-        );
       case "pantry":
         return (
           <DashboardHubPantryCard
@@ -676,6 +594,7 @@ export function DashboardPage({
     return (
       <FamilyHubDashboard
         data={data}
+        setData={setData}
         greeting={greeting}
         navigateWithinApp={navigateWithinApp}
         onOpenPantry={onOpenPantry}
@@ -704,10 +623,12 @@ export function DashboardPage({
               greeting={greeting}
               householdName={getAppDisplayName(data.adminSettings)}
               notificationCount={notificationCount}
-              activeMemberLabel={activeMember ? getMemberFullName(activeMember) : undefined}
+              activeMemberLabel={
+                dashboardScope === DASHBOARD_LAYOUT_SCOPE_FAMILY ? undefined : layoutViewLabel
+              }
               navigateWithinApp={navigateWithinApp}
               onNotificationsClick={() => {
-                navigateWithinApp?.("/#home-notifications");
+                navigateWithinApp?.("/dashboard#home-notifications");
                 window.requestAnimationFrame(() =>
                   document
                     .getElementById("home-notifications")
@@ -741,7 +662,6 @@ export function DashboardPage({
         {showTodaySnapshot ? (
           <DashboardHomeTodaySnapshot
             snapshotNotificationCount={snapshotNotificationCount}
-            importantMessageCount={importantMessageCount}
             shoppingNeedCount={groceryNeeds.length}
             todayEventCount={todayPlannerCount}
             upcomingEventCount={upcomingPlannerCount}
@@ -810,33 +730,7 @@ export function DashboardPage({
           </div>
         )}
 
-        {showPostMessage ? (
-          <div className="flex flex-wrap justify-end gap-2">
-            <Button
-              type="button"
-              variant="secondary"
-              className="font-semibold"
-              onClick={openDashboardMessageCreate}
-            >
-              Post household message
-            </Button>
-          </div>
-        ) : null}
       </div>
-
-      <MessageBoardDrawer
-        open={msgDrawerOpen}
-        mode={msgDrawerMode}
-        draft={msgDraft}
-        categories={messageCategories}
-        familyMembers={data.familyMembers}
-        onClose={() => {
-          setMsgDrawerOpen(false);
-          setMsgDraft(null);
-        }}
-        onSave={saveDashboardMessage}
-        onDelete={undefined}
-      />
     </WorkspacePageShell>
     </div>
   );

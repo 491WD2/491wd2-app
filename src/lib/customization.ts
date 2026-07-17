@@ -172,7 +172,7 @@ export function getDashboardWelcomeMessage(admin: AdminSettings): string {
 }
 
 export function getModuleHouseholdInventoryLabel(admin: AdminSettings): string {
-  return getLabel(admin, LABEL_KEYS.moduleHouseholdInventory, "Pantry & Inventory");
+  return getLabel(admin, LABEL_KEYS.moduleHouseholdInventory, "Inventory");
 }
 
 export function getModuleShoppingLabel(admin: AdminSettings): string {

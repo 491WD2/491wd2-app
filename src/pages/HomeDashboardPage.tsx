@@ -9,8 +9,6 @@ import {
   HomeChoreCardIcon,
   HomeClockButtonIcon,
   HomeListButtonIcon,
-  HomeMailButtonIcon,
-  HomeMessageCardIcon,
   HomePantryCardIcon,
   HomePencilButtonIcon,
   HomePlusRingButtonIcon,
@@ -41,7 +39,6 @@ const ACTION_CARD_ICONS = {
   "add-shopping-item": HomeShoppingCardIcon,
   "add-pantry-item": HomePantryCardIcon,
   "add-chore": HomeChoreCardIcon,
-  "add-message": HomeMessageCardIcon,
   "add-calendar-event": HomeCalendarCardIcon,
 } as const;
 
@@ -50,7 +47,6 @@ const ACTION_PRIMARY_ICONS = {
   "add-shopping-item": HomePlusRingButtonIcon,
   "add-pantry-item": HomePencilButtonIcon,
   "add-chore": HomeCalendarButtonIcon,
-  "add-message": HomeMailButtonIcon,
   "add-calendar-event": HomeCalendarButtonIcon,
 } as const;
 
@@ -59,7 +55,6 @@ const ACTION_SECONDARY_ICONS = {
   "add-shopping-item": HomeListButtonIcon,
   "add-pantry-item": HomeClockButtonIcon,
   "add-chore": HomeClockButtonIcon,
-  "add-message": HomePencilButtonIcon,
   "add-calendar-event": HomeArrowButtonIcon,
 } as const;
 

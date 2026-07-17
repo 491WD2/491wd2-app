@@ -7,9 +7,7 @@ export const PAGE_SECTIONS_BY_ROUTE: Record<PageLayoutRouteKey, PageSectionDef[]
   home: [
     { id: "todaySnapshot", label: "Today snapshot", description: "Strip under the header" },
     { id: "layoutControls", label: "Edit layout controls", description: "Home grid editor" },
-    { id: "postMessage", label: "Post household message", description: "Button above the feed" },
   ],
-  messages: null,
   calendar: null,
   shopping: null,
   pantry: null,

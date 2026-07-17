@@ -13,8 +13,6 @@ export type PageProps = {
   onOpenShopping?: () => void;
   onOpenCalendar?: () => void;
   onOpenPlanner?: () => void;
-  /** Prefer messages board instead of legacy Docs when simplifying navigation. */
-  onOpenMessages?: () => void;
   onOpenSettings?: () => void;
   onSwitchUser?: () => void;
   onLockScreen?: () => void;

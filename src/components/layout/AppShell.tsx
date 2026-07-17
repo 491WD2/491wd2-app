@@ -11,6 +11,7 @@ import {
 import type { AdminSettings, ModuleKey } from "../../data/familyData";
 import { cn } from "../../lib/utils";
 import { useUiCustomization } from "../../context/UiCustomizationContext";
+import { setThemeMode } from "../../lib/appTheme";
 import { DS_MAIN_COLUMN } from "../../lib/designSystem";
 import {
   SMARTHR_FOCUS_RING_ACCENT_45,
@@ -49,6 +50,7 @@ import { KioskShell } from "./KioskShell";
 import type { KioskHeaderMember } from "./KioskHeader";
 import {
   resolveKioskNavFromShell,
+  type KioskNavId,
   usesUnifiedKioskShell,
 } from "../../lib/kioskShellConfig";
 import { navigateKioskNav } from "../../lib/kioskShellNavigation";
@@ -56,10 +58,9 @@ import { navigateKioskNav } from "../../lib/kioskShellNavigation";
 export type { RouteKey, ShellRoute };
 export { routes };
 
-/** Home · Messages · Calendar · Shopping · Pantry — Cleaning & Settings in “More”. */
+/** Home · Calendar · Shopping · Pantry — Cleaning & Settings in “More”. */
 const bottomNavRoutes: RouteKey[] = [
   "dashboard",
-  "messages",
   "calendar",
   "shopping",
   "pantry",
@@ -86,7 +87,7 @@ function routeVisible(
   }
   return (
     key === "dashboard" ||
-    key === "messages" ||
+    key === "adminux" ||
     key === "settings" ||
     moduleVisibility?.[key as ModuleKey] !== false
   );
@@ -165,7 +166,6 @@ export function AppShell({
   const { pageLayout, updateGlobalLayout, resolveLayoutForRoute } = useUiCustomization();
   const sidebarCollapsed = pageLayout.global.sidebarCollapsed;
   const layoutResolved = resolveLayoutForRoute(activeRoute);
-  const layoutWide = layoutResolved.width === "wide";
   const layoutCompact = layoutResolved.density === "compact";
 
   useEffect(() => {
@@ -194,10 +194,19 @@ export function AppShell({
   const showBottomNav =
     showMobileChrome && activeRoute !== "kiosk";
 
-  /** Premium dark shell for signed-in app routes (not login/cloud-login/not-found). */
-  const shellDark = showMobileChrome;
+  /** Bright AdminUX shell for signed-in routes (Command Center look site-wide). */
+  const shellDark = false;
+  const useAdminuxChrome = showMobileChrome;
 
-  const hideStickyHeader = showMobileChrome && activeRoute === "dashboard";
+  const hideStickyHeader =
+    showMobileChrome && (activeRoute === "dashboard" || activeRoute === "adminux");
+
+  useEffect(() => {
+    if (!useAdminuxChrome) {
+      return;
+    }
+    setThemeMode("light");
+  }, [useAdminuxChrome]);
 
   const clockTime = new Intl.DateTimeFormat(undefined, {
     hour: "numeric",
@@ -262,12 +271,23 @@ export function AppShell({
     activeRoute !== "kiosk";
 
   const unifiedKioskChrome =
-    (unifiedKioskLayout ?? true) &&
+    (unifiedKioskLayout ?? false) &&
     usesUnifiedKioskShell(activeRoute) &&
     showMobileChrome;
 
   if (unifiedKioskChrome) {
     const activeNav = resolveKioskNavFromShell(activeRoute, locationHref);
+    const hiddenKioskNav: KioskNavId[] = [];
+    if (!routeVisible("shopping", moduleVisibility)) hiddenKioskNav.push("shopping");
+    if (!routeVisible("pantry", moduleVisibility)) hiddenKioskNav.push("pantry");
+    if (!routeVisible("calendar", moduleVisibility)) hiddenKioskNav.push("calendar");
+    if (!routeVisible("notifications", moduleVisibility)) hiddenKioskNav.push("notifications");
+    if (restrictChildNavigation || !routeVisible("subscriptions", moduleVisibility)) {
+      hiddenKioskNav.push("subscriptions");
+    }
+    if (!routeVisible("tasks", moduleVisibility)) hiddenKioskNav.push("chores");
+    if (!routeVisible("pets", moduleVisibility)) hiddenKioskNav.push("pets");
+    if (restrictChildNavigation) hiddenKioskNav.push("settings");
     return (
       <QuickActionsOpenerContext.Provider
         value={{
@@ -295,7 +315,7 @@ export function AppShell({
           onSidebarCollapsedChange={(collapsed) =>
             updateGlobalLayout({ sidebarCollapsed: collapsed })
           }
-          hiddenNav={restrictChildNavigation ? ["settings"] : undefined}
+          hiddenNav={hiddenKioskNav.length > 0 ? hiddenKioskNav : undefined}
           onScanFallback={() => onNavigateHref?.("/pantry?scan=1")}
           onAddFallback={() => {
             if (quickActionsGateOk) {
@@ -337,6 +357,7 @@ export function AppShell({
     <div
       className={cn(
         "min-h-screen overflow-x-hidden bg-transparent",
+        useAdminuxChrome && "adminux-app",
         shellDark ? "text-slate-900 dark:text-slate-100" : "text-slate-900",
         largeTextMode && "text-[1.0625rem] [&_main_h1]:text-[1.35rem] [&_main_h2]:text-[1.2rem]",
       )}
@@ -381,10 +402,10 @@ export function AppShell({
       >
         <div
           className={cn(
-            "mx-auto flex w-full flex-col justify-center gap-3",
+            "flex w-full flex-col justify-center gap-3",
             SMARTHR_HEADER_BAR_MIN_H,
             SMARTHR_HEADER_BAR_PADDING,
-            layoutWide ? "max-w-[min(100%,1920px)] 2xl:max-w-[2200px]" : "max-w-[1680px] 2xl:max-w-[1760px]",
+            "max-w-none",
           )}
         >
           {showMobileChrome ? (
@@ -1002,7 +1023,7 @@ export function AppShell({
         data-fs-density={layoutResolved.density}
         data-fs-width={layoutResolved.width}
         className={cn(
-          "mx-auto w-full overflow-y-auto",
+          "w-full overflow-y-auto",
           hideStickyHeader
             ? cn(
                 "max-w-none flex-1",
@@ -1011,10 +1032,7 @@ export function AppShell({
                   : "px-4 py-4 sm:px-6 md:px-6 md:py-4",
               )
             : cn(
-                layoutWide
-                  ? "max-w-[min(100%,1920px)] 2xl:max-w-[2200px]"
-                  : "max-w-[1680px] 2xl:max-w-[1760px]",
-                "px-4 sm:px-6 lg:px-8 xl:px-10",
+                "max-w-none px-4 sm:px-5 lg:px-6 xl:px-7",
                 layoutCompact ? "py-5 sm:py-6" : "sm:py-7",
               ),
           showBottomNav && !hideStickyHeader
@@ -1028,7 +1046,7 @@ export function AppShell({
         )}
       >
         <div
-          className={cn("motion-page")}
+          className={cn("motion-page", useAdminuxChrome && "adminux-skin")}
           key={activeRoute}
         >
           {children}
@@ -1049,8 +1067,7 @@ export function AppShell({
         >
           <div
             className={cn(
-              "mx-auto flex w-full items-stretch justify-between gap-0.5 px-1",
-              layoutWide ? "max-w-[min(100%,1920px)] 2xl:max-w-[2200px]" : "max-w-[1680px] 2xl:max-w-[1760px]",
+              "flex w-full max-w-none items-stretch justify-between gap-0.5 px-1",
             )}
           >
             {bottomNavRoutes.map((key) => {
@@ -1069,9 +1086,7 @@ export function AppShell({
                       ? "Pantry"
                       : key === "calendar"
                         ? "Calendar"
-                        : key === "messages"
-                          ? "Msgs"
-                          : "App";
+                        : "App";
               const isActive = activeRoute === key;
               return (
                 <button

@@ -28,9 +28,14 @@ export function ShoppingCategorySection({
 
   return (
     <section className="gf-shopping-category">
-      <h3 className="gf-shopping-category__title" style={{ color: theme.accent }}>
-        {label}
-      </h3>
+      <div className="gf-shopping-category__head">
+        <h3 className="gf-shopping-category__title" style={{ color: theme.accent }}>
+          {label}
+        </h3>
+        <span className="gf-shopping-category__count">
+          {lines.length} item{lines.length === 1 ? "" : "s"}
+        </span>
+      </div>
       <ul className="gf-shopping-list">
         {lines.map((line) => (
           <ShoppingListCard

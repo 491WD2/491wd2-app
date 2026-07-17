@@ -516,12 +516,14 @@ export function useGroceryProductActions() {
         const nextProduct = { ...product, need: false };
         updateProduct(product.id, { need: false });
         upsertLibraryOverride(nextProduct);
+        removeItemsByProductId(product.id);
         return;
       }
       upsertExtraProduct({ ...product, need: false });
       emitExtraProducts();
+      removeItemsByProductId(product.id);
     },
-    [getProductById, updateProduct],
+    [getProductById, removeItemsByProductId, updateProduct],
   );
 
   const addDetailToShopping = useCallback(

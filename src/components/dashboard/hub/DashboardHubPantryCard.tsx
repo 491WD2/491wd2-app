@@ -79,7 +79,7 @@ export function DashboardHubPantryCard({
           <div>
             <div className="flex flex-wrap items-center gap-2">
               <h2 id="hub-pantry-title" className={hubCardTitleClass}>
-                Pantry Inventory
+                Inventory
               </h2>
               {lowOrOutCount > 0 ? (
                 <span

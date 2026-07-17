@@ -6,7 +6,6 @@ import { PAGE_LAYOUT_STORAGE_KEY } from "./uiCustomizationKeys";
 
 export type PageLayoutRouteKey =
   | "home"
-  | "messages"
   | "calendar"
   | "shopping"
   | "pantry"

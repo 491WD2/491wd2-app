@@ -105,7 +105,13 @@ export function parseShoppingRouteSearch(search?: string) {
   const category: ShoppingKioskCategoryId = isShoppingAddableCategoryId(categoryParam)
     ? categoryParam
     : "all";
-  return { action, category };
+  const itemName = (
+    params.get("name") ??
+    params.get("item") ??
+    params.get("q") ??
+    ""
+  ).trim();
+  return { action, category, itemName };
 }
 
 export const SHOPPING_UNIT_OPTIONS: ReadonlyArray<{

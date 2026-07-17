@@ -3,7 +3,6 @@ import {
   Camera,
   ClipboardList,
   Download,
-  MessageSquare,
   Plus,
   Refrigerator,
   ShoppingCart,
@@ -72,14 +71,6 @@ export function QuickActionsPanel({
       hint: "Household shopping list",
       icon: <ShoppingCart className="h-5 w-5 shrink-0" aria-hidden />,
       onClick: () => navigateHref(buildQuickActionHref({ type: "grocery", name: "" })),
-    });
-  }
-  if (!restrictChildNavigation) {
-    actions.push({
-      label: "Add message",
-      hint: "Household message board",
-      icon: <MessageSquare className="h-5 w-5 shrink-0" aria-hidden />,
-      onClick: () => navigateHref(buildQuickActionHref({ type: "message", title: "" })),
     });
   }
   if (moduleOn(moduleVisibility, "calendar")) {

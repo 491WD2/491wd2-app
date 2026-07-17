@@ -1,4 +1,4 @@
-import { ArrowUpRight, CalendarDays, ClipboardList, Plus, Search } from "lucide-react";
+import { ArrowUpRight, CalendarDays, ChevronRight, ClipboardList, Plus, Search, Table2, Users, X } from "lucide-react";
 import { useMemo, useState } from "react";
 import { type FamilyMember } from "../data/familyData";
 import {
@@ -23,9 +23,8 @@ import {
   WorkspaceFilterBar,
   WorkspacePageShell,
 } from "../components/workspace/ModuleWorkspace";
-import { useKioskShell } from "../components/layout/KioskShellContext";
-import { WidgetPageShell } from "../components/widgets";
 import { wrkMetricCellClassName, wrkPanelClassName } from "../components/workspace/workspaceDesign";
+import "../styles/guided-kiosk.css";
 
 const themeStyles: Record<string, string> = {
   blue: "border-blue-400/25 bg-blue-500/10 text-blue-100",
@@ -50,7 +49,8 @@ export function FamilyMembersPage({
   const [statusFilter, setStatusFilter] = useState("all");
   const [sortMode, setSortMode] = useState("name");
   const [editingMemberId, setEditingMemberId] = useState<string | undefined>();
-  const kioskShell = useKioskShell();
+  const [showFullFamily, setShowFullFamily] = useState(false);
+  const [guidedFlow, setGuidedFlow] = useState<"choose-member" | "find-member" | null>(null);
   const today = new Date().toISOString().slice(0, 10);
   const admin = data.adminSettings;
   const statusOptionsForForms = useMemo(
@@ -95,6 +95,128 @@ export function FamilyMembersPage({
       }
       return a.member.name.localeCompare(b.member.name);
     });
+
+  const activeMemberCount = data.familyMembers.filter((member) => member.status === "active").length;
+
+  function renderFamilyFlowSheet() {
+    if (!guidedFlow) {
+      return null;
+    }
+
+    const chooserRows = guidedFlow === "find-member" ? filteredSummaries : memberSummaries;
+
+    return (
+      <div className="wd-guided-kiosk__sheet-backdrop" role="presentation" onClick={() => setGuidedFlow(null)}>
+        <section
+          className="wd-guided-kiosk__sheet"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="family-flow-title"
+          onClick={(event) => event.stopPropagation()}
+        >
+          <header className="wd-guided-kiosk__sheet-head">
+            <div>
+              <p className="wd-guided-kiosk__eyebrow">Family station</p>
+              <h2 id="family-flow-title">
+                {guidedFlow === "find-member" ? "Find a member" : "Choose a member"}
+              </h2>
+              <p>Select a person, then their profile opens as the next step.</p>
+            </div>
+            <button
+              type="button"
+              className="wd-guided-kiosk__icon-btn"
+              aria-label="Close family chooser"
+              onClick={() => setGuidedFlow(null)}
+            >
+              <X className="h-4 w-4" aria-hidden />
+            </button>
+          </header>
+
+          {guidedFlow === "find-member" ? (
+            <label className="wd-guided-kiosk__field">
+              <span>Search member</span>
+              <div className="wd-guided-kiosk__search">
+                <Search className="h-4 w-4" aria-hidden />
+                <input
+                  value={searchText}
+                  onChange={(event) => setSearchText(event.target.value)}
+                  placeholder="Type a name"
+                />
+              </div>
+            </label>
+          ) : null}
+
+          <div className="wd-guided-kiosk__chooser" role="listbox" aria-label="Family members">
+            {chooserRows.length === 0 ? (
+              <p className="wd-guided-kiosk__empty">No family members match this step.</p>
+            ) : (
+              chooserRows.map(({ member, openResponsibilities, upcomingEvents }) => (
+                <button
+                  key={member.id}
+                  type="button"
+                  className="wd-guided-kiosk__chooser-row"
+                  role="option"
+                  onClick={() => onOpenMemberDashboard?.(member.id)}
+                >
+                  <span>
+                    <strong>{getMemberFullName(member)}</strong>
+                    <small>{openResponsibilities.length} tasks · {upcomingEvents.length} events</small>
+                  </span>
+                  <ChevronRight className="h-4 w-4" aria-hidden />
+                </button>
+              ))
+            )}
+          </div>
+        </section>
+      </div>
+    );
+  }
+
+  if (!showFullFamily) {
+    const station = (
+      <div className="wd-guided-kiosk wd-guided-kiosk--family">
+        <section className="wd-guided-kiosk__hero" aria-labelledby="family-kiosk-title">
+          <div>
+            <p className="wd-guided-kiosk__eyebrow">Family station</p>
+            <h1 id="family-kiosk-title">Who needs attention?</h1>
+            <p>Pick a family step, then choose the member in a focused pop-up.</p>
+          </div>
+          <div className="wd-guided-kiosk__status">
+            <span>{data.familyMembers.length} members</span>
+            <span>{activeMemberCount} active</span>
+            <span>{filteredSummaries.length} in view</span>
+          </div>
+        </section>
+
+        <section className="wd-guided-kiosk__actions-grid" aria-label="Family actions">
+          <button type="button" className="wd-guided-kiosk__action wd-guided-kiosk__action--primary" onClick={() => setGuidedFlow("choose-member")}>
+            <span className="wd-guided-kiosk__action-icon"><Users className="h-5 w-5" aria-hidden /></span>
+            <span><strong>Choose member</strong><small>Open a profile</small></span>
+          </button>
+          <button type="button" className="wd-guided-kiosk__action" onClick={() => setGuidedFlow("find-member")}>
+            <span className="wd-guided-kiosk__action-icon"><Search className="h-5 w-5" aria-hidden /></span>
+            <span><strong>Find member</strong><small>Search, then open profile</small></span>
+          </button>
+          <button type="button" className="wd-guided-kiosk__action" onClick={onOpenTasks}>
+            <span className="wd-guided-kiosk__action-icon"><ClipboardList className="h-5 w-5" aria-hidden /></span>
+            <span><strong>Add task</strong><small>Go to Cleaning station</small></span>
+          </button>
+          <button type="button" className="wd-guided-kiosk__action" onClick={onOpenCalendar}>
+            <span className="wd-guided-kiosk__action-icon"><CalendarDays className="h-5 w-5" aria-hidden /></span>
+            <span><strong>Add event</strong><small>Go to Calendar station</small></span>
+          </button>
+          <button type="button" className="wd-guided-kiosk__action" onClick={() => setShowFullFamily(true)}>
+            <span className="wd-guided-kiosk__action-icon"><Table2 className="h-5 w-5" aria-hidden /></span>
+            <span><strong>Family directory</strong><small>Search, edit, and sort members</small></span>
+          </button>
+        </section>
+
+        {renderFamilyFlowSheet()}
+      </div>
+    );
+
+    return station;
+  }
 
   function addMember() {
     const memberId = crypto.randomUUID();
@@ -182,10 +304,15 @@ export function FamilyMembersPage({
     <WorkspacePageShell>
       <ModuleWorkspaceHeader
         action={
-          <Button onClick={addMember} variant="primary">
-            <Plus className="h-4 w-4" />
-            Add Member
-          </Button>
+          <div className="flex flex-wrap gap-2">
+            <Button onClick={() => setShowFullFamily(false)} variant="secondary">
+              Kiosk station
+            </Button>
+            <Button onClick={addMember} variant="primary">
+              <Plus className="h-4 w-4" />
+              Add Member
+            </Button>
+          </div>
         }
         description="Household directory, responsibilities, and personal pages."
         eyebrow="Household operations"
@@ -354,7 +481,7 @@ export function FamilyMembersPage({
     </WorkspacePageShell>
   );
 
-  return kioskShell ? <WidgetPageShell>{roster}</WidgetPageShell> : roster;
+  return roster;
 }
 
 function DirectoryMetric({ label, value }: { label: string; value: number }) {

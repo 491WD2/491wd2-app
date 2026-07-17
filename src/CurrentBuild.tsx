@@ -10,7 +10,6 @@ import { ModuleGate } from "./components/layout/ModuleGate";
 import { useFamilyData } from "./hooks/useFamilyData";
 import { isRestrictedHouseholdMember } from "./lib/householdUx";
 import { dedupeNotificationsForDisplay } from "./lib/householdNotify";
-import { buildPersonalizedHomeGreeting } from "./lib/kioskGreeting";
 import {
   findMemberById,
   getMemberFullName,
@@ -18,7 +17,6 @@ import {
 import {
   getAppDisplayName,
   getModuleCalendarLabel,
-  getModuleDashboardNavLabel,
   getModuleDocsLabel,
   getModuleFamilyLabel,
   getModuleHouseholdInventoryLabel,
@@ -27,7 +25,6 @@ import {
   getModuleShoppingLabel,
   getModuleTasksLabel,
 } from "./lib/customization";
-import { resolveSessionMemberIdForUi } from "./lib/familyDataSelectors";
 import { HouseholdProductProvider } from "./context/HouseholdProductContext";
 
 const CalendarPage = lazy(() =>
@@ -35,6 +32,11 @@ const CalendarPage = lazy(() =>
 );
 const DashboardPage = lazy(() =>
   import("./pages/DashboardPage").then((m) => ({ default: m.DashboardPage })),
+);
+const AdminUxHouseholdDashboard = lazy(() =>
+  import("./pages/AdminUxHouseholdDashboard").then((m) => ({
+    default: m.AdminUxHouseholdDashboard,
+  })),
 );
 const HiddenModulePage = lazy(() =>
   import("./pages/HiddenModulePage").then((m) => ({ default: m.HiddenModulePage })),
@@ -55,9 +57,6 @@ const SettingsPage = lazy(() =>
 );
 const ShoppingPage = lazy(() =>
   import("./pages/ShoppingPage").then((m) => ({ default: m.ShoppingPage })),
-);
-const MessagesPage = lazy(() =>
-  import("./pages/MessagesPage").then((m) => ({ default: m.MessagesPage })),
 );
 const TasksPage = lazy(() => import("./pages/TasksPage").then((m) => ({ default: m.TasksPage })));
 const KioskPage = lazy(() => import("./pages/KioskPage").then((m) => ({ default: m.KioskPage })));
@@ -101,63 +100,47 @@ export default function App() {
     return () => window.removeEventListener("popstate", handlePopState);
   }, []);
 
-  const resolvedSessionMemberId = useMemo(
-    () => resolveSessionMemberIdForUi(data),
-    [data],
-  );
-  const activeMember =
-    resolvedSessionMemberId != null
-      ? findMemberById(data, resolvedSessionMemberId)
-      : undefined;
+  const explicitRouteMemberId = memberId ? decodeURIComponent(memberId) : undefined;
+  const activeMember = explicitRouteMemberId
+    ? findMemberById(data, explicitRouteMemberId)
+    : undefined;
   const activeMemberLabel = activeMember ? getMemberFullName(activeMember) : undefined;
 
   const dashboardHeader = useMemo((): DashboardHeaderContext | undefined => {
     if (activeRoute !== "dashboard") {
       return undefined;
     }
-    const first = activeMember
-      ? activeMember.name.trim().split(/\s+/)[0] || activeMember.name
-      : "";
-    const greeting =
-      activeMember && first
-        ? buildPersonalizedHomeGreeting(first)
-        : "Welcome home.";
-    const mid = resolvedSessionMemberId;
     const raw = data.notifications.filter((n) => {
       if (n.dismissedAt) {
         return false;
       }
-      const to = (n.recipientMemberId ?? "").trim();
-      if (!to) {
-        return true;
-      }
-      if (!mid) {
-        return false;
-      }
-      return to === mid;
+      return true;
     });
     const notificationCount = dedupeNotificationsForDisplay(raw).length;
     const groceryCount = data.shopping.filter((s) => !s.purchased).length;
     const statusLine = `${groceryCount} on your shopping list · ${notificationCount} notification${notificationCount === 1 ? "" : "s"}`;
-    return { greeting, statusLine, notificationCount };
+    return { greeting: "Welcome home.", statusLine, notificationCount };
   }, [
     activeRoute,
-    activeMember,
-    resolvedSessionMemberId,
     data.notifications,
     data.shopping,
   ]);
 
-  /** Legacy PIN routes (`/kiosk-login`, `/login`) → home without rendering a PIN screen. */
+  /** Legacy landing aliases resolve to the Command Center (AdminUX) home. */
   useLayoutEffect(() => {
     const normalized = pathname.replace(/\/$/, "") || "/";
-    if (normalized !== "/kiosk-login" && normalized !== "/login") {
+    if (
+      normalized !== "/" &&
+      normalized !== "/kiosk-login" &&
+      normalized !== "/login" &&
+      normalized !== "/home"
+    ) {
       return;
     }
     window.history.replaceState(
       null,
       "",
-      `/${window.location.search}${window.location.hash}`,
+      `/adminux${window.location.search}${window.location.hash}`,
     );
     setRouteHref(
       `${window.location.pathname}${window.location.search}${window.location.hash}`,
@@ -192,12 +175,12 @@ export default function App() {
       kioskShellMembers={data.familyMembers
         .filter((m) => m.status !== "archived")
         .map((m) => ({ id: m.id, label: getMemberFullName(m) }))}
-      kioskActiveMemberId={resolvedSessionMemberId ?? null}
+      kioskActiveMemberId={activeMember?.id ?? null}
       onKioskMemberChange={(id) => {
         if (id) {
           navigateToMember(id);
         } else {
-          navigateToRoute("family");
+          navigateToRoute("dashboard");
         }
       }}
       restrictChildNavigation={isRestrictedHouseholdMember(activeMember)}
@@ -208,7 +191,8 @@ export default function App() {
       dashboardHeader={dashboardHeader}
       locationHref={routeHref}
       routeLabels={{
-        dashboard: getModuleDashboardNavLabel(data.adminSettings),
+        dashboard: "Dashboard",
+        adminux: "Command Center",
         family: getModuleFamilyLabel(data.adminSettings),
         tasks: getModuleTasksLabel(data.adminSettings),
         kitchen: "Kitchen Assignments",
@@ -219,7 +203,6 @@ export default function App() {
         calendar: getModuleCalendarLabel(data.adminSettings),
         planner: getModuleCalendarLabel(data.adminSettings),
         docs: getModuleDocsLabel(data.adminSettings),
-        messages: "Messages",
         kitchenSchedule: "Kitchen Schedule",
         notifications: "Notifications",
         subscriptions: "Subscriptions",
@@ -228,7 +211,7 @@ export default function App() {
     >
       <Suspense fallback={<AppLoading />}>
       {activeRoute === "cloud-login" ? (
-        <LoginPage onBack={() => navigateTo("/")} />
+        <LoginPage onBack={() => navigateTo("/adminux")} />
       ) : null}
       {activeRoute === "kiosk" ? (
         <KioskPage
@@ -268,6 +251,26 @@ export default function App() {
           />
         </ModuleGate>
       ) : null}
+      {activeRoute === "adminux" ? (
+        <ModuleGate
+          moduleKey="dashboard"
+          moduleVisibility={data.adminSettings.moduleVisibility}
+          onOpenDashboard={() => navigateToRoute("dashboard")}
+          onOpenSettings={() => navigateToRoute("settings")}
+        >
+          <AdminUxHouseholdDashboard
+            data={data}
+            setData={setData}
+            navigateWithinApp={navigateTo}
+            onOpenPantry={() => navigateToRoute("pantry")}
+            onOpenShopping={() => navigateToRoute("shopping")}
+            onOpenTasks={() => navigateToRoute("tasks")}
+            onOpenCalendar={() => navigateToRoute("calendar")}
+            onOpenSettings={() => navigateToRoute("settings")}
+            onOpenDashboard={() => navigateToRoute("dashboard")}
+          />
+        </ModuleGate>
+      ) : null}
       {activeRoute === "family" && memberId ? (
         <ModuleGate
           moduleKey="family"
@@ -282,7 +285,6 @@ export default function App() {
             onOpenDashboard={() => navigateToRoute("dashboard")}
             onOpenTasks={() => navigateToRoute("tasks")}
             onOpenCalendar={() => navigateToRoute("calendar")}
-            onOpenMessages={() => navigateToRoute("messages")}
             onBackToFamily={() => navigateToRoute("family")}
           />
         </ModuleGate>
@@ -400,13 +402,6 @@ export default function App() {
           onGoSettings={() => navigateToRoute("settings")}
         />
       ) : null}
-      {activeRoute === "messages" ? (
-        <MessagesPage
-          data={data}
-          setData={setData}
-          onOpenDashboard={() => navigateToRoute("dashboard")}
-        />
-      ) : null}
       {activeRoute === "kitchenSchedule" ? (
         <ModuleGate
           moduleKey="tasks"
@@ -465,7 +460,8 @@ export default function App() {
 }
 
 const routePathMap: Record<RouteKey, string> = {
-  dashboard: "/",
+  dashboard: "/dashboard",
+  adminux: "/adminux",
   kiosk: "/kiosk",
   family: "/family",
   tasks: "/tasks",
@@ -480,7 +476,6 @@ const routePathMap: Record<RouteKey, string> = {
   calendar: "/calendar",
   planner: "/planner",
   docs: "/docs",
-  messages: "/messages",
   settings: "/settings",
 };
 
@@ -491,10 +486,18 @@ function parsePath(pathname: string): {
   const [, firstSegment, secondSegment] = pathname.split("/");
 
   if (!firstSegment) {
-    return { activeRoute: "dashboard" };
+    return { activeRoute: "adminux" };
   }
 
   if (firstSegment === "login" || firstSegment === "kiosk-login") {
+    return { activeRoute: "adminux" };
+  }
+
+  if (firstSegment === "home") {
+    return { activeRoute: "adminux" };
+  }
+
+  if (firstSegment === "dashboard") {
     return { activeRoute: "dashboard" };
   }
 
@@ -508,10 +511,6 @@ function parsePath(pathname: string): {
 
   if (firstSegment === "kiosk") {
     return { activeRoute: "kiosk" };
-  }
-
-  if (firstSegment === "messages") {
-    return { activeRoute: "messages" };
   }
 
   if (firstSegment === "kitchen-schedule") {

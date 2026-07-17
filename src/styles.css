@@ -1,8 +1,10 @@
 @import "tailwindcss";
+@import "bootstrap-icons/font/bootstrap-icons.css";
 @import "./styles/design-tokens.css";
 @import "./styles/bankdash-components.css";
 @import "./components/widgets/widgets.css";
 @import "./styles/pantry-shopping-grofast.css";
+@import "./styles/adminux-skin.css";
 
 /** Tailwind v4 — scan app sources; purges unused utilities in production */
 @source "./**/*.{ts,tsx}";
@@ -42,39 +44,40 @@
   /**
    * UI customization (`familysite-491:appearance`) — set on :root at runtime; fallbacks match SmartHR.
    */
-  --fs-primary: #f26522;
-  --fs-gradient-start: #ff6f28;
-  --fs-gradient-end: #ff5325;
-  --fs-page-bg: #f7f7f7;
-  --fs-card-bg: #ffffff;
-  --fs-sidebar-active-bg: rgba(254, 159, 67, 0.08);
-  --fs-sidebar-active-text: #fe9f43;
-  --fs-text: #1f1f1f;
-  --fs-text-muted: #637381;
+  --fs-primary: var(--lg-cyan);
+  --fs-gradient-start: var(--lg-cyan);
+  --fs-gradient-end: var(--lg-violet);
+  --fs-page-bg: var(--lg-bg-0);
+  --fs-card-bg: rgba(7, 12, 29, 0.76);
+  --fs-sidebar-active-bg: rgba(125, 249, 255, 0.12);
+  --fs-sidebar-active-text: var(--lg-text);
+  --fs-text: var(--lg-text);
+  --fs-text-muted: var(--lg-text-muted);
 
   /**
    * Global app backdrop — dark teal → navy (upper-left softer, right/deeper darker).
    * Used by html; cards/panels keep solid DS_* surfaces on top.
    */
-  --app-shell-gradient: linear-gradient(
-    100deg,
-    #264f5b 0%,
-    #1e4452 18%,
-    #18394a 42%,
-    #102c3e 68%,
-    #0a1c2b 100%
-  );
-  --app-shell-fallback: #0a1c2b;
+  --app-shell-gradient:
+    radial-gradient(circle at 14% -8%, rgba(125, 249, 255, 0.2), transparent 26rem),
+    radial-gradient(circle at 86% 4%, rgba(255, 122, 223, 0.16), transparent 27rem),
+    radial-gradient(circle at 50% 82%, rgba(36, 242, 192, 0.08), transparent 34rem),
+    linear-gradient(145deg, var(--lg-bg-0) 0%, var(--lg-bg-1) 48%, #02030b 100%);
+  --app-shell-fallback: var(--lg-bg-0);
 
   /** SmartHR template body (`base.scss`: $__mix__gray) */
   --app-light-dashboard-bg: #f7f7f7;
   --app-light-dashboard-fallback: #f7f7f7;
 
   /* Workstation sizing tokens (Surface/iPad landscape friendly). */
-  --workstation-max-width: 1680px;
-  --workstation-content-width: min(100%, var(--workstation-max-width));
+  --workstation-max-width: none;
+  --workstation-content-width: 100%;
   --workstation-gap: clamp(1rem, 1.4vw, 1.75rem);
   --workstation-panel-radius: 1rem;
+  --kiosk-page-topbar-height: 64px;
+  --kiosk-page-subnav-height: 56px;
+  --kiosk-page-hero-height: 132px;
+  --kiosk-dashboard-header-height: 150px;
 }
 
 * {
@@ -85,8 +88,10 @@ html {
   min-width: 320px;
   min-height: 100%;
   /* Light: template `body` background — $__mix__gray (#f7f7f7); overridden by appearance prefs */
-  background-color: var(--fs-page-bg, var(--app-light-dashboard-fallback));
-  background-image: none;
+  background-color: var(--app-shell-fallback);
+  background-image: var(--app-shell-gradient);
+  background-repeat: no-repeat;
+  background-size: cover;
 }
 
 html.dark {
@@ -126,6 +131,7 @@ body {
   min-width: 320px;
   min-height: 100vh;
   background: transparent;
+  color: var(--lg-text);
   font-size: 16px;
   line-height: 1.5;
   text-rendering: optimizeLegibility;
@@ -136,6 +142,20 @@ body {
   background: transparent;
 }
 
+#root::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    linear-gradient(rgba(255, 255, 255, 0.026) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.022) 1px, transparent 1px);
+  background-size: 54px 54px;
+  mask-image: radial-gradient(circle at 50% 22%, black, transparent 74%);
+  opacity: 0.34;
+}
+
 button,
 input,
 select {
@@ -143,13 +163,28 @@ select {
 }
 
 select option {
-  background: #1b2028;
-  color: #f8fafc;
+  background: #07111f;
+  color: var(--lg-text);
 }
 
 ::selection {
-  background: rgba(59, 130, 246, 0.22);
-  color: #0f172a;
+  background: rgba(125, 249, 255, 0.24);
+  color: var(--lg-text);
+}
+
+input,
+textarea,
+select {
+  color-scheme: dark;
+}
+
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible,
+button:focus-visible,
+a:focus-visible {
+  outline: 2px solid rgba(125, 249, 255, 0.62);
+  outline-offset: 3px;
 }
 
 @keyframes workspace-enter {
@@ -204,10 +239,11 @@ select option {
   color: #0f172a;
 }
 
-/* Centered workstation shell for 3:2 devices. */
+/* Full-width workstation shell for 3:2 kiosk devices. */
 .workstation-shell {
   width: var(--workstation-content-width);
-  margin-inline: auto;
+  max-width: none;
+  margin-inline: 0;
   padding-inline: clamp(0.875rem, 2vw, 1.5rem);
 }
 
@@ -228,6 +264,38 @@ select option {
   background-image: var(--app-shell-gradient);
   background-repeat: no-repeat;
   background-size: cover;
+}
+
+/* Liquid glass global app surfaces */
+.dashboard-smart-hr-root,
+.app-shell-gradient-bg {
+  background-color: var(--app-shell-fallback);
+  background-image: var(--app-shell-gradient);
+  color: var(--lg-text);
+}
+
+.motion-card,
+.motion-panel {
+  border-color: var(--lg-border, rgba(218, 236, 255, 0.18));
+  background:
+    linear-gradient(140deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.03) 46%, rgba(255, 255, 255, 0.055)),
+    rgba(7, 12, 29, 0.68);
+  color: var(--lg-text, #f8fbff);
+  box-shadow: var(--lg-shadow-soft, 0 16px 44px rgba(0, 0, 0, 0.32));
+  backdrop-filter: blur(18px) saturate(145%);
+}
+
+.motion-row:hover,
+.motion-card:hover {
+  border-color: var(--lg-border-strong, rgba(218, 236, 255, 0.3));
+  background-color: rgba(255, 255, 255, 0.07);
+}
+
+.motion-tab-active {
+  border-color: rgba(125, 249, 255, 0.34);
+  background: rgba(125, 249, 255, 0.12);
+  color: var(--lg-text, #f8fbff);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -7,15 +7,23 @@ import {
   type ReactNode,
 } from "react";
 import {
+  ArrowLeft,
+  Barcode,
+  Bell,
+  ChevronRight,
   Download,
   HardDrive,
+  Home,
   ListChecks,
+  LogOut,
   MonitorSmartphone,
   RotateCcw,
+  Settings,
   Shield,
   Sparkles,
   Tablet,
   Upload,
+  UserRound,
 } from "lucide-react";
 import { useAuth } from "../auth";
 import {
@@ -84,13 +92,15 @@ import { AppearanceLayoutEditor } from "../components/settings/AppearanceLayoutE
 import { siteNotificationEnabled } from "../lib/notificationPreferences";
 import { testAiConnection } from "../services/aiClient";
 import { pingInstacartConnection } from "../services/instacartClient";
+import "../styles/pantry-shopping-grofast.css";
+import "../styles/guided-kiosk.css";
 
 const moduleLabels: Record<(typeof moduleKeys)[number], string> = {
   dashboard: "Home",
   family: "Members",
   tasks: "Cleaning",
   projects: "Workspace",
-  pantry: "Pantry & Inventory",
+  pantry: "Inventory",
   shopping: "Shopping",
   calendar: "Calendar",
   planner: "Calendar",
@@ -102,7 +112,6 @@ type SettingsTabId =
   | "members_pins"
   | "kitchen_schedule"
   | "shopping_pantry"
-  | "messages"
   | "notifications"
   | "subscription"
   | "appearance"
@@ -117,7 +126,6 @@ const SETTINGS_TABS: { id: SettingsTabId; label: string }[] = [
   { id: "members_pins", label: "Members & PINs" },
   { id: "kitchen_schedule", label: "Kitchen Schedule" },
   { id: "shopping_pantry", label: "Shopping & Pantry" },
-  { id: "messages", label: "Messages" },
   { id: "notifications", label: "Notifications" },
   { id: "subscription", label: "Subscription" },
   { id: "appearance", label: "Appearance" },
@@ -199,6 +207,7 @@ function SettingsTabRail({
 
 export function SettingsPage({ data, setData, onOpenLogin, navigateWithinApp }: PageProps) {
   const [settingsTab, setSettingsTab] = useState<SettingsTabId>("household");
+  const [showFullSettings, setShowFullSettings] = useState(true);
   const [importText, setImportText] = useState("");
   const [choreCsvText, setChoreCsvText] = useState("");
   const [groceryCsvText, setGroceryCsvText] = useState("");
@@ -219,9 +228,10 @@ export function SettingsPage({ data, setData, onOpenLogin, navigateWithinApp }: 
   >("unknown");
   const [instacartLastDetail, setInstacartLastDetail] = useState("");
   const [instacartTesting, setInstacartTesting] = useState(false);
+  const [settingsPreferencesMemberId, setSettingsPreferencesMemberId] = useState("");
   const settings = data.adminSettings;
   const storageStatus = getLocalStorageStatus();
-  const { user } = useAuth();
+  const { user, signOut } = useAuth();
   const supabaseAuthConfigured = isSupabaseConfigured();
   const localStorageActive = storageStatus === "OK";
   const backupToolsStatus = getBackupToolsStatus();
@@ -291,6 +301,57 @@ export function SettingsPage({ data, setData, onOpenLogin, navigateWithinApp }: 
     [inventoryCsvText, data],
   );
   const validInventoryRows = inventoryImportPreview.filter((row) => row.isValid);
+  const activePantryItems = useMemo(
+    () => data.pantry.filter((item) => !item.inactiveInInventory),
+    [data.pantry],
+  );
+  const inventorySpaceRows = useMemo(() => {
+    const spaces = [
+      {
+        id: "pantry",
+        label: "Main Pantry",
+        match: (item: PantryItem) => item.location === "Pantry" || item.storageArea === "Pantry",
+      },
+      {
+        id: "freezer",
+        label: "Freezer",
+        match: (item: PantryItem) =>
+          item.location.includes("Freezer") || item.storageArea.includes("Freezer"),
+      },
+      {
+        id: "refrigerator",
+        label: "Refrigerator",
+        match: (item: PantryItem) =>
+          item.location.includes("Fridge") || item.storageArea.includes("Fridge"),
+      },
+      {
+        id: "cabinets",
+        label: "Kitchen Cabinets",
+        match: (item: PantryItem) =>
+          item.location === "Kitchen Cabinets" || item.storageArea === "Kitchen Cabinets",
+      },
+    ];
+
+    return spaces.map((space) => ({
+      ...space,
+      count: activePantryItems.filter(space.match).length,
+    }));
+  }, [activePantryItems]);
+  const pushNotificationsOn = notificationEffective(
+    undefined,
+    settings.siteNotificationDefaults,
+    "enableReminders",
+  );
+  const pantryAlertsOn = notificationEffective(
+    undefined,
+    settings.siteNotificationDefaults,
+    "inventoryLowStock",
+  );
+  const shoppingAlertsOn = notificationEffective(
+    undefined,
+    settings.siteNotificationDefaults,
+    "shoppingUpdates",
+  );
 
   function enterCloudPreview() {
     setCloudPreviewError(null);
@@ -502,7 +563,6 @@ export function SettingsPage({ data, setData, onOpenLogin, navigateWithinApp }: 
     { key: "shoppingUpdates", label: "Shopping updates" },
     { key: "inventoryLowStock", label: "Pantry low / out" },
     { key: "petMedicationDue", label: "Pet medication due" },
-    { key: "importantMessages", label: "Important messages" },
     { key: "kitchenDutyReminders", label: "Kitchen duty reminders" },
   ];
 
@@ -527,8 +587,7 @@ export function SettingsPage({ data, setData, onOpenLogin, navigateWithinApp }: 
   function updateMemberNotificationPrefs(
     patch: Partial<MemberNotificationPreferences>,
   ) {
-    const memberId =
-      settings.activePreferencesMemberId ?? data.familyMembers[0]?.id;
+    const memberId = settingsPreferencesMemberId;
     if (!memberId) {
       return;
     }
@@ -914,6 +973,181 @@ export function SettingsPage({ data, setData, onOpenLogin, navigateWithinApp }: 
   const storagePayloadKb =
     rawStoragePayload != null ? Math.round((rawStoragePayload.length / 1024) * 10) / 10 : null;
 
+  function openSettingsSection(id: SettingsTabId) {
+    selectSettingsTab(id);
+    setShowFullSettings(true);
+  }
+
+  if (!showFullSettings) {
+    return (
+      <div className="wd-settings-ref">
+        <header className="wd-settings-ref__topbar" aria-label="Settings navigation">
+          <button type="button" className="wd-settings-ref__back" onClick={() => navigateWithinApp?.("/pantry")}>
+            <ArrowLeft className="h-4 w-4" aria-hidden />
+            Back
+          </button>
+          <strong>Settings</strong>
+          <span aria-hidden />
+        </header>
+
+        <nav className="wd-settings-ref__switcher" aria-label="Shared pantry and shopping pages">
+          <button type="button" onClick={() => navigateWithinApp?.("/pantry")}>Inventory</button>
+          <button type="button" onClick={() => navigateWithinApp?.("/shopping")}>Shopping</button>
+          <button type="button" onClick={() => navigateWithinApp?.("/shopping")}>Product Details</button>
+          <button type="button" className="wd-settings-ref__switcher-active" aria-current="page">Settings</button>
+        </nav>
+
+        <section className="wd-settings-ref__hero" aria-labelledby="settings-kiosk-title">
+          <span aria-hidden><Settings className="h-7 w-7" /></span>
+          <div>
+            <h1 id="settings-kiosk-title">Settings</h1>
+            <p>{settings.householdName || "Shared household"}</p>
+          </div>
+        </section>
+
+        <main className="wd-settings-ref__content" aria-label="Shared pantry and shopping settings">
+          <section className="wd-settings-ref__card">
+            <header>
+              <span aria-hidden><Barcode className="h-5 w-5" /></span>
+              <h2>Barcode Lookup</h2>
+            </header>
+            <div className="wd-settings-ref__stack">
+              <div className="wd-settings-ref__field">
+                <span>Product Name Format</span>
+                <div className="wd-settings-ref__select-like">
+                  <strong>Long Names (Recommended)</strong>
+                  <small>Includes brand information from OpenFoodFacts when available</small>
+                  <ChevronRight className="h-4 w-4" aria-hidden />
+                </div>
+              </div>
+              <div className="wd-settings-ref__example">
+                <strong>Example:</strong>
+                <p><span>Short:</span> Hot Sauce</p>
+                <p><span>Long:</span> Frank's RedHot Original Cayenne Pepper Sauce</p>
+              </div>
+              <p className="wd-settings-ref__note">
+                <strong>Note:</strong> Product names can still be edited manually after scanning.
+              </p>
+            </div>
+          </section>
+
+          <section className="wd-settings-ref__card">
+            <header>
+              <span aria-hidden><Home className="h-5 w-5" /></span>
+              <h2>Inventory Spaces</h2>
+            </header>
+            <div className="wd-settings-ref__rows">
+              {inventorySpaceRows.map((space) => (
+                <button
+                  key={space.id}
+                  type="button"
+                  className="wd-settings-ref__row"
+                  onClick={() => openSettingsSection("shopping_pantry")}
+                >
+                  <span className="wd-settings-ref__row-icon" aria-hidden><Home className="h-4 w-4" /></span>
+                  <span>
+                    <strong>{space.label}</strong>
+                    <small>{space.count} item{space.count === 1 ? "" : "s"}</small>
+                  </span>
+                  <ChevronRight className="h-5 w-5" aria-hidden />
+                </button>
+              ))}
+            </div>
+          </section>
+
+          <section className="wd-settings-ref__card">
+            <header>
+              <span aria-hidden><Bell className="h-5 w-5" /></span>
+              <h2>Notifications</h2>
+            </header>
+            <div className="wd-settings-ref__rows">
+              <label className="wd-settings-ref__toggle-row">
+                <span>
+                  <strong>Push Notifications</strong>
+                  <small>Receive household alerts and updates</small>
+                </span>
+                <input
+                  type="checkbox"
+                  checked={pushNotificationsOn}
+                  onChange={(event) =>
+                    updateSiteNotificationDefaults({ enableReminders: event.target.checked })
+                  }
+                />
+              </label>
+              <label className="wd-settings-ref__toggle-row">
+                <span>
+                  <strong>Pantry Alerts</strong>
+                  <small>Get notified when pantry items need attention</small>
+                </span>
+                <input
+                  type="checkbox"
+                  checked={pantryAlertsOn}
+                  onChange={(event) =>
+                    updateSiteNotificationDefaults({ inventoryLowStock: event.target.checked })
+                  }
+                />
+              </label>
+              <label className="wd-settings-ref__toggle-row">
+                <span>
+                  <strong>Shopping Updates</strong>
+                  <small>Notify the household when the shared list changes</small>
+                </span>
+                <input
+                  type="checkbox"
+                  checked={shoppingAlertsOn}
+                  onChange={(event) =>
+                    updateSiteNotificationDefaults({ shoppingUpdates: event.target.checked })
+                  }
+                />
+              </label>
+            </div>
+          </section>
+
+          <section className="wd-settings-ref__card">
+            <header>
+              <span aria-hidden><UserRound className="h-5 w-5" /></span>
+              <h2>Account</h2>
+            </header>
+            <div className="wd-settings-ref__rows">
+              <button type="button" className="wd-settings-ref__row" onClick={() => openSettingsSection("household")}>
+                <span>
+                  <strong>Profile Information</strong>
+                  <small>{user?.email ?? "Local kiosk profile"}</small>
+                </span>
+                <ChevronRight className="h-5 w-5" aria-hidden />
+              </button>
+              <button type="button" className="wd-settings-ref__row" onClick={() => openSettingsSection("household")}>
+                <span>
+                  <strong>Organization</strong>
+                  <small>{settings.householdName || "Shared household"}</small>
+                </span>
+                <ChevronRight className="h-5 w-5" aria-hidden />
+              </button>
+              <button type="button" className="wd-settings-ref__row" onClick={() => setShowFullSettings(true)}>
+                <span>
+                  <strong>Advanced Settings</strong>
+                  <small>Open the full household settings workspace</small>
+                </span>
+                <ChevronRight className="h-5 w-5" aria-hidden />
+              </button>
+            </div>
+          </section>
+
+          {user ? (
+            <button type="button" className="wd-settings-ref__danger" onClick={() => void signOut()}>
+              <LogOut className="h-4 w-4" aria-hidden />
+              Sign Out
+            </button>
+          ) : (
+            <button type="button" className="wd-settings-ref__danger wd-settings-ref__danger--neutral" onClick={onOpenLogin}>
+              Sign In
+            </button>
+          )}
+        </main>
+      </div>
+    );
+  }
+
   return (
     <div className={PAGE_BG}>
       <WorkspacePageShell
@@ -1112,7 +1346,6 @@ export function SettingsPage({ data, setData, onOpenLogin, navigateWithinApp }: 
                   <li>Grocery list helper</li>
                   <li>Pantry meal ideas</li>
                   <li>Cleaning checklist assistant</li>
-                  <li>Message board rewrite helper</li>
                   <li>Schedule prep suggestions</li>
                 </ul>
               </div>
@@ -1679,32 +1912,6 @@ export function SettingsPage({ data, setData, onOpenLogin, navigateWithinApp }: 
         </Card>
       ) : null}
 
-      {settingsTab === "messages" ? (
-      <>
-        <Card tone="light">
-          <CardHeader tone="light" title="Message board" eyebrow="Household notes" />
-          <p className="mb-4 text-sm text-[#575757]">
-            Categories and accent colors apply to the Messages page. Pinned items and visibility follow
-            each note&apos;s fields on that page.
-          </p>
-          <div className="flex flex-wrap gap-2">
-            <Button type="button" variant="primary" onClick={() => navigateWithinApp?.("/messages")}>
-              Open Messages
-            </Button>
-          </div>
-        </Card>
-        <Card tone="light">
-          <CardHeader tone="light" title="Categories &amp; colors" eyebrow="Customize" />
-          <CustomizationCenter
-            allowedTabs={["messages"]}
-            compact
-            data={data}
-            setData={setData}
-          />
-        </Card>
-      </>
-      ) : null}
-
       {settingsTab === "notifications" ? (
       <>
         <Card tone="light">
@@ -1726,7 +1933,7 @@ export function SettingsPage({ data, setData, onOpenLogin, navigateWithinApp }: 
         <Card tone="light">
           <CardHeader tone="light" title="Household defaults" eyebrow="Everyone" />
           <p className="mb-3 text-sm text-[#575757]">
-            Baseline reminders for chores, calendar, shopping, pantry, pets, messages, and kitchen duty.
+            Baseline reminders for chores, calendar, shopping, pantry, pets, and kitchen duty.
           </p>
           <div className="space-y-2">
             {notificationFieldList.map(({ key, label }) => (
@@ -1755,15 +1962,16 @@ export function SettingsPage({ data, setData, onOpenLogin, navigateWithinApp }: 
           </p>
           <SettingsField label="Editing notifications for">
             <Select
-              value={
-                settings.activePreferencesMemberId ??
-                data.familyMembers[0]?.id ??
-                ""
-              }
-              onChange={(event) =>
-                updateSettings({ activePreferencesMemberId: event.target.value })
-              }
+              value={settingsPreferencesMemberId}
+              onChange={(event) => {
+                const memberId = event.target.value;
+                setSettingsPreferencesMemberId(memberId);
+                if (memberId) {
+                  updateSettings({ activePreferencesMemberId: memberId });
+                }
+              }}
             >
+              <option value="">Household defaults</option>
               {data.familyMembers.map((m) => (
                 <option key={m.id} value={m.id}>
                   {getMemberFullName(m)}
@@ -1772,8 +1980,7 @@ export function SettingsPage({ data, setData, onOpenLogin, navigateWithinApp }: 
             </Select>
           </SettingsField>
           {(() => {
-            const memberId =
-              settings.activePreferencesMemberId ?? data.familyMembers[0]?.id;
+            const memberId = settingsPreferencesMemberId;
             const memberPrefs = memberId
               ? settings.userPreferencesByMemberId?.[memberId]?.notificationPreferences
               : undefined;
@@ -2108,7 +2315,6 @@ export function SettingsPage({ data, setData, onOpenLogin, navigateWithinApp }: 
           </p>
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             <DataHealthTile label="Family members" value={dataCheckCounts.members} />
-            <DataHealthTile label="Messages" value={dataCheckCounts.messages} />
             <DataHealthTile label="Calendar events" value={dataCheckCounts.calendarEvents} />
             <DataHealthTile label="Shopping items" value={dataCheckCounts.shopping} />
             <DataHealthTile label="Pantry items" value={dataCheckCounts.pantry} />

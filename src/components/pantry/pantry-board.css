@@ -353,3 +353,93 @@
     align-items: start;
   }
 }
+
+/* Dashboard-matched dark glass treatment for Pantry board surfaces. */
+.fh-pantry-board {
+  --fh-pantry-board-text: #f8fbff;
+  --fh-pantry-board-muted: rgba(205, 218, 244, 0.68);
+  --fh-pantry-board-border: rgba(176, 206, 255, 0.16);
+  --fh-pantry-board-panel:
+    radial-gradient(circle at 92% 0%, rgba(88, 216, 255, 0.12), transparent 14rem),
+    linear-gradient(180deg, rgba(17, 27, 50, 0.92), rgba(8, 13, 26, 0.95));
+  --fh-pantry-board-card:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.085), rgba(255, 255, 255, 0.035)),
+    rgba(8, 13, 31, 0.68);
+  color: var(--fh-pantry-board-text);
+}
+
+.fh-pantry-board__chip,
+.fh-pantry-board__lane,
+.fh-pantry-product,
+.fh-pantry-board__empty,
+.fh-pantry-board__global-empty,
+.fh-pantry-board__add-panel {
+  border-color: var(--fh-pantry-board-border);
+  background: var(--fh-pantry-board-panel);
+  color: var(--fh-pantry-board-text);
+  box-shadow:
+    0 18px 42px rgba(0, 0, 0, 0.28),
+    0 0 28px rgba(88, 216, 255, 0.065),
+    inset 0 1px 0 rgba(255, 255, 255, 0.095);
+  backdrop-filter: blur(18px) saturate(145%);
+}
+
+.fh-pantry-product,
+.fh-pantry-board__empty {
+  background: var(--fh-pantry-board-card);
+}
+
+.fh-pantry-board__chip {
+  border-width: 1px;
+  border-radius: 999px;
+}
+
+.fh-pantry-board__chip--active {
+  border-color: rgba(36, 242, 192, 0.38);
+  background:
+    linear-gradient(90deg, rgba(36, 242, 192, 0.95), rgba(75, 231, 221, 0.95));
+  color: #03110e;
+  box-shadow: 0 0 24px rgba(36, 242, 192, 0.18);
+}
+
+.fh-pantry-board__lane-title,
+.fh-pantry-product__name,
+.fh-pantry-board__empty-title {
+  color: var(--fh-pantry-board-text);
+}
+
+.fh-pantry-board__lane-desc,
+.fh-pantry-board__lane-count,
+.fh-pantry-board__empty-hint {
+  color: var(--fh-pantry-board-muted);
+}
+
+.fh-pantry-board__lane-count,
+.fh-pantry-product__badge,
+.fh-pantry-product__btn {
+  border: 1px solid rgba(176, 206, 255, 0.14);
+  background: rgba(255, 255, 255, 0.07);
+  color: rgba(248, 251, 255, 0.84);
+}
+
+.fh-pantry-product__media {
+  border: 1px solid rgba(176, 206, 255, 0.16);
+  background:
+    radial-gradient(circle at 30% 20%, rgba(36, 242, 192, 0.22), transparent 3.6rem),
+    rgba(255, 255, 255, 0.07);
+  color: #7df9ff;
+}
+
+.fh-pantry-product--use-first,
+.fh-pantry-product--expired,
+.fh-pantry-product--low {
+  background: var(--fh-pantry-board-card);
+}
+
+.fh-pantry-product__btn--primary,
+.fh-pantry-product__btn--accent {
+  border-color: rgba(36, 242, 192, 0.38);
+  background:
+    linear-gradient(90deg, rgba(36, 242, 192, 0.95), rgba(75, 231, 221, 0.95));
+  color: #03110e;
+}

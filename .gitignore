@@ -22,3 +22,6 @@ checkpoints/
 .zip-inspect/
 .tmp-pantry-export/
 server_DISABLED/
+
+# Vendored zip extracts (runtime uses npm chart.js + src/assets/feather)
+vendor/

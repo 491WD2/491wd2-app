@@ -7,8 +7,20 @@ import type {
   ProductLibraryStatusFilter,
 } from "../types/grocery";
 
+const HIDDEN_HOUSEHOLD_PRODUCT_TERMS = ["coffee", "espresso", "cold brew"];
+
+function isVisibleHouseholdProduct(product: HouseholdProduct): boolean {
+  if (product.category.trim().toLowerCase() === "alcohol") {
+    return false;
+  }
+  const searchable = [product.id, product.productName, product.category, product.notes]
+    .join(" ")
+    .toLowerCase();
+  return !HIDDEN_HOUSEHOLD_PRODUCT_TERMS.some((term) => searchable.includes(term));
+}
+
 /** Typed seed library generated from the Notion Food List Database export. */
-export const HOUSEHOLD_PRODUCT_LIBRARY = [
+const HOUSEHOLD_PRODUCT_LIBRARY_SEED = [
   {
     id: "milk-oat",
     productName: "Milk, Oat",
@@ -4882,6 +4894,8 @@ export const HOUSEHOLD_PRODUCT_LIBRARY = [
     source: "notion",
   },
 ] as const satisfies readonly HouseholdProduct[];
+
+export const HOUSEHOLD_PRODUCT_LIBRARY = HOUSEHOLD_PRODUCT_LIBRARY_SEED.filter(isVisibleHouseholdProduct);
 
 export const ACTIVE_SHOPPING_PRODUCTS = HOUSEHOLD_PRODUCT_LIBRARY.filter((product) => product.need);
 

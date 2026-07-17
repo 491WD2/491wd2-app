@@ -24,19 +24,21 @@ export function SmartSuggestions({ suggestions, onNavigate }: SmartSuggestionsPr
 
   return (
     <WidgetCard
+      className="fh-family-hub__section-card fh-family-hub__section-card--suggestions"
       aria-label="Smart suggestions"
       header={
         <WidgetHeader
-          icon={<Sparkles className="h-6 w-6 text-violet-600" />}
+          icon={<Sparkles className="h-6 w-6 text-cyan-300" />}
           title="Smart suggestions"
           subtitle="Based on pantry, chores, and calendar data"
         />
       }
     >
-      <div className="space-y-3">
+      <div className="fh-family-hub__stack fh-family-hub__stack--compact">
         {visible.map((suggestion) => (
           <KioskCard
             key={suggestion.id}
+            className="fh-family-hub__list-card"
             category={
               suggestion.kind === "expiring" || suggestion.kind === "low_stock"
                 ? "pantry"

@@ -39,7 +39,7 @@ export function WorkspacePageShell({
   return (
     <div
       className={cn(
-        "space-y-5 sm:space-y-6",
+        "w-full min-w-0 space-y-5 sm:space-y-6",
         tone === "premiumDark" && cn(DASH_PAGE_BG, "rounded-2xl p-4 sm:p-6"),
         className,
       )}
@@ -65,7 +65,7 @@ export const workspaceTableClassName = wrkTableClassName;
 
 /** Form blocks inside drawers and inline editors (calendar, tasks, member edit). */
 export const workspaceFormSectionClassName =
-  "motion-card rounded-md border border-slate-200 bg-white p-4 shadow-sm ring-1 ring-slate-950/[0.03] sm:p-5";
+  "motion-card rounded-[24px] border border-white/[0.16] bg-white/[0.07] p-4 text-slate-100 shadow-[0_16px_44px_rgba(0,0,0,0.32),inset_0_1px_0_rgba(255,255,255,0.11)] backdrop-blur-xl sm:p-5";
 
 export function WorkspaceFormPanel({
   children,
@@ -94,7 +94,7 @@ export function WorkspaceFilterBar({
         "motion-panel rounded-lg border p-4 sm:p-5",
         dark
           ? "border-white/10 bg-[#141922]/90 shadow-lg shadow-black/25 ring-1 ring-white/[0.06]"
-          : "border-slate-200 bg-white shadow-sm ring-1 ring-slate-950/[0.04]",
+          : "rounded-[24px] border-white/[0.16] bg-white/[0.07] text-slate-100 shadow-[0_16px_44px_rgba(0,0,0,0.32),inset_0_1px_0_rgba(255,255,255,0.11)] backdrop-blur-xl",
         className,
       )}
     >
@@ -192,7 +192,7 @@ export function ModuleActionBar({
         "motion-panel rounded-lg px-4 py-3.5 sm:px-5",
         dark
           ? cn(DASH_CARD, "shadow-black/25")
-          : "border border-slate-200 bg-white shadow-sm ring-1 ring-slate-950/[0.04]",
+          : "rounded-[24px] border border-white/[0.16] bg-white/[0.07] text-slate-100 shadow-[0_16px_44px_rgba(0,0,0,0.32),inset_0_1px_0_rgba(255,255,255,0.11)] backdrop-blur-xl",
         className,
       )}
     >
@@ -222,13 +222,13 @@ export function ModuleSubnav<T extends string>({
         "flex gap-0.5 overflow-x-auto rounded-lg p-1",
         dark
           ? "border border-white/10 bg-[#0d141c] shadow-inner shadow-black/40"
-          : "border border-slate-200 bg-slate-50/90 shadow-inner",
+          : "rounded-2xl border border-slate-200/85 bg-slate-50/95 shadow-inner",
       )}
     >
       {tabs.map((tab) => (
         <button
           className={cn(
-            "motion-tab min-h-10 whitespace-nowrap rounded-md border border-transparent px-3.5 text-sm font-semibold transition",
+            "motion-tab min-h-10 whitespace-nowrap rounded-xl border border-transparent px-3.5 text-sm font-semibold transition",
             dark
               ? showSelection && activeTab === tab.id
                 ? "bg-white/12 text-slate-50"
@@ -265,7 +265,7 @@ export function WorkspacePanel({
   return (
     <section
       className={cn(
-        "motion-panel rounded-lg p-4 sm:p-5",
+        "motion-panel rounded-2xl p-4 sm:p-5",
         dark
           ? cn(DASH_CARD, "shadow-black/30")
           : "border border-slate-200 bg-white shadow-sm ring-1 ring-slate-950/[0.04]",
@@ -357,7 +357,7 @@ export function EmptyStatePanel({
   return (
     <div
       className={cn(
-        "motion-panel rounded-md border border-dashed px-4 py-6 text-center text-sm leading-relaxed sm:px-5 sm:text-left",
+        "motion-panel rounded-2xl border border-dashed px-4 py-6 text-center text-sm leading-relaxed sm:px-5 sm:text-left",
         dark
           ? "border-white/15 bg-white/[0.03] text-slate-400"
           : "border-slate-300 bg-slate-50 text-slate-600",

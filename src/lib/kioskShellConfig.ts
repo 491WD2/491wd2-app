@@ -1,33 +1,42 @@
 import type { ShellRoute } from "../components/layout/shellRoutes";
-import type { MyBuildUserView } from "./appNavigation";
 
 export type KioskNavId =
   | "dashboard"
+  | "shopping"
   | "pantry"
-  | "chores"
-  | "members"
   | "calendar"
-  | "analytics"
+  | "notifications"
+  | "subscriptions"
+  | "chores"
+  | "pets"
   | "settings";
 
 export const KIOSK_NAV_ORDER: KioskNavId[] = [
   "dashboard",
+  "shopping",
   "pantry",
-  "chores",
-  "members",
   "calendar",
-  "analytics",
+  "notifications",
+  "subscriptions",
+  "chores",
+  "pets",
   "settings",
 ];
 
 const UNIFIED_SHELL_ROUTES = new Set<ShellRoute>([
   "dashboard",
+  "shopping",
   "pantry",
   "tasks",
   "kitchen",
+  "kitchenSchedule",
   "family",
   "calendar",
   "planner",
+  "notifications",
+  "subscriptions",
+  "pets",
+  "quick-add",
   "settings",
 ]);
 
@@ -43,16 +52,31 @@ export function resolveKioskNavFromShell(
   const href = locationHref ?? "";
   const search = href.includes("?") ? href.slice(href.indexOf("?")) : "";
   if (search.includes("analytics=1")) {
-    return "analytics";
+    return "chores";
   }
   if (route === "pantry" || href.includes("view=pantry")) {
     return "pantry";
   }
+  if (route === "shopping") {
+    return "shopping";
+  }
+  if (route === "notifications") {
+    return "notifications";
+  }
+  if (route === "subscriptions") {
+    return "subscriptions";
+  }
+  if (route === "pets") {
+    return "pets";
+  }
+  if (route === "quick-add") {
+    return "dashboard";
+  }
   if (route === "tasks" || route === "kitchen") {
     return "chores";
   }
-  if (route === "family") {
-    return "members";
+  if (route === "kitchenSchedule") {
+    return "chores";
   }
   if (route === "calendar" || route === "planner") {
     return "calendar";
@@ -63,45 +87,33 @@ export function resolveKioskNavFromShell(
   return "dashboard";
 }
 
-export function resolveKioskNavFromBuildView(view: MyBuildUserView): KioskNavId {
-  if (view.screen === "home" || view.screen === "planned") {
-    return "dashboard";
-  }
-  if (view.screen === "chores" || view.screen === "cleaning") {
-    return "chores";
-  }
-  if (view.screen === "product-library") {
-    return "pantry";
-  }
-  if (view.screen === "release-checklist") {
-    return "analytics";
-  }
-  if (view.screen === "module") {
-    if (view.moduleId === "pantry" || view.path.includes("view=pantry")) {
-      return "pantry";
-    }
-    if (view.moduleId === "calendar") {
-      return "calendar";
-    }
-    if (view.moduleId === "shopping") {
-      return "dashboard";
-    }
-  }
-  return "dashboard";
-}
-
 export function resolveKioskNavFromPath(pathname: string, search = ""): KioskNavId {
   if (search.includes("analytics=1") || pathname === "/chores") {
-    return pathname === "/chores" ? "chores" : "analytics";
+    return "chores";
   }
   if (pathname.startsWith("/pantry")) {
     return "pantry";
   }
+  if (pathname.startsWith("/shopping")) {
+    return "shopping";
+  }
+  if (pathname.startsWith("/notifications")) {
+    return "notifications";
+  }
+  if (pathname.startsWith("/subscriptions")) {
+    return "subscriptions";
+  }
+  if (pathname.startsWith("/pets")) {
+    return "pets";
+  }
+  if (pathname.startsWith("/quick-add")) {
+    return "dashboard";
+  }
   if (pathname.startsWith("/chores") || pathname.startsWith("/cleaning")) {
     return "chores";
   }
-  if (pathname.startsWith("/family")) {
-    return "members";
+  if (pathname.startsWith("/kitchen-schedule")) {
+    return "chores";
   }
   if (pathname.startsWith("/calendar")) {
     return "calendar";

@@ -1,7 +1,9 @@
+import type { CSSProperties } from "react";
 import { useMemo } from "react";
 import { ScanLine } from "lucide-react";
 import { boardEmptyStateForChip, matchesPantryBoardChip } from "../../lib/pantryBoard";
 import { trackCardScan } from "../../lib/kioskCardAnalytics";
+import { getGroceryCategoryTheme } from "../../lib/groceryCategoryTheme";
 import type { FoodInventoryItem, FoodStorageLocation } from "../../types/inventory";
 import type { PantryBoardChip } from "../../types/pantryBoard";
 import { PantryItemCard } from "./PantryItemCard";
@@ -22,6 +24,8 @@ export type PantryGridProps = {
   emptyTitle?: string;
   emptyHint?: string;
   analyticsSurface?: string;
+  variant?: "default" | "kiosk" | "inventory";
+  groupByCategory?: boolean;
 };
 
 /** GroFast-style responsive product grid for `/pantry?view=pantry`. */
@@ -37,6 +41,8 @@ export function PantryGrid({
   emptyTitle = "No items in this view",
   emptyHint = "Try another filter or scan a product.",
   analyticsSurface = "pantry:food-inventory",
+  variant = "default",
+  groupByCategory = false,
 }: PantryGridProps) {
   const filtered = useMemo(
     () =>
@@ -47,6 +53,25 @@ export function PantryGrid({
   );
 
   const emptyState = boardEmptyStateForChip(chip);
+
+  const groups = useMemo(() => {
+    if (!groupByCategory) {
+      return [];
+    }
+    const map = new Map<string, FoodInventoryItem[]>();
+    for (const item of filtered) {
+      const key = item.category?.trim() || "Uncategorized";
+      const bucket = map.get(key) ?? [];
+      bucket.push(item);
+      map.set(key, bucket);
+    }
+    return [...map.entries()]
+      .sort(([left], [right]) => left.localeCompare(right))
+      .map(([category, categoryItems]) => ({
+        category,
+        items: categoryItems.sort((a, b) => a.name.localeCompare(b.name)),
+      }));
+  }, [filtered, groupByCategory]);
 
   if (filtered.length === 0) {
     return (
@@ -71,6 +96,54 @@ export function PantryGrid({
     );
   }
 
+  if (groupByCategory) {
+    return (
+      <div className="gf-pantry-inventory-sections" aria-label="Pantry items by category">
+        {groups.map((group) => {
+          const theme = getGroceryCategoryTheme(group.category);
+          return (
+            <section
+              key={group.category}
+              className="gf-pantry-inventory-section"
+              style={
+                {
+                  "--gf-pantry-section-accent": theme.accent,
+                  "--gf-pantry-section-soft": theme.soft,
+                } as CSSProperties
+              }
+            >
+              <div className="gf-pantry-inventory-section__head">
+                <div>
+                  <p className="gf-pantry-inventory-section__eyebrow">Category</p>
+                  <h3 className="gf-pantry-inventory-section__title">{group.category}</h3>
+                </div>
+                <span className="gf-pantry-inventory-section__count">
+                  {group.items.length} item{group.items.length === 1 ? "" : "s"}
+                </span>
+              </div>
+              <ul className="gf-pantry-grid gf-pantry-grid--inventory" aria-label={`${group.category} pantry items`}>
+                {group.items.map((item) => (
+                  <li key={item.id}>
+                    <PantryItemCard
+                      item={item}
+                      onUse={onUse}
+                      onEdit={onEdit}
+                      onMove={onMove}
+                      onReorder={onReorder}
+                      onAddToShopping={onAddToShopping}
+                      analyticsSurface={analyticsSurface}
+                      variant={variant}
+                    />
+                  </li>
+                ))}
+              </ul>
+            </section>
+          );
+        })}
+      </div>
+    );
+  }
+
   return (
     <ul className="gf-pantry-grid" aria-label="Pantry items">
       {filtered.map((item) => (
@@ -83,6 +156,7 @@ export function PantryGrid({
             onReorder={onReorder}
             onAddToShopping={onAddToShopping}
             analyticsSurface={analyticsSurface}
+            variant={variant}
           />
         </li>
       ))}

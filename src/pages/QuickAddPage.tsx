@@ -1,8 +1,8 @@
 import { useMemo, useState, type FormEvent, type Dispatch, type SetStateAction } from "react";
+import { CalendarDays, ClipboardList, Home, ListChecks, PackagePlus, Plus, ShoppingCart, StickyNote, Table2, X } from "lucide-react";
 import {
   CANONICAL_HOUSEHOLD_ROSTER_NAMES,
   type FamilyData,
-  type MessageBoardItem,
   type PantryItem,
   type PlannerEvent,
   type Task,
@@ -33,7 +33,7 @@ import {
   type QuickAction,
   validateQuickAction,
 } from "../services/quickActions";
-import { createEmptyMessageBoardItem, displayMessageTitle } from "../lib/messageBoardUtils";
+import "../styles/guided-kiosk.css";
 
 const PAGE_BG =
   "min-h-full bg-[#f7f7f7] text-[#1f1f1f] [-webkit-font-smoothing:antialiased]";
@@ -93,9 +93,6 @@ export function QuickAddPage({
     if (initialAction.type === "note") {
       return initialAction.title;
     }
-    if (initialAction.type === "message") {
-      return initialAction.title;
-    }
     if (initialAction.type === "chore") {
       return initialAction.title;
     }
@@ -111,9 +108,8 @@ export function QuickAddPage({
   const [eventTime, setEventTime] = useState(
     initialAction?.type === "event" ? (initialAction.time ?? "") : "",
   );
-  const [messageBody, setMessageBody] = useState(
-    initialAction?.type === "message" ? (initialAction.body ?? "") : "",
-  );
+  const [showFullQuickAdd, setShowFullQuickAdd] = useState(false);
+  const [chooserOpen, setChooserOpen] = useState(false);
 
   const [choreAssignee, setChoreAssignee] = useState("__family__");
   const [choreWhen, setChoreWhen] = useState<ChoreWhenPreset>("today");
@@ -168,8 +164,6 @@ export function QuickAddPage({
         return { type: "note", title: mf };
       case "chore":
         return { type: "chore", title: mf };
-      case "message":
-        return { type: "message", title: mf, body: messageBody.trim() || undefined };
       case "pantry":
         return { type: "pantry", name: mf };
       case "event":
@@ -182,7 +176,7 @@ export function QuickAddPage({
       default:
         return null;
     }
-  }, [initialType, mainField, eventDate, eventTime, messageBody]);
+  }, [initialType, mainField, eventDate, eventTime]);
 
   const parseErrors = parsed.ok ? [] : parsed.errors;
   const validationErrors = draftAction ? validateQuickAction(draftAction) : [];
@@ -202,11 +196,9 @@ export function QuickAddPage({
             ? moduleEnabled("calendar", data)
             : initialType === "note"
               ? moduleEnabled("docs", data)
-              : initialType === "message"
-                ? true
-                : initialType === "pantry"
-                  ? moduleEnabled("pantry", data)
-                  : false);
+              : initialType === "pantry"
+                ? moduleEnabled("pantry", data)
+                : false);
 
   const moduleBlockMessage =
     draftAction?.type === "grocery" && !moduleEnabled("shopping", data)
@@ -430,36 +422,6 @@ export function QuickAddPage({
         navigateWithinApp("/tasks#chore-tracker");
         break;
       }
-      case "message": {
-        const now = new Date().toISOString();
-        const bodyText = (draftAction.body?.trim() || draftAction.title).trim();
-        const item: MessageBoardItem = {
-          ...createEmptyMessageBoardItem({
-            authorMemberId: data.adminSettings.activePreferencesMemberId ?? undefined,
-          }),
-          title: draftAction.title.trim(),
-          message: bodyText,
-          updatedAt: now,
-          createdAt: now,
-        };
-        setData((current) =>
-          createActivity(
-            {
-              ...current,
-              messageBoard: [item, ...current.messageBoard],
-            },
-            {
-              type: "created",
-              entityType: "messageBoard",
-              entityId: item.id,
-              entityTitle: displayMessageTitle(item),
-              message: `Quick add: message ${displayMessageTitle(item)}.`,
-            },
-          ),
-        );
-        navigateWithinApp("/messages");
-        break;
-      }
       case "pantry": {
         const now = new Date().toISOString();
         const name = draftAction.name.trim() || "New inventory item";
@@ -590,6 +552,121 @@ export function QuickAddPage({
     }
   }
 
+  function quickAddHref(type: QuickAction["type"]) {
+    if (type === "grocery") {
+      return "/quick-add?type=grocery&name=";
+    }
+    if (type === "task") {
+      return "/quick-add?type=task&title=";
+    }
+    if (type === "chore") {
+      return "/quick-add?type=chore&title=";
+    }
+    if (type === "pantry") {
+      return "/quick-add?type=pantry&name=";
+    }
+    if (type === "event") {
+      return "/quick-add?type=event&title=";
+    }
+    return "/quick-add?type=note&title=";
+  }
+
+  function openQuickAddType(type: QuickAction["type"]) {
+    navigateWithinApp(quickAddHref(type));
+  }
+
+  if (!initialType && !showFullQuickAdd) {
+    return (
+      <div className="wd-guided-kiosk wd-guided-kiosk--quick-add">
+        <section className="wd-guided-kiosk__hero" aria-labelledby="quick-add-kiosk-title">
+          <div>
+            <p className="wd-guided-kiosk__eyebrow">Quick Add station</p>
+            <h1 id="quick-add-kiosk-title">What do you want to add?</h1>
+            <p>Pick one household item type. The next screen collects the details and saves it.</p>
+          </div>
+          <div className="wd-guided-kiosk__status">
+            <span>{data.familyMembers.length} members</span>
+            <span>{data.shopping.length} groceries</span>
+            <span>{data.tasks.length} tasks</span>
+          </div>
+        </section>
+
+        <section className="wd-guided-kiosk__actions-grid" aria-label="Quick add actions">
+          <button type="button" className="wd-guided-kiosk__action wd-guided-kiosk__action--primary" onClick={() => setChooserOpen(true)}>
+            <span className="wd-guided-kiosk__action-icon"><Plus className="h-5 w-5" aria-hidden /></span>
+            <span><strong>Choose item type</strong><small>Open quick-add popup</small></span>
+          </button>
+          <button type="button" className="wd-guided-kiosk__action" onClick={() => openQuickAddType("grocery")}>
+            <span className="wd-guided-kiosk__action-icon"><ShoppingCart className="h-5 w-5" aria-hidden /></span>
+            <span><strong>Grocery</strong><small>Name item, then save</small></span>
+          </button>
+          <button type="button" className="wd-guided-kiosk__action" onClick={() => openQuickAddType("task")}>
+            <span className="wd-guided-kiosk__action-icon"><ClipboardList className="h-5 w-5" aria-hidden /></span>
+            <span><strong>Task</strong><small>Add a one-time family task</small></span>
+          </button>
+          <button type="button" className="wd-guided-kiosk__action" onClick={() => openQuickAddType("chore")}>
+            <span className="wd-guided-kiosk__action-icon"><ListChecks className="h-5 w-5" aria-hidden /></span>
+            <span><strong>Chore</strong><small>Assign and schedule</small></span>
+          </button>
+          <button type="button" className="wd-guided-kiosk__action" onClick={() => openQuickAddType("event")}>
+            <span className="wd-guided-kiosk__action-icon"><CalendarDays className="h-5 w-5" aria-hidden /></span>
+            <span><strong>Event</strong><small>Add family calendar item</small></span>
+          </button>
+          <button type="button" className="wd-guided-kiosk__action" onClick={() => openQuickAddType("note")}>
+            <span className="wd-guided-kiosk__action-icon"><StickyNote className="h-5 w-5" aria-hidden /></span>
+            <span><strong>Note</strong><small>Save a household note</small></span>
+          </button>
+          <button type="button" className="wd-guided-kiosk__action" onClick={() => openQuickAddType("pantry")}>
+            <span className="wd-guided-kiosk__action-icon"><PackagePlus className="h-5 w-5" aria-hidden /></span>
+            <span><strong>Pantry item</strong><small>Add inventory item</small></span>
+          </button>
+          <button type="button" className="wd-guided-kiosk__action" onClick={() => setShowFullQuickAdd(true)}>
+            <span className="wd-guided-kiosk__action-icon"><Table2 className="h-5 w-5" aria-hidden /></span>
+            <span><strong>Advanced quick add</strong><small>Use the original chooser</small></span>
+          </button>
+          <button type="button" className="wd-guided-kiosk__action" onClick={onOpenDashboard}>
+            <span className="wd-guided-kiosk__action-icon"><Home className="h-5 w-5" aria-hidden /></span>
+            <span><strong>Home</strong><small>Return to Family Hub</small></span>
+          </button>
+        </section>
+
+        {chooserOpen ? (
+          <div className="wd-guided-kiosk__sheet-backdrop" role="presentation" onClick={() => setChooserOpen(false)}>
+            <section
+              className="wd-guided-kiosk__sheet"
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="quick-add-flow-title"
+              onClick={(event) => event.stopPropagation()}
+            >
+              <header className="wd-guided-kiosk__sheet-head">
+                <div>
+                  <p className="wd-guided-kiosk__eyebrow">Quick Add</p>
+                  <h2 id="quick-add-flow-title">Choose item type</h2>
+                  <p>Pick the kind of household item you want to create.</p>
+                </div>
+                <button
+                  type="button"
+                  className="wd-guided-kiosk__icon-btn"
+                  aria-label="Close quick add chooser"
+                  onClick={() => setChooserOpen(false)}
+                >
+                  <X className="h-4 w-4" aria-hidden />
+                </button>
+              </header>
+              <div className="rounded-[16px] bg-white p-4 text-slate-950">
+                <WorkflowTypeSelector
+                  onPickType={openQuickAddType}
+                  onScanPantry={() => navigateWithinApp("/pantry?tab=add-item")}
+                />
+              </div>
+            </section>
+          </div>
+        ) : null}
+      </div>
+    );
+  }
+
   return (
     <div className={PAGE_BG}>
       <WorkspacePageShell
@@ -597,6 +674,19 @@ export function QuickAddPage({
         tone="light"
       >
       <ModuleWorkspaceHeader
+        action={
+          <Button
+            type="button"
+            variant="secondary"
+            className="border-[#ededed] bg-white font-semibold text-[#575757] shadow-sm hover:bg-[#f8f9fa]"
+            onClick={() => {
+              setShowFullQuickAdd(false);
+              navigateWithinApp("/quick-add");
+            }}
+          >
+            Kiosk station
+          </Button>
+        }
         description="Add something for the household in a few taps. Links can be bookmarked — keep them generic."
         eyebrow="Shortcuts"
         title="Quick Add"
@@ -622,13 +712,11 @@ export function QuickAddPage({
                       ? "/quick-add?type=task&title="
                       : type === "chore"
                         ? "/quick-add?type=chore&title="
-                        : type === "message"
-                          ? "/quick-add?type=message&title="
-                          : type === "pantry"
-                            ? "/quick-add?type=pantry&name="
-                            : type === "event"
-                              ? "/quick-add?type=event&title="
-                              : "/quick-add?type=note&title=";
+                        : type === "pantry"
+                          ? "/quick-add?type=pantry&name="
+                          : type === "event"
+                            ? "/quick-add?type=event&title="
+                            : "/quick-add?type=note&title=";
                 navigateWithinApp(href);
               }}
               onScanPantry={() => navigateWithinApp("/pantry?tab=add-item")}
@@ -776,17 +864,6 @@ export function QuickAddPage({
                   />
                 </label>
               </div>
-            ) : null}
-
-            {initialType === "message" ? (
-              <label className="block space-y-1">
-                <span className={SM_LABEL}>Message (optional — defaults to title)</span>
-                <Textarea
-                  className={cn(SM_INPUT, "min-h-[6rem] resize-y py-3")}
-                  onChange={(e) => setMessageBody(e.target.value)}
-                  value={messageBody}
-                />
-              </label>
             ) : null}
 
             {initialType === "event" ? (

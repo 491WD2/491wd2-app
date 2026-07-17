@@ -5,7 +5,7 @@ import {
   CalendarRange,
   FolderKanban,
   Home,
-  MessageCircle,
+  LayoutDashboard,
   Package,
   PawPrint,
   Settings,
@@ -18,6 +18,7 @@ import {
 
 export type RouteKey =
   | "dashboard"
+  | "adminux"
   | "kiosk"
   | "family"
   | "tasks"
@@ -32,7 +33,6 @@ export type RouteKey =
   | "calendar"
   | "planner"
   | "docs"
-  | "messages"
   | "settings";
 
 /** Sidebar-only / deep links — not in compact mobile header strip. */
@@ -47,6 +47,8 @@ export const PRIMARY_NAV_EXCLUDED = new Set<RouteKey>([
   "subscriptions",
   /** Pets lives in sidebar + More menu, not the compact header strip. */
   "pets",
+  /** AdminUX command center — sidebar primary; keep bottom strip uncluttered. */
+  "adminux",
 ]);
 
 export function isPrimaryNavRoute(key: RouteKey): boolean {
@@ -58,10 +60,10 @@ export function isPrimaryNavRoute(key: RouteKey): boolean {
  */
 export const SIDEBAR_ROUTE_KEYS = [
   "dashboard",
-  "shopping",
+  "adminux",
   "pantry",
+  "shopping",
   "calendar",
-  "messages",
   "notifications",
   "subscriptions",
   "tasks",
@@ -83,9 +85,10 @@ export const routes: Array<{
   label: string;
   icon: typeof Home;
 }> = [
-  { key: "dashboard", label: "Home", icon: Home },
+  { key: "dashboard", label: "Dashboard", icon: Home },
+  { key: "adminux", label: "Command Center", icon: LayoutDashboard },
+  { key: "pantry", label: "Inventory", icon: Package },
   { key: "shopping", label: "Shopping", icon: ShoppingCart },
-  { key: "pantry", label: "Pantry & Inventory", icon: Package },
   { key: "calendar", label: "Calendar", icon: CalendarDays },
   /** Combined cleaning + kitchen workflows — single household surface. */
   { key: "tasks", label: "Cleaning", icon: Sparkles },
@@ -94,7 +97,6 @@ export const routes: Array<{
   { key: "notifications", label: "Notifications", icon: Bell },
   { key: "subscriptions", label: "Subscriptions", icon: Wallet },
   { key: "pets", label: "Pets", icon: PawPrint },
-  { key: "messages", label: "Messages", icon: MessageCircle },
   { key: "family", label: "Members", icon: Users },
   { key: "projects", label: "Workspace", icon: FolderKanban },
   { key: "planner", label: "Calendar", icon: CalendarDays },

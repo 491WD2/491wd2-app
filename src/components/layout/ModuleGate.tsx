@@ -8,7 +8,7 @@ const moduleLabels: Record<ModuleKey, string> = {
   family: "Members",
   tasks: "Cleaning",
   projects: "Workspace",
-  pantry: "Pantry & Inventory",
+  pantry: "Inventory",
   shopping: "Shopping",
   calendar: "Calendar",
   planner: "Calendar",

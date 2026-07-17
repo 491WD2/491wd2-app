@@ -13,14 +13,15 @@
   position: relative;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 10px;
   width: 100%;
-  min-height: 88px;
+  min-width: 0;
+  min-height: 76px;
   padding: var(--fh-kiosk-pad);
-  border: 2px solid var(--fh-kiosk-border);
-  border-radius: var(--fh-kiosk-radius);
+  border: 1px solid var(--fh-kiosk-border);
+  border-radius: 18px;
   background: var(--fh-kiosk-bg);
-  box-shadow: var(--fh-kiosk-shadow);
+  box-shadow: 0 8px 20px rgba(71, 85, 105, 0.08);
   text-align: left;
   color: #0f172a;
   transition:
@@ -34,16 +35,16 @@
   content: "";
   position: absolute;
   left: 0;
-  top: 16px;
-  bottom: 16px;
-  width: 5px;
-  border-radius: 0 6px 6px 0;
+  top: 12px;
+  bottom: 12px;
+  width: 4px;
+  border-radius: 0 5px 5px 0;
   background: var(--fh-kiosk-accent);
 }
 
 .fh-kiosk-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 12px 32px rgba(15, 23, 42, 0.12);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 26px rgba(71, 85, 105, 0.12);
 }
 
 .fh-kiosk-card:active {
@@ -124,20 +125,20 @@
 .fh-kiosk-card__head {
   display: flex;
   align-items: flex-start;
-  gap: 16px;
-  padding-left: 8px;
+  gap: 12px;
+  padding-left: 6px;
 }
 
 .fh-kiosk-card__visual {
   flex-shrink: 0;
-  width: 56px;
-  height: 56px;
+  width: 42px;
+  height: 42px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 16px;
+  border-radius: 13px;
   background: color-mix(in srgb, var(--fh-kiosk-accent) 14%, white);
-  font-size: 1.75rem;
+  font-size: 1.25rem;
   overflow: hidden;
 }
 
@@ -154,23 +155,23 @@
 
 .fh-kiosk-card__title {
   margin: 0;
-  font-size: 1.125rem;
+  font-size: 0.98rem;
   font-weight: 800;
   line-height: 1.25;
   letter-spacing: -0.02em;
 }
 
 .fh-kiosk-card__subtitle {
-  margin: 6px 0 0;
-  font-size: 0.9375rem;
+  margin: 4px 0 0;
+  font-size: 0.82rem;
   line-height: 1.45;
   color: #64748b;
   font-weight: 500;
 }
 
 .fh-kiosk-card__meta {
-  margin-top: 8px;
-  font-size: 0.8125rem;
+  margin-top: 6px;
+  font-size: 0.75rem;
   font-weight: 600;
   color: #94a3b8;
 }
@@ -178,15 +179,15 @@
 .fh-kiosk-card__badge-row {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 10px;
+  gap: 6px;
+  margin-top: 8px;
 }
 
 .fh-kiosk-card__badge {
   display: inline-flex;
-  padding: 4px 12px;
+  padding: 3px 9px;
   border-radius: 999px;
-  font-size: 0.6875rem;
+  font-size: 0.64rem;
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.06em;
@@ -210,13 +211,13 @@
   display: flex;
   justify-content: space-between;
   margin-bottom: 8px;
-  font-size: 0.8125rem;
+  font-size: 0.75rem;
   font-weight: 700;
   color: #64748b;
 }
 
 .fh-kiosk-card__progress-track {
-  height: 10px;
+  height: 8px;
   border-radius: 999px;
   background: #e2e8f0;
   overflow: hidden;
@@ -268,17 +269,17 @@
 
 /* Stat card */
 .fh-kiosk-stat {
-  min-height: 100px;
+  min-height: 82px;
   justify-content: center;
 }
 
 .fh-kiosk-stat .fh-kiosk-card__title {
-  font-size: 2rem;
+  font-size: 1.5rem;
 }
 
 .fh-kiosk-card--compact {
-  --fh-kiosk-pad: 14px;
-  min-height: 72px;
+  --fh-kiosk-pad: 12px;
+  min-height: 64px;
 }
 
 .fh-kiosk-card--compact .fh-kiosk-card__title {
@@ -298,13 +299,13 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
-  min-height: 48px;
-  min-width: 48px;
-  padding: 0 18px;
-  border-radius: 14px;
-  border: 2px solid #e2e8f0;
+  min-height: 40px;
+  min-width: 40px;
+  padding: 0 14px;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
   background: #f8fafc;
-  font-size: 0.9375rem;
+  font-size: 0.86rem;
   font-weight: 700;
   color: #0f172a;
   cursor: pointer;
@@ -330,7 +331,7 @@
 .fh-kiosk-grid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 16px;
+  gap: 10px;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -404,7 +405,8 @@
 
 .fh-kiosk-page__header {
   margin-bottom: 28px;
-  max-width: 1400px;
+  width: 100%;
+  max-width: none;
 }
 
 .fh-kiosk-page__title {
@@ -421,4 +423,444 @@
   text-transform: uppercase;
   letter-spacing: 0.16em;
   color: #64748b;
+}
+
+/* Reusable dark module/category shortcut card */
+.fh-module-card {
+  --fh-module-accent: #4fb7ff;
+  position: relative;
+  width: 100%;
+  min-height: 104px;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 14px;
+  overflow: hidden;
+  padding: 18px 16px 18px 20px;
+  border: 1px solid rgba(150, 170, 210, 0.16);
+  border-radius: 18px;
+  background:
+    radial-gradient(circle at 92% 0%, color-mix(in srgb, var(--fh-module-accent) 16%, transparent), transparent 10rem),
+    linear-gradient(180deg, rgba(17, 27, 50, 0.94), rgba(8, 13, 26, 0.97));
+  color: #f7fbff;
+  text-align: left;
+  box-shadow:
+    0 16px 36px rgba(0, 0, 0, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.055);
+  cursor: pointer;
+  touch-action: manipulation;
+  transition:
+    border-color 0.16s ease,
+    box-shadow 0.16s ease,
+    transform 0.16s ease,
+    background 0.16s ease;
+}
+
+.fh-module-card::before {
+  content: "";
+  position: absolute;
+  inset: 14px auto 14px 0;
+  width: 4px;
+  border-radius: 0 999px 999px 0;
+  background: var(--fh-module-accent);
+  box-shadow: 0 0 18px color-mix(in srgb, var(--fh-module-accent) 38%, transparent);
+}
+
+.fh-module-card:hover {
+  transform: translateY(-2px);
+  border-color: color-mix(in srgb, var(--fh-module-accent) 34%, rgba(150, 170, 210, 0.22));
+  box-shadow:
+    0 20px 44px rgba(0, 0, 0, 0.34),
+    0 0 28px color-mix(in srgb, var(--fh-module-accent) 12%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.065);
+}
+
+.fh-module-card:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--fh-module-accent) 72%, white);
+  outline-offset: 3px;
+}
+
+.fh-module-card__icon {
+  width: 44px;
+  height: 44px;
+  display: inline-grid;
+  place-items: center;
+  flex: 0 0 auto;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--fh-module-accent) 18%, rgba(255, 255, 255, 0.08));
+  color: color-mix(in srgb, var(--fh-module-accent) 72%, white);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--fh-module-accent) 18%, transparent);
+}
+
+.fh-module-card__copy {
+  min-width: 0;
+  display: grid;
+  gap: 6px;
+}
+
+.fh-module-card__copy strong {
+  overflow: hidden;
+  color: #f7fbff;
+  font-size: 0.96rem;
+  font-weight: 900;
+  letter-spacing: -0.025em;
+  line-height: 1.1;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.fh-module-card__copy small {
+  color: #a4b0ca;
+  font-size: 0.75rem;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.fh-module-card__arrow {
+  width: 28px;
+  height: 28px;
+  display: inline-grid;
+  place-items: center;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.055);
+  color: rgba(247, 251, 255, 0.66);
+  transition:
+    background 0.16s ease,
+    color 0.16s ease,
+    transform 0.16s ease;
+}
+
+.fh-module-card:hover .fh-module-card__arrow {
+  background: color-mix(in srgb, var(--fh-module-accent) 18%, rgba(255, 255, 255, 0.08));
+  color: #ffffff;
+  transform: translateX(2px);
+}
+
+.fh-module-card--green {
+  --fh-module-accent: #20e6a2;
+}
+
+.fh-module-card--blue {
+  --fh-module-accent: #4fb7ff;
+}
+
+.fh-module-card--purple {
+  --fh-module-accent: #a78bfa;
+}
+
+.fh-module-card--amber {
+  --fh-module-accent: #ffc65c;
+}
+
+.fh-module-card--orange {
+  --fh-module-accent: #ff8b3d;
+}
+
+.fh-family-hub .fh-module-card {
+  min-height: 112px;
+  border-color: color-mix(in srgb, var(--fh-module-accent) 24%, rgba(176, 206, 255, 0.16));
+  border-radius: var(--fh-ref-inner-radius, 18px);
+  background:
+    linear-gradient(145deg, color-mix(in srgb, var(--fh-module-accent) 16%, rgba(255, 255, 255, 0.075)), rgba(255, 255, 255, 0.026) 48%),
+    radial-gradient(circle at 92% 0%, color-mix(in srgb, var(--fh-module-accent) 25%, transparent), transparent 10rem),
+    rgba(8, 13, 31, 0.74);
+  box-shadow:
+    0 18px 44px rgba(0, 0, 0, 0.36),
+    0 0 26px color-mix(in srgb, var(--fh-module-accent) 12%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.13);
+  backdrop-filter: blur(16px) saturate(145%);
+}
+
+.fh-family-hub .fh-module-card::before {
+  width: 3px;
+  inset: 18px auto 18px 0;
+  box-shadow:
+    0 0 22px color-mix(in srgb, var(--fh-module-accent) 52%, transparent),
+    8px 0 28px color-mix(in srgb, var(--fh-module-accent) 14%, transparent);
+}
+
+.fh-family-hub .fh-module-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(120deg, rgba(255, 255, 255, 0.12), transparent 34%, rgba(255, 255, 255, 0.04));
+  opacity: 0.64;
+}
+
+.fh-family-hub .fh-module-card > * {
+  position: relative;
+  z-index: 1;
+}
+
+.fh-family-hub .fh-module-card__icon {
+  border-radius: 16px;
+  background:
+    radial-gradient(circle at 30% 18%, rgba(255, 255, 255, 0.24), transparent 35%),
+    color-mix(in srgb, var(--fh-module-accent) 21%, rgba(255, 255, 255, 0.08));
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--fh-module-accent) 22%, transparent),
+    0 0 22px color-mix(in srgb, var(--fh-module-accent) 22%, transparent);
+}
+
+.fh-family-hub .fh-module-card__arrow {
+  background: rgba(255, 255, 255, 0.075);
+  color: rgba(248, 251, 255, 0.78);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.055);
+}
+
+.fh-family-hub .fh-module-card:hover {
+  border-color: color-mix(in srgb, var(--fh-module-accent) 45%, rgba(176, 206, 255, 0.18));
+  box-shadow:
+    0 24px 54px rgba(0, 0, 0, 0.42),
+    0 0 34px color-mix(in srgb, var(--fh-module-accent) 18%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.16);
+}
+
+/* Tasks opening screen — tasks.make inspired entry card */
+.fh-tasks-entry {
+  min-height: 100%;
+  display: grid;
+  place-items: center;
+  padding: clamp(18px, 3vw, 34px);
+  background:
+    radial-gradient(circle at 50% 8%, rgba(255, 255, 255, 0.78), transparent 20rem),
+    linear-gradient(135deg, #f6f1ff 0%, #eef3ff 48%, #eef7ff 100%);
+  color: #172033;
+}
+
+.fh-tasks-entry__card {
+  width: min(100%, 360px);
+  padding: 22px;
+  border: 1px solid rgba(23, 32, 51, 0.08);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow:
+    0 18px 42px rgba(71, 85, 105, 0.11),
+    0 1px 0 rgba(255, 255, 255, 0.8) inset;
+}
+
+.fh-tasks-entry__eyebrow {
+  margin: 0;
+  text-align: center;
+  font-size: 0.68rem;
+  font-weight: 850;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #64748b;
+}
+
+.fh-tasks-entry__title {
+  margin: 7px 0 0;
+  text-align: center;
+  font-size: 1.08rem;
+  font-weight: 850;
+  letter-spacing: -0.03em;
+  color: #172033;
+}
+
+.fh-tasks-entry__hint {
+  margin: 7px 0 16px;
+  text-align: center;
+  font-size: 0.78rem;
+  font-weight: 650;
+  color: #6f7787;
+}
+
+.fh-tasks-entry__members {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.fh-tasks-entry__member-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 42px;
+  padding: 0 12px;
+  border: 1px solid rgba(23, 32, 51, 0.09);
+  border-radius: 10px;
+  background: #ffffff;
+  color: #172033;
+  text-align: left;
+  font-size: 0.84rem;
+  font-weight: 800;
+  cursor: pointer;
+  touch-action: manipulation;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+  transition:
+    transform 0.14s ease,
+    border-color 0.14s ease,
+    box-shadow 0.14s ease,
+    background 0.14s ease;
+}
+
+.fh-tasks-entry__member-btn:hover {
+  transform: translateY(-1px);
+  border-color: rgba(249, 115, 22, 0.3);
+  background: #fffaf5;
+  box-shadow: 0 8px 18px rgba(71, 85, 105, 0.1);
+}
+
+.fh-tasks-entry__member-btn:active {
+  transform: translateY(0);
+}
+
+.fh-tasks-entry__member-btn--household {
+  margin-top: 2px;
+  background: linear-gradient(180deg, #fffaf5 0%, #ffffff 100%);
+}
+
+.fh-tasks-entry__avatar {
+  width: 24px;
+  height: 24px;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #ffead8, #f0e7ff);
+  color: #9a3412;
+  font-size: 0.74rem;
+  font-weight: 850;
+}
+
+/* Dashboard dark kiosk card treatment */
+.fh-family-hub .fh-kiosk-card {
+  border-color: rgba(150, 170, 210, 0.14);
+  border-radius: var(--fh-ref-inner-radius, 16px);
+  padding: 18px;
+  background:
+    radial-gradient(circle at 92% 0%, color-mix(in srgb, var(--fh-kiosk-accent) 20%, transparent), transparent 10rem),
+    linear-gradient(180deg, rgba(17, 27, 50, 0.9), rgba(8, 13, 26, 0.95));
+  color: #f7fbff;
+  box-shadow:
+    0 14px 34px rgba(0, 0, 0, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.fh-family-hub .fh-kiosk-card:hover {
+  border-color: color-mix(in srgb, var(--fh-kiosk-accent) 38%, rgba(150, 170, 210, 0.2));
+  box-shadow:
+    0 18px 40px rgba(0, 0, 0, 0.34),
+    0 0 24px color-mix(in srgb, var(--fh-kiosk-accent) 12%, transparent);
+}
+
+.fh-family-hub .fh-kiosk-card__visual {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--fh-ref-inner-radius, 16px);
+  background: color-mix(in srgb, var(--fh-kiosk-accent) 18%, rgba(255, 255, 255, 0.08));
+  color: color-mix(in srgb, var(--fh-kiosk-accent) 74%, white);
+}
+
+.fh-family-hub .fh-kiosk-card__head {
+  gap: 14px;
+  padding-left: 0;
+}
+
+.fh-family-hub .fh-kiosk-card__title {
+  color: #f7fbff;
+  font-size: 0.94rem;
+  font-weight: 900;
+  line-height: 1.2;
+}
+
+.fh-family-hub .fh-kiosk-card__subtitle,
+.fh-family-hub .fh-kiosk-card__meta,
+.fh-family-hub .fh-kiosk-card__progress-label {
+  color: #a4b0ca;
+}
+
+.fh-family-hub .fh-kiosk-card__progress-track {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.fh-family-hub .fh-kiosk-card__badge {
+  background: color-mix(in srgb, var(--fh-kiosk-accent) 20%, rgba(255, 255, 255, 0.08));
+  color: color-mix(in srgb, var(--fh-kiosk-accent) 70%, white);
+}
+
+/* Calendar dark planning-board card treatment */
+.fh-calendar-page .fh-kiosk-card {
+  border-color: rgba(150, 170, 210, 0.14);
+  border-radius: 16px;
+  padding: 16px;
+  background:
+    radial-gradient(circle at 92% 0%, color-mix(in srgb, var(--fh-kiosk-accent) 18%, transparent), transparent 10rem),
+    linear-gradient(180deg, rgba(17, 27, 50, 0.9), rgba(8, 13, 26, 0.95));
+  color: #f7fbff;
+  box-shadow:
+    0 14px 34px rgba(0, 0, 0, 0.26),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.fh-calendar-page .fh-kiosk-card__head {
+  gap: 12px;
+  padding-left: 0;
+}
+
+.fh-calendar-page .fh-kiosk-card__visual {
+  width: 42px;
+  height: 42px;
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--fh-kiosk-accent) 18%, rgba(255, 255, 255, 0.08));
+  color: color-mix(in srgb, var(--fh-kiosk-accent) 74%, white);
+}
+
+.fh-calendar-page .fh-kiosk-card__title {
+  color: #f7fbff;
+  font-size: 0.9rem;
+  font-weight: 900;
+}
+
+.fh-calendar-page .fh-kiosk-card__subtitle,
+.fh-calendar-page .fh-kiosk-card__meta,
+.fh-calendar-page .fh-kiosk-card__progress-label {
+  color: #a4b0ca;
+}
+
+.fh-calendar-page .fh-kiosk-card__badge {
+  background: color-mix(in srgb, var(--fh-kiosk-accent) 20%, rgba(255, 255, 255, 0.08));
+  color: color-mix(in srgb, var(--fh-kiosk-accent) 70%, white);
+}
+
+/* App-wide liquid glass kiosk cards */
+.fh-kiosk-card {
+  border-color: var(--lg-border, rgba(218, 236, 255, 0.18));
+  border-radius: var(--lg-radius-lg, 22px);
+  background:
+    linear-gradient(140deg, rgba(255, 255, 255, 0.11), rgba(255, 255, 255, 0.035) 46%, rgba(255, 255, 255, 0.06)),
+    radial-gradient(circle at 92% 0%, color-mix(in srgb, var(--fh-kiosk-accent) 18%, transparent), transparent 12rem),
+    rgba(7, 12, 29, 0.72);
+  color: var(--lg-text, #f8fbff);
+  box-shadow: var(--lg-shadow-soft, 0 16px 44px rgba(0, 0, 0, 0.32));
+  backdrop-filter: blur(18px) saturate(145%);
+}
+
+.fh-kiosk-card:hover {
+  border-color: color-mix(in srgb, var(--fh-kiosk-accent) 38%, var(--lg-border-strong, rgba(218, 236, 255, 0.3)));
+  box-shadow:
+    0 24px 58px rgba(0, 0, 0, 0.42),
+    0 0 30px color-mix(in srgb, var(--fh-kiosk-accent) 12%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.13);
+}
+
+.fh-kiosk-card__title {
+  color: var(--lg-text, #f8fbff);
+}
+
+.fh-kiosk-card__subtitle,
+.fh-kiosk-card__meta,
+.fh-kiosk-card__progress-label {
+  color: var(--lg-text-muted, rgba(177, 193, 218, 0.68));
+}
+
+.fh-kiosk-card__visual {
+  background:
+    radial-gradient(circle at 28% 20%, rgba(255, 255, 255, 0.22), transparent 36%),
+    color-mix(in srgb, var(--fh-kiosk-accent) 18%, rgba(255, 255, 255, 0.08));
+  color: color-mix(in srgb, var(--fh-kiosk-accent) 74%, white);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--fh-kiosk-accent) 18%, transparent);
 }

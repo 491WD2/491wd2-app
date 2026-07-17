@@ -6,18 +6,16 @@ export type HomeDashboardCardId =
   | "shopping"
   | "chores"
   | "calendar"
-  | "messages"
   | "notes"
   | "scan";
 
-/** User-facing My Build screens (App-level, not Backend Console). */
+/** User-facing household screens. */
 export type BuildUserModuleId =
   | "home"
   | "pantry"
   | "shopping"
   | "chores"
   | "calendar"
-  | "messages"
   | "notes";
 
 export type BuildUserView =
@@ -92,15 +90,6 @@ export type HomeDashboardEventRow = {
   title: string;
   time: string;
   tone: "blue" | "green" | "purple" | "orange";
-};
-
-export type HomeDashboardMessageRow = {
-  id: string;
-  name: string;
-  avatarPath?: string;
-  preview: string;
-  time: string;
-  unread?: boolean;
 };
 
 export type HomeDashboardRecommendationRow = {

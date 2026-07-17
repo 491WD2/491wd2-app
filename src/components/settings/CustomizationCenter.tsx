@@ -3,7 +3,6 @@ import { RotateCcw, Save } from "lucide-react";
 import {
   cleaningZones,
   coldLocationDetails,
-  DEFAULT_MESSAGE_BOARD_CATEGORY_DEFINITIONS,
   defaultDocVisibilityOptions,
   defaultGroceryCategoryOptions,
   defaultInventoryCategoryOptions,
@@ -25,11 +24,9 @@ import {
   taskStatuses,
   type CustomizationSettings,
   type FamilyData,
-  type MessageBoardCategoryDefinition,
-  type MessageBoardColorKey,
 } from "../../data/familyData";
 import { Button } from "../ui/Button";
-import { Input, Select } from "../ui/Field";
+import { Input } from "../ui/Field";
 import {
   ModuleSubnav,
   WorkspaceFilterBar,
@@ -41,7 +38,6 @@ import {
   normalizeCustomization,
   type CustomizationLabelKey,
 } from "../../lib/customization";
-import { normalizeColorKey } from "../../lib/colorCoding";
 import { cn } from "../../lib/utils";
 
 export type CustomizationTab =
@@ -51,8 +47,7 @@ export type CustomizationTab =
   | "calendar"
   | "grocery"
   | "projects"
-  | "docs"
-  | "messages";
+  | "docs";
 
 const customizationTabs: { id: CustomizationTab; label: string }[] = [
   { id: "labels", label: "Labels" },
@@ -62,20 +57,6 @@ const customizationTabs: { id: CustomizationTab; label: string }[] = [
   { id: "grocery", label: "Grocery & Inventory" },
   { id: "projects", label: "Workspace" },
   { id: "docs", label: "Notes" },
-  { id: "messages", label: "Message board" },
-];
-
-const MESSAGE_BOARD_COLOR_KEYS: MessageBoardColorKey[] = [
-  "slate",
-  "blue",
-  "sky",
-  "teal",
-  "green",
-  "amber",
-  "orange",
-  "rose",
-  "purple",
-  "pink",
 ];
 
 function cloneDraft(raw: CustomizationSettings | undefined): CustomizationSettings {
@@ -125,7 +106,7 @@ const LABEL_DEFAULTS: Record<
   [LABEL_KEYS.dashboardTitle]: (s) => s.householdName,
   [LABEL_KEYS.dashboardWelcomeMessage]: (s) =>
     s.dashboardWelcomeMessage || "Run the house from one calm place.",
-  [LABEL_KEYS.moduleHouseholdInventory]: () => "Pantry & Inventory",
+  [LABEL_KEYS.moduleHouseholdInventory]: () => "Inventory",
   [LABEL_KEYS.moduleShopping]: () => "Shopping",
   [LABEL_KEYS.moduleTasks]: () => "Cleaning",
   [LABEL_KEYS.moduleFamily]: () => "Members",
@@ -224,47 +205,6 @@ export function CustomizationCenter({
   };
 
   const admin = data.adminSettings;
-
-  function updateMessageBoardCategoryRow(
-    index: number,
-    patch: Partial<MessageBoardCategoryDefinition>,
-  ) {
-    setDraft((d) => {
-      const cur = [
-        ...(d.messageBoardCategories ?? [...DEFAULT_MESSAGE_BOARD_CATEGORY_DEFINITIONS]),
-      ];
-      const prev = cur[index];
-      if (!prev) {
-        return d;
-      }
-      cur[index] = { ...prev, ...patch };
-      return { ...d, messageBoardCategories: cur };
-    });
-  }
-
-  function removeMessageBoardCategoryRow(index: number) {
-    setDraft((d) => {
-      const cur = [
-        ...(d.messageBoardCategories ?? [...DEFAULT_MESSAGE_BOARD_CATEGORY_DEFINITIONS]),
-      ];
-      cur.splice(index, 1);
-      return { ...d, messageBoardCategories: cur };
-    });
-  }
-
-  function addMessageBoardCategoryRow() {
-    setDraft((d) => {
-      const cur = [
-        ...(d.messageBoardCategories ?? [...DEFAULT_MESSAGE_BOARD_CATEGORY_DEFINITIONS]),
-      ];
-      cur.push({
-        id: crypto.randomUUID(),
-        label: "New category",
-        colorKey: "slate",
-      });
-      return { ...d, messageBoardCategories: cur };
-    });
-  }
 
   const labelField = (key: CustomizationLabelKey, label: string, hint: string) => {
     const value = draft.labels?.[key] ?? "";
@@ -675,72 +615,6 @@ export function CustomizationCenter({
             "Access control picks",
           )}
         </div>
-      ) : null}
-
-      {tab === "messages" ? (
-        <WorkspacePanel eyebrow="Household workstation" title="Message board categories">
-          <p className="mb-3 text-xs text-slate-600">
-            Soft accent colors keep the board easy to scan. Removing a category here does not delete
-            messages—existing notes keep their labels and appear as options while editing.
-          </p>
-          <div className="space-y-3">
-            {(draft.messageBoardCategories ?? [...DEFAULT_MESSAGE_BOARD_CATEGORY_DEFINITIONS]).map(
-              (row, index) => (
-                <div
-                  key={row.id}
-                  className="flex flex-wrap items-end gap-2 rounded-lg border border-slate-200 bg-white p-3 shadow-sm"
-                >
-                  <label className="min-w-[10rem] flex-1 space-y-1">
-                    <span className="text-[0.65rem] font-semibold uppercase tracking-wide text-slate-500">
-                      Label
-                    </span>
-                    <Input
-                      value={row.label}
-                      onChange={(event) =>
-                        updateMessageBoardCategoryRow(index, { label: event.target.value })
-                      }
-                    />
-                  </label>
-                  <label className="w-36 space-y-1">
-                    <span className="text-[0.65rem] font-semibold uppercase tracking-wide text-slate-500">
-                      Color key
-                    </span>
-                    <Select
-                      value={row.colorKey}
-                      onChange={(event) =>
-                        updateMessageBoardCategoryRow(index, {
-                          colorKey: normalizeColorKey(event.target.value),
-                        })
-                      }
-                    >
-                      {MESSAGE_BOARD_COLOR_KEYS.map((k) => (
-                        <option key={k} value={k}>
-                          {k}
-                        </option>
-                      ))}
-                    </Select>
-                  </label>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    className="text-rose-700"
-                    onClick={() => removeMessageBoardCategoryRow(index)}
-                  >
-                    Remove
-                  </Button>
-                </div>
-              ),
-            )}
-          </div>
-          <Button
-            type="button"
-            variant="secondary"
-            className="mt-4"
-            onClick={addMessageBoardCategoryRow}
-          >
-            Add category
-          </Button>
-        </WorkspacePanel>
       ) : null}
 
       <div className={cn("flex justify-end border-t border-slate-200 pt-4")}>

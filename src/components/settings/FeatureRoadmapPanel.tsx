@@ -39,14 +39,6 @@ const ROADMAP_ROWS: RoadmapRow[] = [
     nextStep: "Change PIN anytime under My settings.",
   },
   {
-    feature: "Message board",
-    status: "Live",
-    description:
-      "Household notes with categories, pins, and quick updates everyone can see.",
-    priority: "High",
-    nextStep: "Pin what matters on Home and Messages.",
-  },
-  {
     feature: "Shopping list",
     status: "Live",
     description:
@@ -133,14 +125,6 @@ const ROADMAP_ROWS: RoadmapRow[] = [
       "Ideas for tying reminders or inventory to Home Assistant—only when it stays safe and simple.",
     priority: "Low",
     nextStep: "Settings placeholder only; no bridge required to use FamilySite.",
-  },
-  {
-    feature: "Text messages to phones",
-    status: "Removed / Not needed",
-    description:
-      "We focused on in-app alerts so nothing sensitive routes through phone carriers by surprise.",
-    priority: "Low",
-    nextStep: "Use Notifications on Home instead.",
   },
 ];
 

@@ -1,4 +1,14 @@
-import { ArrowRightLeft, Check, Pencil, RotateCcw, ShoppingCart } from "lucide-react";
+import type { CSSProperties } from "react";
+import {
+  ArrowRightLeft,
+  CalendarDays,
+  Check,
+  MapPin,
+  Package,
+  Pencil,
+  RotateCcw,
+  ShoppingCart,
+} from "lucide-react";
 import {
   formatInventoryExpiryLabel,
   getInventoryExpiryStatus,
@@ -6,6 +16,7 @@ import {
   type FoodInventoryItem,
   type FoodStorageLocation,
 } from "../../types/inventory";
+import { getGroceryCategoryTheme } from "../../lib/groceryCategoryTheme";
 import { isUseFirstItem, isLowStockItem, isExpiredItem } from "../../lib/pantryBoard";
 import { pantryStatusLabel, resolvePantryItemStatus } from "../../lib/pantryItemStatus";
 import {
@@ -36,6 +47,7 @@ export type PantryItemCardProps = {
   onReorder: (item: FoodInventoryItem) => void;
   onAddToShopping?: (item: FoodInventoryItem) => void;
   analyticsSurface?: string;
+  variant?: "default" | "kiosk" | "inventory";
 };
 
 export function PantryItemCard({
@@ -46,6 +58,7 @@ export function PantryItemCard({
   onReorder,
   onAddToShopping,
   analyticsSurface = "pantry:food-inventory",
+  variant = "default",
 }: PantryItemCardProps) {
   const expiry = getInventoryExpiryStatus(item.expiryDate);
   const useFirst = isUseFirstItem(item) && !isExpiredItem(item);
@@ -54,16 +67,41 @@ export function PantryItemCard({
     expiryDate: item.expiryDate,
     quantity: item.quantity,
   });
-  const locLabel = INVENTORY_LOCATION_META[item.location].label;
-  const emoji = CATEGORY_EMOJI[item.category] ?? "🏷️";
+  const locLabel = INVENTORY_LOCATION_META[item.location]?.label ?? "Pantry";
+  const category = item.category?.trim() || "General";
+  const emoji = CATEGORY_EMOJI[category] ?? "🏷️";
+  const theme = getGroceryCategoryTheme(category);
   const nextLocations = (["pantry", "fridge", "freezer"] as const).filter(
     (loc) => loc !== item.location,
   );
+  const inventoryVariant = variant === "inventory";
+  const kioskVariant = variant === "kiosk" || inventoryVariant;
 
   return (
-    <article className="gf-pantry-item">
+    <article
+      className={cn(
+        "gf-pantry-item",
+        kioskVariant && "gf-pantry-item--kiosk",
+        inventoryVariant && "gf-pantry-item--inventory",
+        useFirst && "gf-pantry-item--use-first",
+        low && "gf-pantry-item--low",
+        expiry === "expired" && "gf-pantry-item--expired",
+      )}
+      style={
+        {
+          "--gf-pantry-card-accent": theme.accent,
+          "--gf-pantry-card-soft": theme.soft,
+        } as CSSProperties
+      }
+    >
       <div className="gf-pantry-item__media">
         {useFirst ? <span className="gf-pantry-item__use-first">Expiring</span> : null}
+        {kioskVariant ? (
+          <span className="gf-pantry-item__qty-pill">
+            {inventoryVariant ? <span className="gf-pantry-item__qty-label">Qty</span> : null}
+            {item.quantity} {item.unit}
+          </span>
+        ) : null}
         {item.imageUrl ? (
           <img src={item.imageUrl} alt="" loading="lazy" />
         ) : (
@@ -75,9 +113,26 @@ export function PantryItemCard({
 
       <div className="gf-pantry-item__body">
         <h3 className="gf-pantry-item__name">{item.name}</h3>
-        <p className="gf-pantry-item__meta">
-          {item.quantity} {item.unit} · {locLabel}
-        </p>
+        {kioskVariant ? (
+          <div className="gf-pantry-item__meta-grid" aria-label="Item details">
+            <span>
+              <Package className="h-3.5 w-3.5" aria-hidden />
+              {category}
+            </span>
+            <span>
+              <MapPin className="h-3.5 w-3.5" aria-hidden />
+              {locLabel}
+            </span>
+            <span>
+              <CalendarDays className="h-3.5 w-3.5" aria-hidden />
+              {formatInventoryExpiryLabel(item.expiryDate)}
+            </span>
+          </div>
+        ) : (
+          <p className="gf-pantry-item__meta">
+            {item.quantity} {item.unit} · {locLabel}
+          </p>
+        )}
 
         <div className="gf-pantry-item__badges">
           <span
@@ -93,7 +148,7 @@ export function PantryItemCard({
             {expiry === "expired" ? "Expired" : formatInventoryExpiryLabel(item.expiryDate)}
           </span>
           <span className="gf-pantry-item__badge gf-pantry-item__badge--loc">{locLabel}</span>
-          <span className="gf-pantry-item__badge gf-pantry-item__badge--cat">{item.category}</span>
+          <span className="gf-pantry-item__badge gf-pantry-item__badge--cat">{category}</span>
           {item.source === "scan" || item.barcode ? (
             <span className="gf-pantry-item__badge gf-pantry-item__badge--scan">Scanned</span>
           ) : null}
@@ -114,7 +169,7 @@ export function PantryItemCard({
             }}
           >
             <Check className="h-4 w-4" aria-hidden />
-            Use
+            Used one
           </button>
           <button
             type="button"
@@ -125,7 +180,7 @@ export function PantryItemCard({
             }}
           >
             <Pencil className="h-4 w-4" aria-hidden />
-            Edit
+            Details
           </button>
           {nextLocations[0] ? (
             <button
@@ -137,7 +192,7 @@ export function PantryItemCard({
               }}
             >
               <ArrowRightLeft className="h-4 w-4" aria-hidden />
-              Move
+              Move spot
             </button>
           ) : null}
           <button
@@ -149,7 +204,7 @@ export function PantryItemCard({
             }}
           >
             <RotateCcw className="h-4 w-4" aria-hidden />
-            Reorder
+            Need more
           </button>
           {onAddToShopping ? (
             <button
@@ -161,7 +216,7 @@ export function PantryItemCard({
               }}
             >
               <ShoppingCart className="h-4 w-4" aria-hidden />
-              Add to shopping list
+              Add to list
             </button>
           ) : null}
         </div>

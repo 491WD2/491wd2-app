@@ -14,6 +14,7 @@ export type FamilyStatusGridProps = {
 export function FamilyStatusGrid({ members, onOpenMember }: FamilyStatusGridProps) {
   return (
     <WidgetCard
+      className="fh-family-hub__section-card fh-family-hub__section-card--members"
       aria-label="Member progress"
       header={
         <WidgetHeader

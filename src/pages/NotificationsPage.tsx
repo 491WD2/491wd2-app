@@ -1,5 +1,5 @@
-import { ArrowLeft, ListChecks } from "lucide-react";
-import { useMemo } from "react";
+import { ArrowLeft, Bell, ListChecks, Settings, Table2, X } from "lucide-react";
+import { useMemo, useState } from "react";
 import { HouseholdAlertsPanel } from "../components/dashboard/HouseholdAlertsPanel";
 import { Button } from "../components/ui/Button";
 import { WorkspacePageShell, WorkspaceRoutedSection } from "../components/workspace/ModuleWorkspace";
@@ -9,11 +9,14 @@ import { getChoreDueDate, isChoreDone } from "../lib/choreTrackerUtils";
 import { DS_MAIN_COLUMN } from "../lib/designSystem";
 import { cn } from "../lib/utils";
 import type { PageProps } from "./pageTypes";
+import "../styles/guided-kiosk.css";
 
 const PAGE_BG =
   "min-h-full bg-[#f7f7f7] text-[#1f1f1f] [-webkit-font-smoothing:antialiased]";
 const btnSecondary =
   "border-[#ededed] bg-white font-semibold text-[#637381] shadow-sm hover:bg-[#f8f9fa]";
+
+type NotificationsGuidedFlow = "alerts" | "chores";
 
 export function NotificationsPage({
   data,
@@ -23,6 +26,8 @@ export function NotificationsPage({
 }: PageProps) {
   const today = useMemo(() => new Date().toISOString().slice(0, 10), []);
   const sessionMemberId = resolveSessionMemberIdForUi(data);
+  const [showFullNotifications, setShowFullNotifications] = useState(false);
+  const [guidedFlow, setGuidedFlow] = useState<NotificationsGuidedFlow | null>(null);
 
   const activeCount = useMemo(
     () =>
@@ -49,6 +54,126 @@ export function NotificationsPage({
       ).length,
     [data.tasks, today],
   );
+
+  function renderNotificationsFlowSheet() {
+    if (!guidedFlow) {
+      return null;
+    }
+
+    return (
+      <div className="wd-guided-kiosk__sheet-backdrop" role="presentation" onClick={() => setGuidedFlow(null)}>
+        <section
+          className="wd-guided-kiosk__sheet"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="notifications-flow-title"
+          onClick={(event) => event.stopPropagation()}
+        >
+          <header className="wd-guided-kiosk__sheet-head">
+            <div>
+              <p className="wd-guided-kiosk__eyebrow">Notification station</p>
+              <h2 id="notifications-flow-title">
+                {guidedFlow === "alerts" ? "Review alerts" : "Chore alerts"}
+              </h2>
+              <p>{guidedFlow === "alerts" ? "Review active household alerts in one focused panel." : "Check chore urgency, then jump to the chore tracker if needed."}</p>
+            </div>
+            <button
+              type="button"
+              className="wd-guided-kiosk__icon-btn"
+              aria-label="Close notification flow"
+              onClick={() => setGuidedFlow(null)}
+            >
+              <X className="h-4 w-4" aria-hidden />
+            </button>
+          </header>
+
+          {guidedFlow === "alerts" ? (
+            <HouseholdAlertsPanel
+              data={data}
+              setData={setData}
+              currentMemberId={sessionMemberId}
+              premiumDark
+              maxItems={12}
+              inboxMode="session"
+              className="rounded-[18px] border border-white/15"
+            />
+          ) : (
+            <div className="wd-guided-kiosk__confirm">
+              <article className="wd-guided-kiosk__summary-card">
+                <div>
+                  <p className="wd-guided-kiosk__eyebrow">Cleaning</p>
+                  <h3>Chore status</h3>
+                </div>
+                <dl>
+                  <div>
+                    <dt>Due today</dt>
+                    <dd>{choresDueToday}</dd>
+                  </div>
+                  <div>
+                    <dt>Overdue</dt>
+                    <dd>{choresOverdue}</dd>
+                  </div>
+                  <div>
+                    <dt>Route</dt>
+                    <dd>Cleaning</dd>
+                  </div>
+                </dl>
+              </article>
+              {navigateWithinApp ? (
+                <button
+                  type="button"
+                  className="wd-guided-kiosk__primary"
+                  onClick={() => navigateWithinApp("/tasks#chore-tracker")}
+                >
+                  Open chore tracker
+                </button>
+              ) : null}
+            </div>
+          )}
+        </section>
+      </div>
+    );
+  }
+
+  if (!showFullNotifications) {
+    return (
+      <div className="wd-guided-kiosk wd-guided-kiosk--notifications">
+        <section className="wd-guided-kiosk__hero" aria-labelledby="notifications-kiosk-title">
+          <div>
+            <p className="wd-guided-kiosk__eyebrow">Notification station</p>
+            <h1 id="notifications-kiosk-title">What alert step?</h1>
+            <p>Review household alerts one step at a time, then jump only where action is needed.</p>
+          </div>
+          <div className="wd-guided-kiosk__status">
+            <span>{activeCount} active</span>
+            <span>{choresDueToday} chores today</span>
+            <span>{choresOverdue} overdue</span>
+          </div>
+        </section>
+
+        <section className="wd-guided-kiosk__actions-grid" aria-label="Notification actions">
+          <button type="button" className="wd-guided-kiosk__action wd-guided-kiosk__action--primary" onClick={() => setGuidedFlow("alerts")}>
+            <span className="wd-guided-kiosk__action-icon"><Bell className="h-5 w-5" aria-hidden /></span>
+            <span><strong>Review alerts</strong><small>Open focused alert inbox</small></span>
+          </button>
+          <button type="button" className="wd-guided-kiosk__action" onClick={() => setGuidedFlow("chores")}>
+            <span className="wd-guided-kiosk__action-icon"><ListChecks className="h-5 w-5" aria-hidden /></span>
+            <span><strong>Chore alerts</strong><small>Due and overdue summary</small></span>
+          </button>
+          <button type="button" className="wd-guided-kiosk__action" onClick={() => navigateWithinApp?.("/settings#notifications")}>
+            <span className="wd-guided-kiosk__action-icon"><Settings className="h-5 w-5" aria-hidden /></span>
+            <span><strong>Alert settings</strong><small>Open settings section</small></span>
+          </button>
+          <button type="button" className="wd-guided-kiosk__action" onClick={() => setShowFullNotifications(true)}>
+            <span className="wd-guided-kiosk__action-icon"><Table2 className="h-5 w-5" aria-hidden /></span>
+            <span><strong>Advanced inbox</strong><small>Show all alert panels</small></span>
+          </button>
+        </section>
+
+        {renderNotificationsFlowSheet()}
+      </div>
+    );
+  }
 
   return (
     <div className={PAGE_BG}>
@@ -79,6 +204,15 @@ export function NotificationsPage({
           </div>
           {navigateWithinApp ? (
             <div className="flex flex-wrap gap-2">
+              <Button
+                type="button"
+                variant="secondary"
+                className={cn("min-h-10 text-sm font-semibold", btnSecondary)}
+                onClick={() => setShowFullNotifications(false)}
+              >
+                <ArrowLeft className="mr-2 h-4 w-4" aria-hidden />
+                Kiosk station
+              </Button>
               <Button
                 type="button"
                 variant="secondary"

@@ -1,9 +1,11 @@
 import {
   ArrowLeft,
   CalendarDays,
+  CheckCircle2,
   ClipboardList,
   Home,
-  MessageSquare,
+  Table2,
+  X,
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import type {
@@ -23,7 +25,6 @@ import { Input } from "../components/ui/Field";
 import { MemberDashboard } from "../components/member/MemberDashboard";
 import { KioskPageTitle } from "../components/layout/KioskPageTitle";
 import { useKioskShell } from "../components/layout/KioskShellContext";
-import { WidgetPageShell } from "../components/widgets";
 import { useMemberTasks } from "../hooks/useMemberTasks";
 import {
   trackMemberDashboardView,
@@ -32,10 +33,11 @@ import {
   trackMemberTaskSkip,
 } from "../lib/memberDashboardAnalytics";
 import type { PageProps } from "./pageTypes";
+import "../styles/guided-kiosk.css";
 
 type MemberDashboardPageProps = Pick<
   PageProps,
-  "data" | "setData" | "onOpenDashboard" | "onOpenTasks" | "onOpenCalendar" | "onOpenMessages"
+  "data" | "setData" | "onOpenDashboard" | "onOpenTasks" | "onOpenCalendar"
 > & {
   memberId: string;
   onBackToFamily: () => void;
@@ -48,7 +50,6 @@ export function MemberDashboardPage({
   onOpenDashboard,
   onOpenTasks,
   onOpenCalendar,
-  onOpenMessages,
   onBackToFamily,
 }: MemberDashboardPageProps) {
   const member = data.familyMembers.find((item) => item.id === memberId);
@@ -138,6 +139,9 @@ export function MemberDashboardPage({
   const [pinNew, setPinNew] = useState("");
   const [pinConfirm, setPinConfirm] = useState("");
   const [pinErr, setPinErr] = useState<string | null>(null);
+  const [showFullMember, setShowFullMember] = useState(false);
+  const [guidedFlow, setGuidedFlow] = useState<"tasks" | "events" | "activity" | null>(null);
+  const [guidedMessage, setGuidedMessage] = useState<string | null>(null);
 
   useEffect(() => {
     trackMemberDashboardView(memberSafe.id, getMemberFullName(memberSafe));
@@ -220,6 +224,7 @@ export function MemberDashboardPage({
           },
         ),
       );
+      setGuidedMessage(`Completed ${task.title}.`);
       return;
     }
 
@@ -249,6 +254,7 @@ export function MemberDashboardPage({
         },
       ),
     );
+    setGuidedMessage(`Completed ${task.title}.`);
   }
 
   function skipTask(task: Task) {
@@ -283,6 +289,7 @@ export function MemberDashboardPage({
         },
       ),
     );
+    setGuidedMessage(`Skipped ${task.title}.`);
   }
 
   function saveTask(
@@ -325,6 +332,154 @@ export function MemberDashboardPage({
   const kioskShell = useKioskShell();
   const dateLabel = formatFullDate(new Date());
 
+  function renderMemberFlowSheet() {
+    if (!guidedFlow) {
+      return null;
+    }
+
+    const flowTitle =
+      guidedFlow === "tasks" ? "Choose a task" : guidedFlow === "events" ? "Upcoming events" : "Recent activity";
+
+    return (
+      <div className="wd-guided-kiosk__sheet-backdrop" role="presentation" onClick={() => setGuidedFlow(null)}>
+        <section
+          className="wd-guided-kiosk__sheet"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="member-flow-title"
+          onClick={(event) => event.stopPropagation()}
+        >
+          <header className="wd-guided-kiosk__sheet-head">
+            <div>
+              <p className="wd-guided-kiosk__eyebrow">Member station</p>
+              <h2 id="member-flow-title">{flowTitle}</h2>
+              <p>Handle one item for {getMemberFullName(memberSafe)}, then return to the station.</p>
+            </div>
+            <button
+              type="button"
+              className="wd-guided-kiosk__icon-btn"
+              aria-label="Close member flow"
+              onClick={() => setGuidedFlow(null)}
+            >
+              <X className="h-4 w-4" aria-hidden />
+            </button>
+          </header>
+
+          {guidedFlow === "tasks" ? (
+            <div className="wd-guided-kiosk__chooser" role="list" aria-label="Member tasks">
+              {openAssignedItems.length === 0 ? (
+                <p className="wd-guided-kiosk__empty">No open tasks for this member.</p>
+              ) : (
+                openAssignedItems.map((task) => (
+                  <div key={task.id} className="wd-guided-kiosk__chooser-row">
+                    <span>
+                      <strong>{task.title}</strong>
+                      <small>Due {getTaskDueDate(task) || "soon"} · {task.status}</small>
+                    </span>
+                    <span className="flex flex-wrap gap-2">
+                      <button type="button" className="wd-guided-kiosk__secondary" onClick={() => skipTask(task)}>
+                        Skip
+                      </button>
+                      <button type="button" className="wd-guided-kiosk__primary" onClick={() => completeTask(task)}>
+                        Done
+                      </button>
+                    </span>
+                  </div>
+                ))
+              )}
+            </div>
+          ) : null}
+
+          {guidedFlow === "events" ? (
+            <div className="wd-guided-kiosk__chooser" role="list" aria-label="Member events">
+              {upcomingPlannerItems.length === 0 ? (
+                <p className="wd-guided-kiosk__empty">No upcoming events for this member.</p>
+              ) : (
+                upcomingPlannerItems.map((event) => (
+                  <article key={event.id} className="wd-guided-kiosk__summary-card">
+                    <strong>{event.title}</strong>
+                    <small>{event.date}{event.time ? ` · ${event.time}` : ""}</small>
+                  </article>
+                ))
+              )}
+            </div>
+          ) : null}
+
+          {guidedFlow === "activity" ? (
+            <div className="wd-guided-kiosk__chooser" role="list" aria-label="Member activity">
+              {recentActivity.length === 0 ? (
+                <p className="wd-guided-kiosk__empty">No recent activity for this member.</p>
+              ) : (
+                recentActivity.map((activity) => (
+                  <article key={activity.id} className="wd-guided-kiosk__summary-card">
+                    <strong>{activity.message ?? activity.entityTitle ?? "Activity"}</strong>
+                    <small>{activity.createdAt ? new Date(activity.createdAt).toLocaleString() : "Recent"}</small>
+                  </article>
+                ))
+              )}
+            </div>
+          ) : null}
+        </section>
+      </div>
+    );
+  }
+
+  if (!showFullMember) {
+    const station = (
+      <div className="wd-guided-kiosk wd-guided-kiosk--member">
+        <section className="wd-guided-kiosk__hero" aria-labelledby="member-kiosk-title">
+          <div>
+            <p className="wd-guided-kiosk__eyebrow">Member station</p>
+            <h1 id="member-kiosk-title">{getMemberFullName(memberSafe)}</h1>
+            <p>Choose one personal step: tasks, events, activity, or the profile workspace.</p>
+          </div>
+          <div className="wd-guided-kiosk__status">
+            <span>{itemsDueToday.length} due today</span>
+            <span>{overdueItems.length} overdue</span>
+            <span>{upcomingPlannerItems.length} events</span>
+          </div>
+        </section>
+
+        {guidedMessage ? (
+          <section className="wd-guided-kiosk__complete" role="status">
+            <CheckCircle2 className="h-5 w-5" aria-hidden />
+            <p>{guidedMessage}</p>
+            <button type="button" onClick={() => setGuidedMessage(null)}>
+              Continue
+            </button>
+          </section>
+        ) : null}
+
+        <section className="wd-guided-kiosk__actions-grid" aria-label="Member actions">
+          <button type="button" className="wd-guided-kiosk__action wd-guided-kiosk__action--primary" onClick={() => setGuidedFlow("tasks")}>
+            <span className="wd-guided-kiosk__action-icon"><ClipboardList className="h-5 w-5" aria-hidden /></span>
+            <span><strong>Tasks</strong><small>Choose task, then mark done</small></span>
+          </button>
+          <button type="button" className="wd-guided-kiosk__action" onClick={() => setGuidedFlow("events")}>
+            <span className="wd-guided-kiosk__action-icon"><CalendarDays className="h-5 w-5" aria-hidden /></span>
+            <span><strong>Events</strong><small>Review upcoming schedule</small></span>
+          </button>
+          <button type="button" className="wd-guided-kiosk__action" onClick={() => setGuidedFlow("activity")}>
+            <span className="wd-guided-kiosk__action-icon"><CheckCircle2 className="h-5 w-5" aria-hidden /></span>
+            <span><strong>Activity</strong><small>See recent updates</small></span>
+          </button>
+          <button type="button" className="wd-guided-kiosk__action" onClick={() => setShowFullMember(true)}>
+            <span className="wd-guided-kiosk__action-icon"><Table2 className="h-5 w-5" aria-hidden /></span>
+            <span><strong>Profile workspace</strong><small>Open detailed member page</small></span>
+          </button>
+          <button type="button" className="wd-guided-kiosk__action" onClick={onBackToFamily}>
+            <span className="wd-guided-kiosk__action-icon"><ArrowLeft className="h-5 w-5" aria-hidden /></span>
+            <span><strong>Family list</strong><small>Back to family station</small></span>
+          </button>
+        </section>
+
+        {renderMemberFlowSheet()}
+      </div>
+    );
+
+    return station;
+  }
+
   const body = (
     <>
       {kioskShell ? (
@@ -340,6 +495,9 @@ export function MemberDashboardPage({
             <Home className="h-4 w-4" />
             Dashboard
           </Button>
+          <Button onClick={() => setShowFullMember(false)} variant="secondary">
+            Kiosk station
+          </Button>
           <Button onClick={onBackToFamily}>
             <ArrowLeft className="h-4 w-4" />
             Edit Profile
@@ -353,10 +511,6 @@ export function MemberDashboardPage({
           <Button onClick={onOpenCalendar} variant="secondary">
             <CalendarDays className="h-4 w-4" />
             Add Event
-          </Button>
-          <Button onClick={onOpenMessages} variant="secondary">
-            <MessageSquare className="h-4 w-4" />
-            Message Board
           </Button>
         </div>
       </section>
@@ -441,9 +595,7 @@ export function MemberDashboardPage({
     </>
   );
 
-  return kioskShell ? <WidgetPageShell>{body}</WidgetPageShell> : (
-    <div className="motion-page space-y-5 px-4 pb-8 sm:space-y-6 sm:px-6">{body}</div>
-  );
+  return <div className="motion-page space-y-5 px-4 pb-8 sm:space-y-6 sm:px-6">{body}</div>;
 }
 
 function cleaningCompletionStatusLabel(status: CleaningCompletionRecord["status"]): string {

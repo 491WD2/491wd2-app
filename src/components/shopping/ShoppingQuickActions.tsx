@@ -7,6 +7,8 @@ export type ShoppingQuickActionsProps = {
   onReorderNote?: () => void;
   saveMessage?: string;
   saveDisabled?: boolean;
+  primaryLabel?: string;
+  secondaryLabel?: string;
 };
 
 export function ShoppingQuickActions({
@@ -15,11 +17,13 @@ export function ShoppingQuickActions({
   onReorderNote,
   saveMessage,
   saveDisabled = false,
+  primaryLabel = "Save shopping list",
+  secondaryLabel = "Reorder list (local note)",
 }: ShoppingQuickActionsProps) {
   return (
-    <div className="gf-shopping-quick">
+    <div className="gf-shopping-quick" aria-label="Shopping list actions">
       {saveMessage ? (
-        <p className="text-sm font-semibold text-emerald-800" role="status">
+        <p className="gf-shopping-quick__status" role="status">
           {saveMessage}
         </p>
       ) : null}
@@ -29,15 +33,15 @@ export function ShoppingQuickActions({
         onClick={onSaveList}
         disabled={saveDisabled}
       >
-        <span>Save shopping list</span>
-        <span>
+        <span>{primaryLabel}</span>
+        <span className="gf-shopping-quick__count">
           {itemCount} item{itemCount === 1 ? "" : "s"}
         </span>
       </button>
       {onReorderNote ? (
         <button type="button" className="gf-shopping-quick__ghost" onClick={onReorderNote}>
           <RotateCcw className="inline h-4 w-4" aria-hidden />
-          Reorder list (local note)
+          {secondaryLabel}
         </button>
       ) : null}
     </div>

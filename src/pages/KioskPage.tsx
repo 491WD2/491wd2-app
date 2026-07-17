@@ -7,6 +7,8 @@ import {
   Plus,
   ShoppingBag,
   ShoppingCart,
+  Table2,
+  X,
 } from "lucide-react";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import type { FamilyData, Task } from "../data/familyData";
@@ -21,6 +23,9 @@ import {
   isInventoryExpiringSoon,
   isInventoryLowStock,
 } from "./inventory/inventoryUtils";
+import "../styles/guided-kiosk.css";
+
+type KioskGuidedFlow = "priorities" | "chores" | "shopping" | "calendar" | "inventory";
 
 type KioskPageProps = {
   data: FamilyData;
@@ -31,6 +36,8 @@ type KioskPageProps = {
 export function KioskPage({ data, onNavigate, openAppHref }: KioskPageProps) {
   const admin = data.adminSettings;
   const [now, setNow] = useState(() => new Date());
+  const [showFullKiosk, setShowFullKiosk] = useState(false);
+  const [guidedFlow, setGuidedFlow] = useState<KioskGuidedFlow | null>(null);
   const today = now.toISOString().slice(0, 10);
   const showClock = admin.showClock !== false;
   const showQuickActions = admin.showQuickActions !== false;
@@ -112,10 +119,204 @@ export function KioskPage({ data, onNavigate, openAppHref }: KioskPageProps) {
     [],
   );
 
+  function renderKioskFlowSheet() {
+    if (!guidedFlow) {
+      return null;
+    }
+
+    const titleByFlow: Record<KioskGuidedFlow, string> = {
+      priorities: "Top priorities",
+      chores: "Chores due today",
+      shopping: "Shopping pulse",
+      calendar: "Upcoming plans",
+      inventory: "Inventory alerts",
+    };
+
+    return (
+      <div className="wd-guided-kiosk__sheet-backdrop" role="presentation" onClick={() => setGuidedFlow(null)}>
+        <section
+          className="wd-guided-kiosk__sheet"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="kiosk-flow-title"
+          onClick={(event) => event.stopPropagation()}
+        >
+          <header className="wd-guided-kiosk__sheet-head">
+            <div>
+              <p className="wd-guided-kiosk__eyebrow">Kiosk overview</p>
+              <h2 id="kiosk-flow-title">{titleByFlow[guidedFlow]}</h2>
+              <p>Review one kiosk area, then jump into the station that handles it.</p>
+            </div>
+            <button
+              type="button"
+              className="wd-guided-kiosk__icon-btn"
+              aria-label="Close kiosk flow"
+              onClick={() => setGuidedFlow(null)}
+            >
+              <X className="h-4 w-4" aria-hidden />
+            </button>
+          </header>
+
+          {guidedFlow === "priorities" ? (
+            <div className="wd-guided-kiosk__confirm">
+              <ul className="grid gap-3">
+                {topPriorities.length === 0 ? (
+                  <KioskEmpty soft text="Nothing queued. You are clear for now." />
+                ) : null}
+                {topPriorities.map((task) => (
+                  <KioskRow
+                    key={task.id}
+                    subtitle={`${task.type === "chore" ? "Chore" : "Task"} · due ${formatShortDate(taskDueKey(task))}`}
+                    title={task.title}
+                  />
+                ))}
+              </ul>
+              <button type="button" className="wd-guided-kiosk__primary" onClick={() => openAppHref("/tasks")}>
+                Open Cleaning
+              </button>
+            </div>
+          ) : null}
+
+          {guidedFlow === "chores" ? (
+            <div className="wd-guided-kiosk__confirm">
+              <ul className="grid gap-3">
+                {choresDueToday.length === 0 ? (
+                  <KioskEmpty soft text="No chores due today." />
+                ) : null}
+                {choresDueToday.map((task) => (
+                  <KioskRow key={task.id} subtitle="Chore" title={task.title} />
+                ))}
+              </ul>
+              <button type="button" className="wd-guided-kiosk__primary" onClick={() => openAppHref("/tasks")}>
+                Open Cleaning
+              </button>
+            </div>
+          ) : null}
+
+          {guidedFlow === "shopping" ? (
+            <div className="wd-guided-kiosk__confirm">
+              <div className="grid gap-3 sm:grid-cols-2">
+                <KioskInfoCard
+                  detail={groceryNeedCount === 0 ? "List is clear" : "Items still to buy"}
+                  label="Grocery list"
+                  value={groceryNeedCount}
+                />
+                <KioskInfoCard
+                  detail={purchasedCount === 0 ? "None yet" : "Add to inventory when stocked"}
+                  label="Purchased"
+                  value={purchasedCount}
+                />
+              </div>
+              <button type="button" className="wd-guided-kiosk__primary" onClick={() => openAppHref("/shopping")}>
+                Open Shopping
+              </button>
+            </div>
+          ) : null}
+
+          {guidedFlow === "calendar" ? (
+            <div className="wd-guided-kiosk__confirm">
+              <ul className="grid gap-3">
+                {upcomingPlanner.length === 0 ? (
+                  <KioskEmpty soft text="No upcoming planner items." />
+                ) : null}
+                {upcomingPlanner.map((event) => (
+                  <KioskRow
+                    key={event.id}
+                    subtitle={`${formatShortDate(event.date)} · ${event.time}`}
+                    title={event.title}
+                  />
+                ))}
+              </ul>
+              <button type="button" className="wd-guided-kiosk__primary" onClick={() => onNavigate("calendar")}>
+                Open Calendar
+              </button>
+            </div>
+          ) : null}
+
+          {guidedFlow === "inventory" ? (
+            <div className="wd-guided-kiosk__confirm">
+              <div className="grid gap-3 sm:grid-cols-2">
+                <KioskInfoCard detail="Staples below minimum" label="Low stock" value={lowStock.length} />
+                <KioskInfoCard detail="Next 14 days" label="Expiring soon" value={expiring.length} />
+              </div>
+              <button type="button" className="wd-guided-kiosk__primary" onClick={() => openAppHref("/pantry")}>
+                Open Pantry
+              </button>
+            </div>
+          ) : null}
+        </section>
+      </div>
+    );
+  }
+
+  if (!showFullKiosk) {
+    return (
+      <div className="wd-guided-kiosk wd-guided-kiosk--overview">
+        <LandscapeHint />
+        <section className="wd-guided-kiosk__hero" aria-labelledby="kiosk-station-title">
+          <div>
+            <p className="wd-guided-kiosk__eyebrow">{household}</p>
+            <h1 id="kiosk-station-title">{showClock ? timeFormatter.format(now) : "Kiosk station"}</h1>
+            <p>{dateFormatter.format(now)} · {welcome}</p>
+          </div>
+          <div className="wd-guided-kiosk__status">
+            <span>{choresDueToday.length} chores today</span>
+            <span>{groceryNeedCount} groceries</span>
+            <span>{lowStock.length + expiring.length} stock alerts</span>
+          </div>
+        </section>
+
+        <section className="wd-guided-kiosk__actions-grid" aria-label="Kiosk overview actions">
+          <button type="button" className="wd-guided-kiosk__action wd-guided-kiosk__action--primary" onClick={() => setGuidedFlow("priorities")}>
+            <span className="wd-guided-kiosk__action-icon"><Plus className="h-5 w-5" aria-hidden /></span>
+            <span><strong>Top priorities</strong><small>Open today’s most important items</small></span>
+          </button>
+          <button type="button" className="wd-guided-kiosk__action" onClick={() => setGuidedFlow("chores")}>
+            <span className="wd-guided-kiosk__action-icon"><ClipboardList className="h-5 w-5" aria-hidden /></span>
+            <span><strong>Chores today</strong><small>Review due chores</small></span>
+          </button>
+          <button type="button" className="wd-guided-kiosk__action" onClick={() => setGuidedFlow("shopping")}>
+            <span className="wd-guided-kiosk__action-icon"><ShoppingCart className="h-5 w-5" aria-hidden /></span>
+            <span><strong>Shopping</strong><small>See grocery list status</small></span>
+          </button>
+          <button type="button" className="wd-guided-kiosk__action" onClick={() => setGuidedFlow("calendar")}>
+            <span className="wd-guided-kiosk__action-icon"><CalendarDays className="h-5 w-5" aria-hidden /></span>
+            <span><strong>Calendar</strong><small>See upcoming plans</small></span>
+          </button>
+          <button type="button" className="wd-guided-kiosk__action" onClick={() => setGuidedFlow("inventory")}>
+            <span className="wd-guided-kiosk__action-icon"><PackageSearch className="h-5 w-5" aria-hidden /></span>
+            <span><strong>Inventory alerts</strong><small>Low-stock and expiring food</small></span>
+          </button>
+          <button type="button" className="wd-guided-kiosk__action" onClick={() => openAppHref("/quick-add")}>
+            <span className="wd-guided-kiosk__action-icon"><ShoppingBag className="h-5 w-5" aria-hidden /></span>
+            <span><strong>Quick add</strong><small>Add a household item</small></span>
+          </button>
+          <button type="button" className="wd-guided-kiosk__action" onClick={() => onNavigate("dashboard")}>
+            <span className="wd-guided-kiosk__action-icon"><Home className="h-5 w-5" aria-hidden /></span>
+            <span><strong>Family Hub</strong><small>Open the main station</small></span>
+          </button>
+          <button type="button" className="wd-guided-kiosk__action" onClick={() => setShowFullKiosk(true)}>
+            <span className="wd-guided-kiosk__action-icon"><Table2 className="h-5 w-5" aria-hidden /></span>
+            <span><strong>Kiosk overview</strong><small>Show the detailed kiosk board</small></span>
+          </button>
+        </section>
+
+        {renderKioskFlowSheet()}
+      </div>
+    );
+  }
+
   return (
     <div className="kiosk-prose pb-10 pt-2">
       <div className="workstation-shell space-y-8">
         <LandscapeHint />
+        <button
+          type="button"
+          className="inline-flex min-h-11 items-center justify-center rounded-xl border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50"
+          onClick={() => setShowFullKiosk(false)}
+        >
+          Kiosk station
+        </button>
       <section
         id="kiosk-hero"
         className="rounded-2xl border border-slate-200/90 bg-white p-6 shadow-sm ring-1 ring-slate-950/[0.04] sm:p-8"

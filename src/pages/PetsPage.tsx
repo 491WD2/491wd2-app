@@ -1,4 +1,4 @@
-import { Bell, History, PawPrint, Pencil, Plus, StickyNote, Trash2 } from "lucide-react";
+import { Bell, CheckCircle2, ChevronRight, History, PawPrint, Pencil, Plus, StickyNote, Table2, Trash2, X } from "lucide-react";
 import { useId, useMemo, useState } from "react";
 import type { PetMedicationEntry } from "../data/familyData";
 import { Button } from "../components/ui/Button";
@@ -30,6 +30,7 @@ import {
 } from "../lib/petFleaMedication";
 import { cn, getMemberFullName } from "../lib/utils";
 import type { PageProps } from "./pageTypes";
+import "../styles/guided-kiosk.css";
 
 const PAGE_BG =
   "min-h-full bg-[#f7f7f7] text-[#1f1f1f] [-webkit-font-smoothing:antialiased]";
@@ -109,6 +110,9 @@ export function PetsPage({
 
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [showFullPets, setShowFullPets] = useState(false);
+  const [guidedFlow, setGuidedFlow] = useState<"choose-pet" | "alerts" | null>(null);
+  const [guidedMessage, setGuidedMessage] = useState<string | null>(null);
 
   const [formPetId, setFormPetId] = useState("");
   const [formDate, setFormDate] = useState(() => formatLocalDateInput(new Date()));
@@ -211,7 +215,7 @@ export function PetsPage({
       return next;
     });
 
-    window.alert("Flea medication entry saved.");
+    setGuidedMessage("Flea medication entry saved.");
     closeDrawer();
   }
 
@@ -241,6 +245,247 @@ export function PetsPage({
 
   const activePetsOptions = pets.filter((p) => p.active);
 
+  function renderPetsFlowSheet() {
+    if (!guidedFlow) {
+      return null;
+    }
+
+    return (
+      <div className="wd-guided-kiosk__sheet-backdrop" role="presentation" onClick={() => setGuidedFlow(null)}>
+        <section
+          className="wd-guided-kiosk__sheet"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="pets-flow-title"
+          onClick={(event) => event.stopPropagation()}
+        >
+          <header className="wd-guided-kiosk__sheet-head">
+            <div>
+              <p className="wd-guided-kiosk__eyebrow">Pet station</p>
+              <h2 id="pets-flow-title">
+                {guidedFlow === "choose-pet" ? "Choose a pet" : "Pet reminders"}
+              </h2>
+              <p>
+                {guidedFlow === "choose-pet"
+                  ? "Pick a pet, then the medication entry pop-up opens."
+                  : "Review due reminders, then dismiss or open full care."}
+              </p>
+            </div>
+            <button
+              type="button"
+              className="wd-guided-kiosk__icon-btn"
+              aria-label="Close pet flow"
+              onClick={() => setGuidedFlow(null)}
+            >
+              <X className="h-4 w-4" aria-hidden />
+            </button>
+          </header>
+
+          {guidedFlow === "choose-pet" ? (
+            <div className="wd-guided-kiosk__chooser" role="listbox" aria-label="Choose pet">
+              {activePetsOptions.length === 0 ? (
+                <p className="wd-guided-kiosk__empty">No active pets are set up yet.</p>
+              ) : (
+                activePetsOptions.map((pet) => {
+                  const latest = latestFleaEntryForPet(pet.id, entries);
+                  const status = computeFleaMedicationUiStatus(latest?.givenAt);
+                  return (
+                    <button
+                      key={pet.id}
+                      type="button"
+                      className="wd-guided-kiosk__chooser-row"
+                      role="option"
+                      onClick={() => {
+                        setGuidedFlow(null);
+                        openAdd(pet.id);
+                      }}
+                    >
+                      <span>
+                        <strong>{pet.name}</strong>
+                        <small>{chipLabel(status)} · flea medication</small>
+                      </span>
+                      <ChevronRight className="h-4 w-4" aria-hidden />
+                    </button>
+                  );
+                })
+              )}
+            </div>
+          ) : (
+            <div className="wd-guided-kiosk__chooser" role="list" aria-label="Pet reminders">
+              {fleaAlerts.length === 0 ? (
+                <p className="wd-guided-kiosk__empty">No pet reminders right now.</p>
+              ) : (
+                fleaAlerts.map((alert) => (
+                  <div key={alert.id} className="wd-guided-kiosk__chooser-row">
+                    <span>
+                      <strong>{alert.title}</strong>
+                      <small>{alert.body || "Medication reminder"}</small>
+                    </span>
+                    <button
+                      type="button"
+                      className="wd-guided-kiosk__secondary"
+                      onClick={() => dismissAlert(alert.id)}
+                    >
+                      Dismiss
+                    </button>
+                  </div>
+                ))
+              )}
+            </div>
+          )}
+        </section>
+      </div>
+    );
+  }
+
+  const petDrawer = drawerOpen ? (
+    <>
+      <DrawerBackdrop ariaLabel="Close form" onClick={closeDrawer} />
+      <DrawerPanel
+        aria-labelledby={`${titleId}-flea`}
+        className="z-50 !border-[#ededed] !bg-white !shadow-[0_12px_48px_rgba(0,0,0,0.12)] lg:max-w-md"
+      >
+        <DrawerHeader
+          eyebrow="Flea medication"
+          title={editingId ? "Edit entry" : "Add Flea Medication"}
+          titleId={`${titleId}-flea`}
+          trailing={
+            <Button
+              type="button"
+              variant="ghost"
+              className="text-[#575757] hover:bg-[#f8f9fa]"
+              onClick={closeDrawer}
+            >
+              Cancel
+            </Button>
+          }
+        />
+        <DrawerBody>
+          <div className="space-y-4">
+            <label className="block text-xs font-medium text-[#637381]">
+              Cat
+              <Select
+                className={cn("mt-1", SM_INPUT)}
+                value={formPetId}
+                onChange={(e) => setFormPetId(e.target.value)}
+              >
+                <option value="">Select…</option>
+                {activePetsOptions.map((p) => (
+                  <option key={p.id} value={p.id}>
+                    {p.name}
+                  </option>
+                ))}
+              </Select>
+            </label>
+            <div className="grid grid-cols-2 gap-3">
+              <label className="block text-xs font-medium text-[#637381]">
+                Date
+                <Input
+                  type="date"
+                  className={cn("mt-1", SM_INPUT)}
+                  value={formDate}
+                  onChange={(e) => setFormDate(e.target.value)}
+                />
+              </label>
+              <label className="block text-xs font-medium text-[#637381]">
+                Time
+                <Input
+                  type="time"
+                  className={cn("mt-1", SM_INPUT)}
+                  value={formTime}
+                  onChange={(e) => setFormTime(e.target.value)}
+                />
+              </label>
+            </div>
+            <label className="block text-xs font-medium text-[#637381]">
+              Given by
+              <Select
+                className={cn("mt-1", SM_INPUT)}
+                value={formGivenBy}
+                onChange={(e) => setFormGivenBy(e.target.value)}
+              >
+                <option value="">—</option>
+                {rosterForGivenBy.map((m) => (
+                  <option key={m.id} value={m.id}>
+                    {getMemberFullName(m)}
+                  </option>
+                ))}
+              </Select>
+            </label>
+            <label className="block text-xs font-medium text-[#637381]">
+              Notes
+              <Textarea
+                className={cn("mt-1 min-h-[88px]", SM_INPUT)}
+                placeholder="Optional"
+                value={formNotes}
+                onChange={(e) => setFormNotes(e.target.value)}
+              />
+            </label>
+            <div className="flex flex-wrap gap-2 pt-2">
+              <Button type="button" variant="primary" onClick={saveEntry}>
+                Save Entry
+              </Button>
+              <Button type="button" variant="secondary" onClick={closeDrawer}>
+                Cancel
+              </Button>
+            </div>
+          </div>
+        </DrawerBody>
+      </DrawerPanel>
+    </>
+  ) : null;
+
+  if (!showFullPets) {
+    return (
+      <div className="wd-guided-kiosk wd-guided-kiosk--pets">
+        <section className="wd-guided-kiosk__hero" aria-labelledby="pets-kiosk-title">
+          <div>
+            <p className="wd-guided-kiosk__eyebrow">Pet station</p>
+            <h1 id="pets-kiosk-title">What pet step?</h1>
+            <p>Log flea medication, check reminders, or open the pet care workspace.</p>
+          </div>
+          <div className="wd-guided-kiosk__status">
+            <span>{activePetsOptions.length} active pets</span>
+            <span>{summary.today} due today</span>
+            <span>{summary.overdue} overdue</span>
+          </div>
+        </section>
+
+        {guidedMessage ? (
+          <section className="wd-guided-kiosk__complete" role="status">
+            <CheckCircle2 className="h-5 w-5" aria-hidden />
+            <p>{guidedMessage}</p>
+            <button type="button" onClick={() => setGuidedMessage(null)}>
+              Continue
+            </button>
+          </section>
+        ) : null}
+
+        <section className="wd-guided-kiosk__actions-grid" aria-label="Pet actions">
+          <button type="button" className="wd-guided-kiosk__action wd-guided-kiosk__action--primary" onClick={() => setGuidedFlow("choose-pet")}>
+            <span className="wd-guided-kiosk__action-icon"><Plus className="h-5 w-5" aria-hidden /></span>
+            <span><strong>Log medication</strong><small>Choose pet, then save dose</small></span>
+          </button>
+          <button type="button" className="wd-guided-kiosk__action" onClick={() => setGuidedFlow("alerts")}>
+            <span className="wd-guided-kiosk__action-icon"><Bell className="h-5 w-5" aria-hidden /></span>
+            <span><strong>Reminders</strong><small>Review due alerts</small></span>
+          </button>
+          <button type="button" className="wd-guided-kiosk__action" onClick={() => setShowFullPets(true)}>
+            <span className="wd-guided-kiosk__action-icon"><History className="h-5 w-5" aria-hidden /></span>
+            <span><strong>Medication history</strong><small>Open care records</small></span>
+          </button>
+          <button type="button" className="wd-guided-kiosk__action" onClick={() => setShowFullPets(true)}>
+            <span className="wd-guided-kiosk__action-icon"><Table2 className="h-5 w-5" aria-hidden /></span>
+            <span><strong>Pet care workspace</strong><small>Status cards and history</small></span>
+          </button>
+        </section>
+
+        {renderPetsFlowSheet()}
+        {petDrawer}
+      </div>
+    );
+  }
+
   return (
     <div className={PAGE_BG}>
       <WorkspacePageShell
@@ -251,6 +496,9 @@ export function PetsPage({
         )}
       >
       <div className="flex flex-wrap items-center gap-3">
+        <Button type="button" variant="secondary" onClick={() => setShowFullPets(false)}>
+          Kiosk station
+        </Button>
         {onOpenDashboard ? (
           <Button type="button" variant="secondary" onClick={onOpenDashboard}>
             Home
@@ -517,102 +765,7 @@ export function PetsPage({
         )}
       </section>
 
-      {drawerOpen ? (
-        <>
-          <DrawerBackdrop ariaLabel="Close form" onClick={closeDrawer} />
-          <DrawerPanel
-            aria-labelledby={`${titleId}-flea`}
-            className="z-50 !border-[#ededed] !bg-white !shadow-[0_12px_48px_rgba(0,0,0,0.12)] lg:max-w-md"
-          >
-            <DrawerHeader
-              eyebrow="Flea medication"
-              title={editingId ? "Edit entry" : "Add Flea Medication"}
-              titleId={`${titleId}-flea`}
-              trailing={
-                <Button
-                  type="button"
-                  variant="ghost"
-                  className="text-[#575757] hover:bg-[#f8f9fa]"
-                  onClick={closeDrawer}
-                >
-                  Cancel
-                </Button>
-              }
-            />
-            <DrawerBody>
-              <div className="space-y-4">
-                <label className="block text-xs font-medium text-[#637381]">
-                  Cat
-                  <Select
-                    className={cn("mt-1", SM_INPUT)}
-                    value={formPetId}
-                    onChange={(e) => setFormPetId(e.target.value)}
-                  >
-                    <option value="">Select…</option>
-                    {activePetsOptions.map((p) => (
-                      <option key={p.id} value={p.id}>
-                        {p.name}
-                      </option>
-                    ))}
-                  </Select>
-                </label>
-                <div className="grid grid-cols-2 gap-3">
-                  <label className="block text-xs font-medium text-[#637381]">
-                    Date
-                    <Input
-                      type="date"
-                      className={cn("mt-1", SM_INPUT)}
-                      value={formDate}
-                      onChange={(e) => setFormDate(e.target.value)}
-                    />
-                  </label>
-                  <label className="block text-xs font-medium text-[#637381]">
-                    Time
-                    <Input
-                      type="time"
-                      className={cn("mt-1", SM_INPUT)}
-                      value={formTime}
-                      onChange={(e) => setFormTime(e.target.value)}
-                    />
-                  </label>
-                </div>
-                <label className="block text-xs font-medium text-[#637381]">
-                  Given by
-                  <Select
-                    className={cn("mt-1", SM_INPUT)}
-                    value={formGivenBy}
-                    onChange={(e) => setFormGivenBy(e.target.value)}
-                  >
-                    <option value="">—</option>
-                    {rosterForGivenBy.map((m) => (
-                      <option key={m.id} value={m.id}>
-                        {getMemberFullName(m)}
-                      </option>
-                    ))}
-                  </Select>
-                </label>
-                <label className="block text-xs font-medium text-[#637381]">
-                  Notes
-                  <Textarea
-                    className={cn("mt-1 min-h-[88px]", SM_INPUT)}
-                    placeholder="Optional"
-                    value={formNotes}
-                    onChange={(e) => setFormNotes(e.target.value)}
-                  />
-                </label>
-                <div className="flex flex-wrap gap-2 pt-2">
-                  <Button type="button" variant="primary" onClick={saveEntry}>
-                    Save Entry
-                  </Button>
-                  <Button type="button" variant="secondary" onClick={closeDrawer}>
-                    Cancel
-                  </Button>
-                </div>
-              </div>
-            </DrawerBody>
-          </DrawerPanel>
-        </>
-      ) : null}
+      {petDrawer}
       </WorkspacePageShell>
     </div>
   );

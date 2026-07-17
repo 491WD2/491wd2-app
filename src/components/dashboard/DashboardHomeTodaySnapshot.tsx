@@ -3,7 +3,6 @@ import {
   Bell,
   CalendarDays,
   ListChecks,
-  MessageSquareWarning,
   Refrigerator,
   ShoppingCart,
 } from "lucide-react";
@@ -28,8 +27,6 @@ type Props = {
   shoppingNeedCount: number;
   todayEventCount: number;
   pantryAttentionCount: number;
-  /** Important / urgent / pinned messages (optionally scoped to dashboard member view). */
-  importantMessageCount: number;
   /** Open chores due today. */
   choresDueTodayCount: number;
   /** Open chores with due date before today. */
@@ -48,7 +45,6 @@ export function DashboardHomeTodaySnapshot({
   shoppingNeedCount,
   todayEventCount,
   pantryAttentionCount,
-  importantMessageCount,
   choresDueTodayCount,
   choresOverdueCount,
   upcomingEventCount,
@@ -97,14 +93,7 @@ export function DashboardHomeTodaySnapshot({
   return (
     <section aria-label="Today at a glance" className={SMARTHR_DASH_GLANCE_SECTION}>
       <h2 className="sr-only">Today at a glance</h2>
-      <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6 lg:gap-2.5">
-        <MetricCard
-          icon={<MessageSquareWarning className="h-3.5 w-3.5 opacity-80" aria-hidden />}
-          label="Important msgs"
-          value={importantMessageCount}
-          valueTone={importantMessageCount > 0 ? "attention" : "default"}
-          onClick={navigateWithinApp ? () => navigateWithinApp("/messages") : undefined}
-        />
+      <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-5 lg:gap-2.5">
         <MetricCard
           icon={<Bell className="h-3.5 w-3.5 opacity-80" aria-hidden />}
           label="Notifications"

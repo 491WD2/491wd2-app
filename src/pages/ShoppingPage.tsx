@@ -1,39 +1,49 @@
-import { ChevronRight, Grid2X2, Minus, Plus, X } from "lucide-react";
+import {
+  ArrowLeft,
+  CheckCircle2,
+  ChevronRight,
+  ListChecks,
+  Minus,
+  Package,
+  Plus,
+  ScanLine,
+  Search,
+  Settings,
+  Share2,
+  ShoppingCart,
+  Sparkles,
+  Store,
+  Users,
+  X,
+} from "lucide-react";
 import {
   useEffect,
   useId,
   useMemo,
   useState,
   type FormEvent,
-  type CSSProperties,
 } from "react";
 import type { ShoppingItem } from "../data/familyData";
 import { ProductDetailPanel } from "../components/ProductDetailPanel";
 import { ProductScanPanel } from "../components/ProductScanPanel";
+import { ShoppingListCard } from "../components/shopping/ShoppingListCard";
+import { ShoppingQuickActions } from "../components/shopping/ShoppingQuickActions";
 import { useHouseholdProducts } from "../context/HouseholdProductContext";
 import { createActivity } from "../lib/activity";
 import { useGroceryProductActions } from "../lib/groceryProductActions";
 import { collectKnownGroceryStores, useGroceryCart } from "../lib/groceryCartStore";
 import {
-  findBestHouseholdProductMatch,
-  getMostUsedFallbackCategory,
-  SHOPPING_MOST_USED_LABELS,
-} from "../lib/groceryLibraryData";
-import {
   buildShoppingRouteHref,
   categoryToStoreSection,
-  getShoppingCategoryLabel,
   householdProductToCatalogItem,
   normalizeShoppingUnit,
   parseShoppingQuantity,
   parseShoppingRouteSearch,
-  SHOPPING_CATEGORY_GROUPS,
   SHOPPING_DEFAULT_STORES,
   SHOPPING_STORE_ADD_NEW,
   SHOPPING_UNIT_OPTIONS,
 } from "../lib/shoppingData";
 import type {
-  ShoppingCatalogItem,
   ShoppingDetailDraft,
   ShoppingKioskCategoryId,
   ShoppingPageAction,
@@ -45,16 +55,9 @@ import {
   mergeShoppingQuantityStrings,
 } from "./shopping/shoppingUtils";
 import type { PageProps } from "./pageTypes";
-import { useUiCustomization } from "../context/UiCustomizationContext";
-import {
-  getGroceryCategoryTheme,
-  groceryCategoryThemeStyle,
-  PANTRY_VISIBLE_CATEGORY_ORDER,
-} from "../lib/groceryCategoryTheme";
 import { useDrawerEscape } from "../hooks/useDrawerEscape";
-import { ShoppingCategorySection } from "../components/shopping/ShoppingCategorySection";
-import { ShoppingQuickActions } from "../components/shopping/ShoppingQuickActions";
 import "../styles/pantry-shopping-grofast.css";
+import "../styles/guided-kiosk.css";
 
 function createShoppingRowFromCartLine(line: GroceryCartLine): ShoppingItem {
   const base = createShoppingItemFromName(line.productName);
@@ -70,28 +73,18 @@ function createShoppingRowFromCartLine(line: GroceryCartLine): ShoppingItem {
   };
 }
 
-type AddItemStep = "category" | "form";
+const MANUAL_SHOPPING_CATEGORY = "Shopping List";
 
 type ShoppingAddDrawerState = {
   mode: "manual" | "product";
-  step: AddItemStep;
   draft: ShoppingDetailDraft;
   brand?: string | null;
   imageUrl?: string | null;
 };
 
-type MostUsedQuickAddItem = {
-  label: string;
-  catalogId?: string;
-  name: string;
-  category: string;
-  unit: string;
-  imageUrl: string | null;
-  brand?: string | null;
-};
+type ShoppingFlowScreen = "hub" | "lists" | "current" | "add" | "new-list" | "shared-list";
 
-export function ShoppingPage({ setData, navigateWithinApp, shoppingSearch = "" }: PageProps) {
-  const { pageLayout } = useUiCustomization();
+export function ShoppingPage({ data, setData, navigateWithinApp, shoppingSearch = "" }: PageProps) {
   const { products } = useHouseholdProducts();
   const {
     detailView,
@@ -99,6 +92,7 @@ export function ShoppingPage({ setData, navigateWithinApp, shoppingSearch = "" }
     detailMode,
     lookupBusy,
     lookupMessage,
+    openProductDetail,
     closeProductDetail,
     updateDetailDraft,
     beginManualDetailDraft,
@@ -114,19 +108,19 @@ export function ShoppingPage({ setData, navigateWithinApp, shoppingSearch = "" }
     addItem,
     updateItem,
     removeItem,
-    quantityByProductId,
   } = useGroceryCart();
-  const sidebarCollapsed = pageLayout.global.sidebarCollapsed;
   const route = useMemo(() => parseShoppingRouteSearch(shoppingSearch), [shoppingSearch]);
   const [activeCategory, setActiveCategory] = useState<ShoppingKioskCategoryId>(route.category);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [selectedLibraryCategory, setSelectedLibraryCategory] = useState<string | null>(null);
   const [saveMessage, setSaveMessage] = useState("");
   const [activeAction, setActiveAction] = useState<ShoppingPageAction | null>(route.action);
+  const [screen, setScreen] = useState<ShoppingFlowScreen>(route.action === "add" ? "add" : "hub");
   const [addDrawerState, setAddDrawerState] = useState<ShoppingAddDrawerState | null>(null);
   const [customStores, setCustomStores] = useState<string[]>([]);
   const [newStoreName, setNewStoreName] = useState("");
-  const [reorderNote, setReorderNote] = useState<string | null>(null);
+  const [currentListTitle, setCurrentListTitle] = useState("Current List");
+  const [selectedStore, setSelectedStore] = useState("All Stores");
+  const [newListTitle, setNewListTitle] = useState("");
+  const [sharedListTitle, setSharedListTitle] = useState("Shared Household List");
 
   const addDrawerTitleId = useId();
 
@@ -141,26 +135,44 @@ export function ShoppingPage({ setData, navigateWithinApp, shoppingSearch = "" }
     [cartLines, customStores, products],
   );
 
+  function createManualShoppingDraft(seedName = ""): ShoppingDetailDraft {
+    return {
+      name: seedName.trim(),
+      category: MANUAL_SHOPPING_CATEGORY,
+      quantity: "1",
+      unit: "each",
+      store: storeOptions[0] ?? "",
+      notes: "",
+    };
+  }
+
   useEffect(() => {
     setActiveCategory(route.category);
     setActiveAction(route.action);
     if (route.action === "add") {
-      setAddDrawerState((current) =>
-        current ?? {
+      setScreen("add");
+      setAddDrawerState((current) => {
+        if (current) {
+          if (!current.draft.name.trim() && route.itemName) {
+            return {
+              ...current,
+              draft: {
+                ...current.draft,
+                name: route.itemName,
+              },
+            };
+          }
+          return current;
+        }
+        return {
           mode: "manual",
-          step: "category",
-          draft: {
-            name: "",
-            category: "",
-            quantity: "1",
-            unit: "each",
-            store: storeOptions[0] ?? "",
-            notes: "",
-          },
-        },
-      );
+          draft: createManualShoppingDraft(route.itemName),
+        };
+      });
+    } else if (activeAction === "add") {
+      setAddDrawerState(null);
     }
-  }, [route.action, route.category, storeOptions]);
+  }, [activeAction, route.action, route.category, route.itemName, storeOptions]);
 
   useEffect(() => {
     document.documentElement.classList.add("wd-shopping-route");
@@ -188,59 +200,83 @@ export function ShoppingPage({ setData, navigateWithinApp, shoppingSearch = "" }
     [products, removedInventoryProductIds],
   );
 
-  const filteredCatalog = useMemo(() => {
-    const query = searchQuery.trim().toLowerCase();
-    return catalog.filter((item) => {
-      const matchesLibraryCategory =
-        !selectedLibraryCategory || item.category === selectedLibraryCategory;
-      const matchesSearch =
-        !query ||
-        item.name.toLowerCase().includes(query) ||
-        item.category.toLowerCase().includes(query);
-      return matchesLibraryCategory && matchesSearch;
-    });
-  }, [catalog, searchQuery, selectedLibraryCategory]);
-
-  const displayCatalog = useMemo(
-    () => [...filteredCatalog].sort((left, right) => left.name.localeCompare(right.name)),
-    [filteredCatalog],
-  );
-
-  const cartTotal = useMemo(
-    () => cartLines.reduce((sum, line) => sum + line.quantity, 0),
+  const openLineCount = useMemo(
+    () => cartLines.filter((line) => !line.purchased).length,
     [cartLines],
   );
-
-  const mostUsedItems = useMemo<MostUsedQuickAddItem[]>(() => {
-    const activeProducts = products.filter(
-      (product) => !removedInventoryProductIds.includes(product.id),
-    );
-
-    return SHOPPING_MOST_USED_LABELS.map((label) => {
-      const match = findBestHouseholdProductMatch(label, activeProducts);
-      if (match) {
-        const catalogItem = householdProductToCatalogItem(match);
-        return {
-          label,
-          catalogId: match.id,
-          name: match.productName,
-          category: match.category,
-          unit: catalogItem.unit,
-          imageUrl: match.imageUrl,
-          brand: match.brand,
-        };
+  const activeCartLines = useMemo(
+    () => cartLines.filter((line) => !line.purchased),
+    [cartLines],
+  );
+  const purchasedCartLines = useMemo(
+    () => cartLines.filter((line) => line.purchased),
+    [cartLines],
+  );
+  const visibleCurrentLines = useMemo(
+    () =>
+      selectedStore === "All Stores"
+        ? activeCartLines
+        : activeCartLines.filter((line) => (line.store.trim() || "No store") === selectedStore),
+    [activeCartLines, selectedStore],
+  );
+  const savedOpenItems = useMemo(
+    () => data.shopping.filter((item) => !item.purchased),
+    [data.shopping],
+  );
+  const savedPurchasedItems = useMemo(
+    () => data.shopping.filter((item) => item.purchased),
+    [data.shopping],
+  );
+  const listCards = useMemo(
+    () => [
+      {
+        id: "current",
+        title: currentListTitle,
+        subtitle: "Live household shopping cart",
+        count: activeCartLines.length,
+        meta: `${purchasedCartLines.length} purchased`,
+        screen: "current" as ShoppingFlowScreen,
+      },
+      {
+        id: "saved",
+        title: "Saved Shopping List",
+        subtitle: "Items saved into the household dashboard",
+        count: savedOpenItems.length,
+        meta: `${savedPurchasedItems.length} completed`,
+        screen: "lists" as ShoppingFlowScreen,
+      },
+      {
+        id: "shared",
+        title: sharedListTitle,
+        subtitle: "Shared family list setup",
+        count: cartLines.length,
+        meta: "Uses current household cart",
+        screen: "shared-list" as ShoppingFlowScreen,
+      },
+    ],
+    [activeCartLines.length, cartLines.length, currentListTitle, purchasedCartLines.length, savedOpenItems.length, savedPurchasedItems.length, sharedListTitle],
+  );
+  const frequentProducts = useMemo(() => {
+    const cartProductIds = new Set(cartLines.map((line) => line.productId));
+    const savedNameCounts = new Map<string, number>();
+    for (const item of data.shopping) {
+      const key = item.name.trim().toLowerCase();
+      if (key) {
+        savedNameCounts.set(key, (savedNameCounts.get(key) ?? 0) + 1);
       }
-
-      return {
-        label,
-        name: label,
-        category: getMostUsedFallbackCategory(label),
-        unit: "each",
-        imageUrl: null,
-        brand: null,
-      };
-    });
-  }, [products, removedInventoryProductIds]);
+    }
+    return catalog
+      .filter((item) => !cartProductIds.has(item.id))
+      .sort((left, right) => {
+        const leftHits = savedNameCounts.get(left.name.trim().toLowerCase()) ?? 0;
+        const rightHits = savedNameCounts.get(right.name.trim().toLowerCase()) ?? 0;
+        if (leftHits !== rightHits) {
+          return rightHits - leftHits;
+        }
+        return left.name.localeCompare(right.name);
+      })
+      .slice(0, 8);
+  }, [cartLines, catalog, data.shopping]);
 
   function syncShoppingRoute(next: {
     action?: ShoppingPageAction | null;
@@ -262,19 +298,66 @@ export function ShoppingPage({ setData, navigateWithinApp, shoppingSearch = "" }
     );
   }
 
-  function openAddItemModal() {
+  function openPantryInventory() {
+    navigateWithinApp?.("/pantry?view=pantry");
+  }
+
+  function openPantrySettings() {
+    navigateWithinApp?.("/pantry?view=settings");
+  }
+
+  function openShoppingScreen(nextScreen: ShoppingFlowScreen) {
+    if (nextScreen !== "add" && activeAction === "add") {
+      syncShoppingRoute({ action: null });
+    }
+    setScreen(nextScreen);
+  }
+
+  function addCatalogProductToShopping(item: (typeof catalog)[number]) {
+    addItem({
+      productId: item.id,
+      productName: item.name,
+      imageUrl: item.imageUrl,
+      category: item.category,
+      quantity: Math.max(1, item.suggestedQuantity || 1),
+      unit: normalizeShoppingUnit(item.unit, "each"),
+      store: products.find((product) => product.id === item.id)?.store ?? storeOptions[0] ?? "",
+      notes: "",
+      purchased: false,
+    });
+    setSaveMessage(`${item.name} was added to ${currentListTitle}.`);
+    setScreen("current");
+  }
+
+  function startShopping() {
+    setSaveMessage(
+      activeCartLines.length
+        ? `Shopping started with ${activeCartLines.length} active item${activeCartLines.length === 1 ? "" : "s"}.`
+        : "Add products before starting the shopping list.",
+    );
+    setScreen("current");
+  }
+
+  function createNewList(shared = false) {
+    const title = (shared ? sharedListTitle : newListTitle).trim();
+    if (!title) {
+      setSaveMessage("Add a list name first.");
+      return;
+    }
+    setCurrentListTitle(title);
+    if (shared) {
+      setSharedListTitle(title);
+    }
+    setSaveMessage(`${title} is ready using the current household shopping items.`);
+    setScreen("current");
+  }
+
+  function openAddItemModal(seedName = route.itemName) {
+    setScreen("add");
     setNewStoreName("");
     setAddDrawerState({
       mode: "manual",
-      step: "category",
-      draft: {
-        name: "",
-        category: "",
-        quantity: "1",
-        unit: "each",
-        store: storeOptions[0] ?? "",
-        notes: "",
-      },
+      draft: createManualShoppingDraft(seedName),
     });
     syncShoppingRoute({ action: "add" });
   }
@@ -282,6 +365,9 @@ export function ShoppingPage({ setData, navigateWithinApp, shoppingSearch = "" }
   function closeAddDrawer() {
     setAddDrawerState(null);
     setNewStoreName("");
+    if (screen === "add") {
+      setScreen("current");
+    }
     if (activeAction === "add") {
       syncShoppingRoute({ action: null });
     }
@@ -300,10 +386,10 @@ export function ShoppingPage({ setData, navigateWithinApp, shoppingSearch = "" }
     brand?: string | null;
     imageUrl?: string | null;
   }) {
+    setScreen("add");
     setNewStoreName("");
     setAddDrawerState({
       mode: "product",
-      step: "form",
       draft: {
         catalogId: args.catalogId,
         name: args.name,
@@ -318,34 +404,27 @@ export function ShoppingPage({ setData, navigateWithinApp, shoppingSearch = "" }
     });
   }
 
-  function openCatalogAddDrawer(item: ShoppingCatalogItem) {
-    const product = products.find((entry) => entry.id === item.id);
-    openProductAddDrawer({
-      catalogId: item.id,
-      name: item.name,
-      category: item.category,
-      quantity: String(item.suggestedQuantity),
-      unit: item.unit,
-      store: product?.store,
-      notes: product?.notes,
-      brand: product?.brand,
-      imageUrl: item.imageUrl,
-    });
-  }
-
-  function openMostUsedAddDrawer(item: MostUsedQuickAddItem) {
-    openProductAddDrawer({
-      catalogId: item.catalogId,
-      name: item.name,
-      category: item.category,
-      unit: item.unit,
-      imageUrl: item.imageUrl,
-      brand: item.brand,
-    });
-  }
-
   function openScanModal() {
     syncShoppingRoute({ action: "scan" });
+  }
+
+  function openShoppingLineDetails(line: GroceryCartLine) {
+    const target = line;
+    const product = products.find((entry) => entry.id === target.productId);
+    if (product) {
+      openProductDetail(product.id);
+      return;
+    }
+    openProductAddDrawer({
+      catalogId: target.productId,
+      name: target.productName,
+      category: target.category,
+      quantity: String(target.quantity),
+      unit: target.unit,
+      store: target.store,
+      notes: target.notes,
+      imageUrl: target.imageUrl,
+    });
   }
 
   function closeScanModal() {
@@ -362,23 +441,6 @@ export function ShoppingPage({ setData, navigateWithinApp, shoppingSearch = "" }
   function handleManualScanEntry(barcode: string) {
     beginManualDetailDraft(barcode);
     closeScanModal();
-  }
-
-  function chooseAddItemCategory(category: string) {
-    setAddDrawerState((current) => ({
-      mode: "manual",
-      step: "form",
-      draft: {
-        name: "",
-        category,
-        quantity: "1",
-        unit: "each",
-        store: storeOptions[0] ?? "",
-        notes: "",
-      },
-      brand: current?.brand,
-      imageUrl: current?.imageUrl,
-    }));
   }
 
   function saveNewStore(target: "detail" | "custom") {
@@ -474,22 +536,6 @@ export function ShoppingPage({ setData, navigateWithinApp, shoppingSearch = "" }
     updateItem(lineId, { purchased });
   }
 
-  const cartByCategory = useMemo(() => {
-    const map = new Map<string, typeof cartLines>();
-    for (const line of cartLines) {
-      const key = line.category.trim() || "Uncategorized";
-      const bucket = map.get(key) ?? [];
-      bucket.push(line);
-      map.set(key, bucket);
-    }
-    return [...map.entries()]
-      .sort(([a], [b]) => getShoppingCategoryLabel(a).localeCompare(getShoppingCategoryLabel(b)))
-      .map(([category, lines]) => ({
-        category,
-        lines: lines.sort((a, b) => a.productName.localeCompare(b.productName)),
-      }));
-  }, [cartLines]);
-
   function saveShoppingList() {
     if (cartLines.length === 0) {
       setSaveMessage("Add items to your list before saving.");
@@ -555,150 +601,57 @@ export function ShoppingPage({ setData, navigateWithinApp, shoppingSearch = "" }
     });
   }
 
-  function renderCategoryGroups(onSelect: (category: ShoppingKioskCategoryId | string) => void) {
-    return (
-      <>
-        <button
-          type="button"
-          className="wd-shopping-kiosk__category-option"
-          onClick={() => onSelect("all")}
-        >
-          All categories
-        </button>
-        {SHOPPING_CATEGORY_GROUPS.map((group) => (
-          <div key={group.id} className="wd-shopping-kiosk__category-group">
-            <p className="wd-shopping-kiosk__category-group-label">{group.label}</p>
-            <div className="wd-shopping-kiosk__category-group-list">
-              {group.categories.map((category) => (
-                <button
-                  key={category}
-                  type="button"
-                  className="wd-shopping-kiosk__category-option"
-                  onClick={() => onSelect(category)}
-                >
-                  {category}
-                </button>
-              ))}
-            </div>
-          </div>
-        ))}
-      </>
-    );
-  }
-
-  function renderCategoryGrid() {
-    const allTheme = getGroceryCategoryTheme("");
-
-    return (
-      <nav className="wd-shopping-kiosk__category-grid" aria-label="Shopping categories">
-        <button
-          type="button"
-          className={
-            selectedLibraryCategory === null
-              ? "wd-shopping-kiosk__category-button wd-shopping-kiosk__category-button--active"
-              : "wd-shopping-kiosk__category-button"
-          }
-          style={
-            {
-              "--wd-shopping-cat-accent": allTheme.accent,
-              "--wd-shopping-cat-soft": allTheme.soft,
-            } as CSSProperties
-          }
-          onClick={() => setSelectedLibraryCategory(null)}
-          aria-current={selectedLibraryCategory === null ? "true" : undefined}
-        >
-          <span className="wd-shopping-kiosk__category-button-icon" aria-hidden>
-            <Grid2X2 size={24} strokeWidth={2.1} />
-          </span>
-          <span className="wd-shopping-kiosk__category-button-name">All Categories</span>
-        </button>
-        {PANTRY_VISIBLE_CATEGORY_ORDER.map((category) => {
-          const theme = getGroceryCategoryTheme(category);
-          const Icon = theme.icon;
-          const active = selectedLibraryCategory === category;
-
-          return (
-            <button
-              key={category}
-              type="button"
-              className={
-                active
-                  ? "wd-shopping-kiosk__category-button wd-shopping-kiosk__category-button--active"
-                  : "wd-shopping-kiosk__category-button"
-              }
-              style={
-                {
-                  "--wd-shopping-cat-accent": theme.accent,
-                  "--wd-shopping-cat-soft": theme.soft,
-                } as CSSProperties
-              }
-              data-category={category}
-              onClick={() => setSelectedLibraryCategory(category)}
-              aria-current={active ? "true" : undefined}
-            >
-              <span className="wd-shopping-kiosk__category-button-icon" aria-hidden>
-                <Icon size={24} strokeWidth={2.1} />
-              </span>
-              <span className="wd-shopping-kiosk__category-button-name">{category}</span>
-            </button>
-          );
-        })}
-      </nav>
-    );
-  }
-
-  function renderMostUsedSection() {
-    return (
-      <section className="wd-shopping-most-used" aria-labelledby="wd-shopping-most-used-title">
-        <div className="wd-shopping-most-used__copy">
-          <h2 id="wd-shopping-most-used-title" className="wd-shopping-most-used__title">
-            Most Used
-          </h2>
-        </div>
-        <div className="wd-shopping-most-used__grid">
-          {mostUsedItems.map((item) => (
-            <div
-              key={item.label}
-              className="wd-shopping-most-used__card"
-              style={groceryCategoryThemeStyle(item.category)}
-            >
-              <span className="wd-shopping-most-used__accent" aria-hidden />
-              <span className="wd-shopping-most-used__name">{item.label}</span>
-              <button
-                type="button"
-                className="wd-shopping-most-used__add-btn"
-                onClick={() => openMostUsedAddDrawer(item)}
-              >
-                <Plus aria-hidden className="wd-shopping-most-used__add-btn-icon" />
-                Add
-              </button>
-            </div>
-          ))}
-        </div>
-      </section>
-    );
-  }
-
   function renderAddDrawer() {
     if (!addDrawerState) {
       return null;
     }
 
-    const { draft, brand, imageUrl, mode, step } = addDrawerState;
+    const { draft, brand, imageUrl, mode } = addDrawerState;
     const showNewStore = draft.store === SHOPPING_STORE_ADD_NEW;
-    const categoryLabel = getShoppingCategoryLabel(draft.category);
     const letter = draft.name.trim().charAt(0) || "?";
+    const query = draft.name.trim().toLowerCase();
+    const libraryMatches =
+      query.length >= 2
+        ? catalog
+            .filter((item) => item.name.toLowerCase().includes(query))
+            .filter((item) => item.name.toLowerCase() !== query)
+            .slice(0, 5)
+        : [];
+    const heroTitle = draft.name.trim() || "New shopping item";
+    const heroSubtitle =
+      mode === "product" && brand?.trim() ? brand.trim() : "Type 2-3 letters and pick from your product library.";
 
     return (
       <aside
-        className="wd-shopping-add-drawer wd-shopping-add-drawer--inline"
+        className="wd-shopping-add-drawer wd-shopping-add-drawer--inline wd-shopping-add-drawer--pantry-system"
         role="region"
         aria-labelledby={addDrawerTitleId}
       >
-        <div className="wd-shopping-add-drawer__head">
-          <h2 id={addDrawerTitleId} className="wd-shopping-add-drawer__title">
-            Add to Shopping List
-          </h2>
+        <div className="wd-shopping-add-drawer__hero">
+          <span className="wd-shopping-add-drawer__product-tile" aria-hidden>
+            {imageUrl ? (
+              <img
+                className="wd-shopping-add-drawer__product-image"
+                src={imageUrl}
+                alt=""
+              />
+            ) : (
+              <span className="wd-shopping-add-drawer__product-letter">{letter}</span>
+            )}
+          </span>
+          <div className="wd-shopping-add-drawer__hero-copy">
+            <p>Shopping item</p>
+            <h2 id={addDrawerTitleId} className="wd-shopping-add-drawer__title">
+              Add item
+            </h2>
+            <strong>{heroTitle}</strong>
+            <span>{heroSubtitle}</span>
+            <div className="wd-shopping-add-drawer__pills" aria-label="Shopping item summary">
+              <span>{draft.quantity || "1"} {draft.unit || "each"}</span>
+              <span>{draft.store || "Default list"}</span>
+              <span>{draft.catalogId ? "Library item" : "Manual"}</span>
+            </div>
+          </div>
           <button
             type="button"
             className="wd-shopping-add-drawer__close"
@@ -709,60 +662,78 @@ export function ShoppingPage({ setData, navigateWithinApp, shoppingSearch = "" }
           </button>
         </div>
 
-        {step === "category" ? (
+        <form className="wd-shopping-add-drawer__form" onSubmit={submitAddDrawer}>
           <div className="wd-shopping-add-drawer__body">
-            <p className="wd-shopping-add-drawer__intro">Choose a category for the new item.</p>
-            {renderCategoryGroups((category) => {
-              if (category === "all") {
-                return;
-              }
-              chooseAddItemCategory(category);
-            })}
-          </div>
-        ) : (
-          <form className="wd-shopping-add-drawer__form" onSubmit={submitAddDrawer}>
-            <div className="wd-shopping-add-drawer__body">
-                {mode === "product" ? (
-                  <div className="wd-shopping-add-drawer__product">
-                    <span className="wd-shopping-add-drawer__product-tile" aria-hidden>
-                      {imageUrl ? (
-                        <img
-                          className="wd-shopping-add-drawer__product-image"
-                          src={imageUrl}
-                          alt=""
-                        />
-                      ) : (
-                        <span className="wd-shopping-add-drawer__product-letter">{letter}</span>
-                      )}
-                    </span>
-                    <div className="wd-shopping-add-drawer__product-copy">
-                      <p className="wd-shopping-add-drawer__product-category">{categoryLabel}</p>
-                      <p className="wd-shopping-add-drawer__product-name">{draft.name}</p>
-                      {brand?.trim() ? (
-                        <p className="wd-shopping-add-drawer__product-brand">{brand.trim()}</p>
-                      ) : null}
-                    </div>
-                  </div>
-                ) : (
-                  <>
-                    <p className="wd-shopping-add-drawer__selected">
-                      Category: <strong>{categoryLabel}</strong>
-                    </p>
-                    <label className="wd-shopping-add-drawer__field">
-                      <span>Item name</span>
-                      <input
-                        value={draft.name}
-                        onChange={(event) =>
-                          updateAddDrawerDraft({ ...draft, name: event.target.value })
-                        }
-                        required
-                      />
-                    </label>
-                  </>
-                )}
+            <section className="wd-shopping-add-drawer__card">
+              <header>
+                <ShoppingCart className="h-4 w-4" aria-hidden />
+                <div>
+                  <h3>Item details</h3>
+                  <p>Name and product library match.</p>
+                </div>
+              </header>
+              <label className="wd-shopping-add-drawer__field">
+                <span>Name</span>
+                <input
+                  value={draft.name}
+                  onChange={(event) =>
+                    updateAddDrawerDraft({
+                      ...draft,
+                      catalogId: undefined,
+                      name: event.target.value,
+                      category: draft.category || MANUAL_SHOPPING_CATEGORY,
+                    })
+                  }
+                  placeholder="Start typing an item"
+                  required
+                />
+              </label>
 
+              {libraryMatches.length > 0 ? (
+                <div className="wd-shopping-add-drawer__matches" aria-label="Product library suggestions">
+                  {libraryMatches.map((item) => (
+                    <button
+                      key={item.id}
+                      type="button"
+                      onClick={() =>
+                        setAddDrawerState((current) =>
+                          current
+                            ? {
+                                ...current,
+                                mode: "product",
+                                imageUrl: item.imageUrl,
+                                draft: {
+                                  ...current.draft,
+                                  catalogId: item.id,
+                                  name: item.name,
+                                  category: item.category,
+                                  quantity: String(item.suggestedQuantity || 1),
+                                  unit: normalizeShoppingUnit(item.unit, "each"),
+                                },
+                              }
+                            : current,
+                        )
+                      }
+                    >
+                      <span>{item.imageUrl ? <img src={item.imageUrl} alt="" /> : item.name.charAt(0)}</span>
+                      <strong>{item.name}</strong>
+                    </button>
+                  ))}
+                </div>
+              ) : null}
+            </section>
+
+            <section className="wd-shopping-add-drawer__card">
+              <header>
+                <Plus className="h-4 w-4" aria-hidden />
+                <div>
+                  <h3>Count and store</h3>
+                  <p>Quantity, unit, and where to buy it.</p>
+                </div>
+              </header>
+              <div className="wd-shopping-add-drawer__field-grid">
                 <div className="wd-shopping-add-drawer__field">
-                  <span>Amount</span>
+                  <span>Qty</span>
                   <div className="wd-shopping-add-drawer__amount">
                     <button
                       type="button"
@@ -793,7 +764,7 @@ export function ShoppingPage({ setData, navigateWithinApp, shoppingSearch = "" }
                 </div>
 
                 <label className="wd-shopping-add-drawer__field">
-                  <span>Unit / Size</span>
+                  <span>Unit</span>
                   <select
                     value={draft.unit}
                     onChange={(event) =>
@@ -807,246 +778,439 @@ export function ShoppingPage({ setData, navigateWithinApp, shoppingSearch = "" }
                     ))}
                   </select>
                 </label>
-
-                <label className="wd-shopping-add-drawer__field">
-                  <span>Store</span>
-                  <select
-                    value={draft.store}
-                    onChange={(event) =>
-                      updateAddDrawerDraft({ ...draft, store: event.target.value })
-                    }
-                  >
-                    {storeOptions.map((store) => (
-                      <option key={store} value={store}>
-                        {store}
-                      </option>
-                    ))}
-                    <option value={SHOPPING_STORE_ADD_NEW}>Add New Store</option>
-                  </select>
-                </label>
-
-                {showNewStore ? (
-                  <div className="wd-shopping-add-drawer__new-store">
-                    <label className="wd-shopping-add-drawer__field">
-                      <span>New store name</span>
-                      <input
-                        value={newStoreName}
-                        onChange={(event) => setNewStoreName(event.target.value)}
-                        placeholder="Store name"
-                      />
-                    </label>
-                    <button
-                      type="button"
-                      className="wd-shopping-add-drawer__secondary"
-                      onClick={() => saveNewStore("custom")}
-                    >
-                      Save New Store
-                    </button>
-                  </div>
-                ) : null}
-
-                <label className="wd-shopping-add-drawer__field">
-                  <span>Notes</span>
-                  <textarea
-                    value={draft.notes}
-                    onChange={(event) =>
-                      updateAddDrawerDraft({ ...draft, notes: event.target.value })
-                    }
-                    rows={3}
-                  />
-                </label>
-
-                <div className="wd-shopping-add-drawer__footer">
-                {mode === "manual" ? (
-                  <button
-                    type="button"
-                    className="wd-shopping-add-drawer__secondary"
-                    onClick={() =>
-                      setAddDrawerState((current) =>
-                        current ? { ...current, step: "category" } : current,
-                      )
-                    }
-                  >
-                    Back
-                  </button>
-                ) : (
-                  <button
-                    type="button"
-                    className="wd-shopping-add-drawer__secondary"
-                    onClick={closeAddDrawer}
-                  >
-                    Cancel
-                  </button>
-                )}
-                <button type="submit" className="wd-shopping-add-drawer__primary">
-                  Add to Shopping List
-                </button>
               </div>
-            </div>
-          </form>
-          )}
-        </aside>
-    );
-  }
-  function renderCatalogItems() {
-    if (displayCatalog.length === 0) {
-      return (
-        <div className="wd-pantry-kiosk__empty" role="status">
-          <p className="wd-pantry-kiosk__empty-title">No items match this filter.</p>
-          <p className="wd-pantry-kiosk__empty-hint">Try another category or clear search.</p>
-        </div>
-      );
-    }
 
-    return (
-      <ul className="wd-pantry-kiosk__rows wd-pantry-category-items">
-        {displayCatalog.map((item) => {
-          const inCart = quantityByProductId(item.id);
-          const product = products.find((entry) => entry.id === item.id);
-          const store = product?.store?.trim() ?? "";
-          const letter = item.name.trim().charAt(0).toUpperCase() || "?";
-          const theme = getGroceryCategoryTheme(item.category);
+              <label className="wd-shopping-add-drawer__field">
+                <span>Store</span>
+                <select
+                  value={draft.store}
+                  onChange={(event) =>
+                    updateAddDrawerDraft({ ...draft, store: event.target.value })
+                  }
+                >
+                  {storeOptions.map((store) => (
+                    <option key={store} value={store}>
+                      {store}
+                    </option>
+                  ))}
+                  <option value={SHOPPING_STORE_ADD_NEW}>Add New Store</option>
+                </select>
+              </label>
 
-          return (
-            <li key={item.id}>
+              {showNewStore ? (
+                <div className="wd-shopping-add-drawer__new-store">
+                  <label className="wd-shopping-add-drawer__field">
+                    <span>New store name</span>
+                    <input
+                      value={newStoreName}
+                      onChange={(event) => setNewStoreName(event.target.value)}
+                      placeholder="Store name"
+                    />
+                  </label>
+                  <button
+                    type="button"
+                    className="wd-shopping-add-drawer__secondary"
+                    onClick={() => saveNewStore("custom")}
+                  >
+                    Save New Store
+                  </button>
+                </div>
+              ) : null}
+            </section>
+
+            <section className="wd-shopping-add-drawer__card wd-shopping-add-drawer__card--wide">
+              <header>
+                <CheckCircle2 className="h-4 w-4" aria-hidden />
+                <div>
+                  <h3>Notes</h3>
+                  <p>Optional buying details.</p>
+                </div>
+              </header>
+              <label className="wd-shopping-add-drawer__field">
+                <span>Notes</span>
+                <textarea
+                  value={draft.notes}
+                  onChange={(event) =>
+                    updateAddDrawerDraft({ ...draft, notes: event.target.value })
+                  }
+                  placeholder="Brand, size, substitution, or reminder"
+                  rows={3}
+                />
+              </label>
+            </section>
+
+            <div className="wd-shopping-add-drawer__footer">
               <button
                 type="button"
-                className="wd-pantry-kiosk__row wd-pantry-category-item"
-                style={
-                  {
-                    borderTopColor: theme.accent,
-                  } as CSSProperties
-                }
-                onClick={() => openCatalogAddDrawer(item)}
+                className="wd-shopping-add-drawer__secondary"
+                onClick={closeAddDrawer}
               >
-                <span className="wd-pantry-kiosk__row-media" aria-hidden>
-                  {item.imageUrl ? <img src={item.imageUrl} alt="" loading="lazy" /> : <span>{letter}</span>}
-                </span>
-                <span className="wd-pantry-kiosk__row-copy">
-                  <strong>{item.name}</strong>
-                  <span>
-                    {item.suggestedQuantity} {item.unit}
-                    {store ? ` · ${store}` : ""}
-                  </span>
-                  {inCart > 0 ? <span>In list: {inCart} {item.unit}</span> : null}
-                </span>
-                <ChevronRight aria-hidden className="wd-pantry-kiosk__row-arrow" />
+                Cancel
               </button>
-            </li>
-          );
-        })}
-      </ul>
+              <button type="submit" className="wd-shopping-add-drawer__primary">
+                Add to Shopping List
+              </button>
+            </div>
+          </div>
+        </form>
+      </aside>
     );
   }
 
-  return (
-    <div
-      className={`wd-shopping-kiosk${
-        sidebarCollapsed ? " wd-shopping-kiosk--sidebar-collapsed" : ""
-      }`}
-    >
-      <header className="wd-shopping-kiosk__header" aria-labelledby="wd-shopping-kiosk-title">
-        <div className="wd-shopping-kiosk__header-inner">
-          <div>
-            <h1 id="wd-shopping-kiosk-title" className="wd-shopping-kiosk__title">
-              Shopping List
-            </h1>
-            <p className="wd-shopping-kiosk__subtitle">What does the household need next?</p>
-          </div>
-          <div className="wd-shopping-kiosk__header-actions">
-            <label className="wd-shopping-kiosk__search">
-              <span className="wd-shopping-kiosk__search-label">Search</span>
-              <input
-                type="search"
-                value={searchQuery}
-                onChange={(event) => setSearchQuery(event.target.value)}
-                placeholder="Search name, store, notes…"
-                aria-label="Search shopping products"
-              />
-            </label>
-            <button
-              type="button"
-              className="wd-pantry-kiosk__btn wd-pantry-kiosk__btn--ghost"
-              onClick={openAddItemModal}
-            >
-              New Add
-            </button>
-            <button
-              type="button"
-              className="wd-pantry-kiosk__btn wd-pantry-kiosk__btn--orange"
-              onClick={openScanModal}
-            >
-              Scan product
-            </button>
-          </div>
-        </div>
+  function renderTopBar() {
+    return (
+      <header className="wd-shopping-ref__topbar" aria-label="Shopping navigation">
+        <button type="button" className="wd-shopping-ref__back" onClick={openPantryInventory}>
+          <ArrowLeft className="h-4 w-4" aria-hidden />
+          Back
+        </button>
+        <strong>Shopping</strong>
+        <span aria-hidden />
       </header>
+    );
+  }
 
-      <div className="wd-shopping-kiosk__most-used-slot">{renderMostUsedSection()}</div>
-
-      <div className="wd-shopping-kiosk__body wd-shopping-kiosk__body--no-sidebar">
-        <div className="wd-shopping-kiosk__center">
-          <div className="wd-shopping-kiosk__categories">{renderCategoryGrid()}</div>
-          <div
-            className={`wd-shopping-kiosk__list-column${
-              addDrawerState ? " wd-shopping-kiosk__list-column--drawer-open" : ""
-            }`}
-          >
-            <div className="wd-shopping-kiosk__list">{renderCatalogItems()}</div>
-            {renderAddDrawer()}
+  function renderHubScreen() {
+    return (
+      <main className="wd-shopping-ref__content wd-shopping-flow" aria-label="Shopping main">
+        <section className="wd-shopping-flow__hero">
+          <div>
+            <h1>Household Shopping</h1>
+            <span>{openLineCount} active items from your real shopping cart and product library.</span>
           </div>
-        </div>
+        </section>
 
-        <aside className="wd-shopping-kiosk__summary wd-shopping-kiosk__cart" aria-label="Shopping list">
-            <div className="gf-shopping-cart">
-              <div className="gf-shopping-cart__head">
-                <h2 className="gf-shopping-cart__title">My list</h2>
-                <p className="gf-shopping-cart__count">
-                  {cartTotal} item{cartTotal === 1 ? "" : "s"}
-                </p>
-              </div>
+        {saveMessage ? <p className="wd-shopping-ref__status" role="status">{saveMessage}</p> : null}
 
-              {reorderNote ? (
-                <p className="text-sm font-semibold text-violet-800" role="status">
-                  {reorderNote}
-                </p>
-              ) : null}
+        <section className="wd-shopping-flow__quick-grid" aria-label="Shopping shortcuts">
+          <button type="button" onClick={() => openShoppingScreen("lists")}>
+            <ListChecks className="h-6 w-6" aria-hidden />
+            <strong>Lists</strong>
+            <span>{listCards.length} list views</span>
+          </button>
+          <button type="button" onClick={() => openAddItemModal()}>
+            <Plus className="h-6 w-6" aria-hidden />
+            <strong>Add Product</strong>
+            <span>Search real products</span>
+          </button>
+          <button type="button" onClick={openScanModal}>
+            <ScanLine className="h-6 w-6" aria-hidden />
+            <strong>Scan Item</strong>
+            <span>Barcode + OpenFoodFacts</span>
+          </button>
+          <button type="button" onClick={() => openShoppingScreen("shared-list")}>
+            <Share2 className="h-6 w-6" aria-hidden />
+            <strong>Shared List</strong>
+            <span>Household planning</span>
+          </button>
+          <button type="button" onClick={openPantrySettings}>
+            <Settings className="h-6 w-6" aria-hidden />
+            <strong>Settings</strong>
+            <span>Pantry and shopping setup</span>
+          </button>
+        </section>
 
-              {cartLines.length === 0 ? (
-                <div className="gf-shopping-empty" role="status">
-                  <p className="gf-shopping-empty__title">Your list is empty</p>
-                  <p className="gf-shopping-empty__hint">Add from the catalog or move items from Pantry.</p>
-                </div>
-              ) : (
-                <div className="flex flex-col gap-5">
-                  {cartByCategory.map((group) => (
-                    <ShoppingCategorySection
-                      key={group.category}
-                      category={group.category}
-                      lines={group.lines}
-                      onTogglePurchased={toggleCartPurchased}
-                      onQuantityChange={setCartQuantity}
-                      onRemove={(id) => setCartQuantity(id, 0)}
-                    />
-                  ))}
-                </div>
-              )}
+        <section className="wd-shopping-flow__cards" aria-label="Shopping list groups">
+          {listCards.map((list) => (
+            <button
+              key={list.id}
+              type="button"
+              className="wd-shopping-flow__list-card"
+              onClick={() => openShoppingScreen(list.screen)}
+            >
+              <span className="wd-shopping-flow__list-icon" aria-hidden>
+                {list.id === "shared" ? <Users className="h-5 w-5" /> : <ShoppingCart className="h-5 w-5" />}
+              </span>
+              <span className="wd-shopping-flow__list-copy">
+                <strong>{list.title}</strong>
+                <small>{list.subtitle}</small>
+              </span>
+              <em>{list.count}</em>
+            </button>
+          ))}
+        </section>
+        <button type="button" className="wd-shopping-flow__pantry-link" onClick={openPantryInventory}>
+          <Package className="h-5 w-5" aria-hidden />
+          <span>
+            <strong>Inventory</strong>
+            <small>Open inventory locations</small>
+          </span>
+          <ChevronRight className="h-5 w-5" aria-hidden />
+        </button>
+      </main>
+    );
+  }
 
-              <ShoppingQuickActions
-                itemCount={cartTotal}
-                onSaveList={saveShoppingList}
-                saveMessage={saveMessage}
-                saveDisabled={cartLines.length === 0}
-                onReorderNote={() => {
-                  setReorderNote("Reorder noted locally — no payment or delivery.");
-                  window.setTimeout(() => setReorderNote(null), 2800);
-                }}
-              />
+  function renderListsScreen() {
+    return (
+      <main className="wd-shopping-ref__content wd-shopping-flow" aria-label="Available shopping lists">
+        <section className="wd-shopping-flow__section-head">
+          <div>
+            <p className="wd-shopping-flow__eyebrow">Lists</p>
+            <h1>Shopping Lists</h1>
+            <span>Built from your current cart and saved household shopping data.</span>
+          </div>
+          <button type="button" onClick={() => openShoppingScreen("new-list")}>
+            <Plus className="h-4 w-4" aria-hidden />
+            New List
+          </button>
+        </section>
+
+        <section className="wd-shopping-flow__cards">
+          {listCards.map((list) => (
+            <button
+              key={list.id}
+              type="button"
+              className="wd-shopping-flow__list-card wd-shopping-flow__list-card--wide"
+              onClick={() => openShoppingScreen(list.screen)}
+            >
+              <span className="wd-shopping-flow__list-icon" aria-hidden>
+                <ListChecks className="h-5 w-5" />
+              </span>
+              <span>
+                <strong>{list.title}</strong>
+                <small>{list.subtitle} · {list.meta}</small>
+              </span>
+              <em>{list.count}</em>
+            </button>
+          ))}
+        </section>
+
+        {savedOpenItems.length > 0 ? (
+          <section className="wd-shopping-flow__saved" aria-label="Saved household shopping items">
+            <h2>Saved Household Items</h2>
+            {savedOpenItems.slice(0, 8).map((item) => (
+              <article key={item.id} className="wd-shopping-flow__saved-row">
+                <strong>{item.name}</strong>
+                <span>{item.quantity || "1"} {item.unit || ""}</span>
+              </article>
+            ))}
+          </section>
+        ) : null}
+      </main>
+    );
+  }
+
+  function renderCurrentListScreen() {
+    return (
+      <main className="wd-shopping-ref__content wd-shopping-flow" aria-label="Current shopping list">
+        <section className="wd-shopping-flow__section-head wd-shopping-flow__section-head--current">
+          <div>
+            <p className="wd-shopping-flow__eyebrow">Current List</p>
+            <h1>{currentListTitle}</h1>
+            <span>{visibleCurrentLines.length} visible active item{visibleCurrentLines.length === 1 ? "" : "s"}.</span>
+          </div>
+          <button type="button" onClick={startShopping}>
+            <Sparkles className="h-4 w-4" aria-hidden />
+            Start Shopping
+          </button>
+        </section>
+
+        <section className="wd-shopping-flow__list-stats" aria-label="Shopping list summary">
+          <article>
+            <span>Active</span>
+            <strong>{activeCartLines.length}</strong>
+            <small>Still needed</small>
+          </article>
+          <article>
+            <span>Visible</span>
+            <strong>{visibleCurrentLines.length}</strong>
+            <small>{selectedStore}</small>
+          </article>
+          <article>
+            <span>Purchased</span>
+            <strong>{purchasedCartLines.length}</strong>
+            <small>Checked off</small>
+          </article>
+        </section>
+
+        <section className="wd-shopping-flow__store-strip" aria-label="Store selector">
+          <Store className="h-5 w-5" aria-hidden />
+          <div>
+            <strong>Store selector</strong>
+            <select value={selectedStore} onChange={(event) => setSelectedStore(event.target.value)}>
+              <option value="All Stores">All Stores</option>
+              {storeOptions.map((store) => (
+                <option key={store} value={store}>
+                  {store}
+                </option>
+              ))}
+            </select>
+          </div>
+        </section>
+
+        <section className="wd-shopping-ref__list wd-shopping-flow__list-panel" aria-label="Current active shopping items">
+          <header className="wd-shopping-flow__list-panel-head">
+            <div>
+              <p>To buy</p>
+              <h2>Active grocery items</h2>
             </div>
-          </aside>
-      </div>
+            <span>{visibleCurrentLines.length} item{visibleCurrentLines.length === 1 ? "" : "s"}</span>
+          </header>
+          {visibleCurrentLines.length === 0 ? (
+            <div className="wd-shopping-ref__empty" role="status">
+              <p>Your current list is empty.</p>
+              <span>Add a product, scan an item, or send something from Pantry.</span>
+            </div>
+          ) : (
+            <div className="wd-shopping-flow__table-wrap">
+              <div className="wd-shopping-flow__table-head" aria-hidden>
+                <span>Need</span>
+                <span>Name</span>
+                <span>Store</span>
+                <span>Amount</span>
+                <span />
+              </div>
+              <ul className="gf-shopping-list wd-shopping-flow__line-list">
+                {visibleCurrentLines.map((line) => (
+                  <ShoppingListCard
+                    key={line.id}
+                    line={line}
+                    variant="table"
+                    onOpenDetails={openShoppingLineDetails}
+                    onTogglePurchased={toggleCartPurchased}
+                    onQuantityChange={setCartQuantity}
+                    onRemove={removeItem}
+                  />
+                ))}
+              </ul>
+            </div>
+          )}
+        </section>
 
+        {purchasedCartLines.length > 0 ? (
+          <section className="wd-shopping-ref__purchased wd-shopping-flow__list-panel wd-shopping-flow__list-panel--purchased" aria-label="Purchased items">
+            <header className="wd-shopping-flow__list-panel-head">
+              <div>
+                <p>Checked off</p>
+                <h2><CheckCircle2 className="h-4 w-4" aria-hidden /> Purchased items</h2>
+              </div>
+              <span>{purchasedCartLines.length} done</span>
+            </header>
+            <div className="wd-shopping-flow__table-wrap">
+              <div className="wd-shopping-flow__table-head" aria-hidden>
+                <span>Done</span>
+                <span>Name</span>
+                <span>Store</span>
+                <span>Amount</span>
+                <span />
+              </div>
+              <ul className="gf-shopping-list wd-shopping-flow__line-list">
+                {purchasedCartLines.map((line) => (
+                  <ShoppingListCard
+                    key={line.id}
+                    line={line}
+                    variant="table"
+                    onOpenDetails={openShoppingLineDetails}
+                    onTogglePurchased={toggleCartPurchased}
+                    onQuantityChange={setCartQuantity}
+                    onRemove={removeItem}
+                  />
+                ))}
+              </ul>
+            </div>
+          </section>
+        ) : null}
 
+        <ShoppingQuickActions
+          itemCount={openLineCount}
+          onSaveList={saveShoppingList}
+          onReorderNote={() => openShoppingScreen("lists")}
+          saveMessage={saveMessage}
+          saveDisabled={cartLines.length === 0}
+          primaryLabel="Save current list"
+          secondaryLabel="Review lists"
+        />
+      </main>
+    );
+  }
+
+  function renderAddProductScreen() {
+    return (
+      <main className="wd-shopping-ref__content wd-shopping-flow" aria-label="Add product">
+        <section className="wd-shopping-flow__section-head">
+          <div>
+            <p className="wd-shopping-flow__eyebrow">Add Product</p>
+            <h1>Find or Add Product</h1>
+            <span>Search your real product library, type a manual item, or scan a barcode.</span>
+          </div>
+          <button type="button" onClick={openScanModal}>
+            <ScanLine className="h-4 w-4" aria-hidden />
+            Scan
+          </button>
+        </section>
+
+        {addDrawerState ? renderAddDrawer() : (
+          <button type="button" className="wd-shopping-ref__add" onClick={() => openAddItemModal()}>
+            <Search className="h-5 w-5" aria-hidden />
+            Start Product Search
+          </button>
+        )}
+
+        {frequentProducts.length > 0 ? (
+          <section className="wd-shopping-flow__recommendations" aria-label="Recommended products">
+            <h2>Recommended from your products</h2>
+            <div>
+              {frequentProducts.map((item) => (
+                <button key={item.id} type="button" onClick={() => addCatalogProductToShopping(item)}>
+                  <span className="wd-shopping-ref__thumb" aria-hidden>
+                    {item.imageUrl ? <img src={item.imageUrl} alt="" loading="lazy" /> : item.name.charAt(0)}
+                  </span>
+                  <strong>{item.name}</strong>
+                  <small>{item.category}</small>
+                </button>
+              ))}
+            </div>
+          </section>
+        ) : null}
+      </main>
+    );
+  }
+
+  function renderListBuilderScreen(shared: boolean) {
+    return (
+      <main className="wd-shopping-ref__content wd-shopping-flow" aria-label={shared ? "Shared list" : "New list"}>
+        <section className="wd-shopping-flow__section-head">
+          <div>
+            <p className="wd-shopping-flow__eyebrow">{shared ? "Shared List" : "New List"}</p>
+            <h1>{shared ? "Shared Household List" : "Create Shopping List"}</h1>
+            <span>Uses the existing household cart and saved shopping data. No data model reset.</span>
+          </div>
+        </section>
+
+        <section className="wd-shopping-flow__builder">
+          <label>
+            <span>List title</span>
+            <input
+              value={shared ? sharedListTitle : newListTitle}
+              onChange={(event) => shared ? setSharedListTitle(event.target.value) : setNewListTitle(event.target.value)}
+              placeholder={shared ? "Shared Household List" : "Weekend Costco Run"}
+            />
+          </label>
+          <div className="wd-shopping-flow__builder-summary">
+            <article>
+              <strong>{activeCartLines.length}</strong>
+              <span>Active items</span>
+            </article>
+            <article>
+              <strong>{storeOptions.length}</strong>
+              <span>Known stores</span>
+            </article>
+            <article>
+              <strong>{products.length}</strong>
+              <span>Products</span>
+            </article>
+          </div>
+          <button type="button" className="wd-shopping-flow__hero-action" onClick={() => createNewList(shared)}>
+            {shared ? "Use Shared List" : "Create List"}
+          </button>
+        </section>
+      </main>
+    );
+  }
+
+  const shoppingPopups = (
+    <>
       {activeAction === "scan" ? (
         <ProductScanPanel
           title="Scan item"
@@ -1078,6 +1242,7 @@ export function ShoppingPage({ setData, navigateWithinApp, shoppingSearch = "" }
               brand: detailView.brand,
               imageUrl: detailView.imageUrl,
             });
+            closeProductDetail();
           }}
           onAddToPantry={() => {
             if (detailMode === "edit") {
@@ -1096,8 +1261,30 @@ export function ShoppingPage({ setData, navigateWithinApp, shoppingSearch = "" }
                 }
               : undefined
           }
+          onNavigateToPantry={() => {
+            closeProductDetail();
+            openPantryInventory();
+          }}
+          onNavigateToShopping={closeProductDetail}
+          onNavigateToSettings={() => {
+            closeProductDetail();
+            openPantrySettings();
+          }}
         />
       ) : null}
+    </>
+  );
+
+  return (
+    <div className="wd-shopping-ref">
+      {renderTopBar()}
+      {screen === "hub" ? renderHubScreen() : null}
+      {screen === "lists" ? renderListsScreen() : null}
+      {screen === "current" ? renderCurrentListScreen() : null}
+      {screen === "add" ? renderAddProductScreen() : null}
+      {screen === "new-list" ? renderListBuilderScreen(false) : null}
+      {screen === "shared-list" ? renderListBuilderScreen(true) : null}
+      {shoppingPopups}
     </div>
   );
 }

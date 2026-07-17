@@ -1,11 +1,15 @@
 import {
+  AlertTriangle,
   ArrowLeft,
   Brain,
+  CheckCircle2,
+  ChevronRight,
   ClipboardList,
   ListChecks,
   Plus,
   Search,
   Table2,
+  UserPlus,
   X,
 } from "lucide-react";
 import { useEffect, useId, useMemo, useState, type ReactNode } from "react";
@@ -70,6 +74,8 @@ import {
   membersReferencedByTasks,
   ownerLabelForAssignment,
 } from "../lib/memberAssignment";
+import "../components/cards/kiosk.css";
+import "../styles/guided-kiosk.css";
 
 type WorkspaceView =
   | "kitchen"
@@ -80,6 +86,8 @@ type WorkspaceView =
   | "person"
   | "day"
   | "table";
+
+type TaskKioskFlow = "add" | "find" | "complete" | "assign" | "today" | "overdue" | "unassigned";
 
 /** SmartHR — Cleaning workspace */
 const PAGE_BG =
@@ -124,7 +132,8 @@ export function TasksPage({
   const taskStatusOptions = getTaskStatuses(admin);
 
   const [brainDumpText, setBrainDumpText] = useState("");
-  const [activeView, setActiveView] = useState<WorkspaceView>("list");
+  const [hasEnteredTasks, setHasEnteredTasks] = useState(true);
+  const [activeView, setActiveView] = useState<WorkspaceView>("rooms");
   const dashboardViewMemberId = useActiveDashboardViewMemberId(activeView);
   const [searchText, setSearchText] = useState("");
   const [personFilter, setPersonFilter] = useState("all");
@@ -133,6 +142,14 @@ export function TasksPage({
   const [recurringFilter, setRecurringFilter] = useState("all");
   const [selectedTaskId, setSelectedTaskId] = useState("");
   const [selectedRoomId, setSelectedRoomId] = useState<string | null>(null);
+  const [showFullWorkspace, setShowFullWorkspace] = useState(true);
+  const [taskFlow, setTaskFlow] = useState<TaskKioskFlow | null>(null);
+  const [taskFlowSearch, setTaskFlowSearch] = useState("");
+  const [taskFlowSelectedId, setTaskFlowSelectedId] = useState("");
+  const [taskFlowTitle, setTaskFlowTitle] = useState("");
+  const [taskFlowType, setTaskFlowType] = useState<TaskType>("task");
+  const [taskFlowAssigneeId, setTaskFlowAssigneeId] = useState("");
+  const [taskFlowComplete, setTaskFlowComplete] = useState<string | null>(null);
   const today = new Date().toISOString().slice(0, 10);
 
   useEffect(() => {
@@ -168,6 +185,14 @@ export function TasksPage({
     () => membersReferencedByTasks(data.familyMembers, data.tasks),
     [data.familyMembers, data.tasks],
   );
+  const tasksEntryMembers = useMemo(
+    () =>
+      data.familyMembers
+        .filter((member) => member.status === "active" || member.status === "guest")
+        .slice()
+        .sort((a, b) => getMemberFullName(a).localeCompare(getMemberFullName(b))),
+    [data.familyMembers],
+  );
   const waitingReviewItems = data.tasks.filter((task) => task.status === "Waiting Review");
   const selectedTask = data.tasks.find((task) => task.id === selectedTaskId);
   const filteredTasks = data.tasks.filter((task) => {
@@ -192,6 +217,34 @@ export function TasksPage({
 
     return matchesSearch && matchesPerson && matchesZone && matchesStatus && matchesRecurring;
   });
+  const taskFlowSelectedTask = data.tasks.find((task) => task.id === taskFlowSelectedId);
+  const taskFlowCandidates = useMemo(() => {
+    const pool =
+      taskFlow === "today"
+        ? todayItems
+        : taskFlow === "overdue"
+          ? overdueItems
+          : taskFlow === "unassigned"
+            ? unassignedItems
+        : taskFlow === "complete" || taskFlow === "assign"
+          ? openTasks
+          : data.tasks;
+    const query = taskFlowSearch.trim().toLowerCase();
+    return pool
+      .filter((task) => {
+        if (!query) {
+          return true;
+        }
+        return (
+          task.title.toLowerCase().includes(query) ||
+          (task.zone ?? "").toLowerCase().includes(query) ||
+          (task.category ?? "").toLowerCase().includes(query) ||
+          (task.owner ?? "").toLowerCase().includes(query)
+        );
+      })
+      .slice(0, 14);
+  }, [data.tasks, openTasks, overdueItems, taskFlow, taskFlowSearch, todayItems, unassignedItems]);
+
   function addTask({
     title = "New household task",
     isBrainDump = false,
@@ -246,6 +299,8 @@ export function TasksPage({
       }),
       tasks: [...current.tasks, task],
     }));
+
+    return taskId;
   }
 
   function addBrainDumpItem() {
@@ -353,6 +408,337 @@ export function TasksPage({
     });
   }
 
+  function resetTaskFlow() {
+    setTaskFlow(null);
+    setTaskFlowSearch("");
+    setTaskFlowSelectedId("");
+    setTaskFlowTitle("");
+    setTaskFlowType("task");
+    setTaskFlowAssigneeId("");
+  }
+
+  function startTaskFlow(flow: TaskKioskFlow) {
+    setTaskFlowComplete(null);
+    setTaskFlow(flow);
+    setTaskFlowSearch("");
+    setTaskFlowSelectedId("");
+    setTaskFlowTitle("");
+    setTaskFlowType(flow === "add" ? "task" : taskFlowType);
+    setTaskFlowAssigneeId("");
+  }
+
+  function createTaskFromFlow() {
+    const title = taskFlowTitle.trim() || (taskFlowType === "chore" ? "New cleaning chore" : "New household task");
+    const taskId = addTask({
+      title,
+      type: taskFlowType,
+      frequency: taskFlowType === "chore" ? "weekly" : "one-time",
+    });
+    setTaskFlowComplete(`Created ${title}.`);
+    resetTaskFlow();
+    setSelectedTaskId(taskId);
+  }
+
+  function assignTaskFromFlow(task: Task) {
+    updateTaskWithActivity(
+      task,
+      { assignedMemberId: taskFlowAssigneeId },
+      `Assigned task: ${task.title}.`,
+    );
+    const member = data.familyMembers.find((item) => item.id === taskFlowAssigneeId);
+    setTaskFlowComplete(
+      member
+        ? `${task.title} was assigned to ${getMemberFullName(member)}.`
+        : `${task.title} was moved to unassigned.`,
+    );
+    resetTaskFlow();
+  }
+
+  function enterTasks(memberId: string | null) {
+    setPersonFilter(memberId ?? "all");
+    setActiveView(memberId ? "person" : "list");
+    setHasEnteredTasks(true);
+  }
+
+  function renderTaskFlowSheet() {
+    if (!taskFlow) {
+      return null;
+    }
+
+    const title =
+      taskFlow === "add"
+        ? "Add a task"
+        : taskFlow === "find"
+          ? "Find a task"
+          : taskFlow === "complete"
+            ? "Mark a task done"
+            : taskFlow === "assign" || taskFlow === "unassigned"
+              ? "Assign a task"
+              : taskFlow === "overdue"
+                ? "Overdue chores"
+                : "Pick a chore for today";
+
+    const helperText =
+      taskFlow === "add"
+        ? "Add the job in plain language. You can fine-tune room, person, and notes next."
+        : taskFlow === "complete"
+          ? "Pick the chore that was finished, then confirm it is done."
+          : taskFlow === "assign" || taskFlow === "unassigned"
+            ? "Pick the task first, then choose who should own it."
+            : taskFlow === "overdue"
+              ? "Start here when the house feels behind. Clear one overdue item at a time."
+              : taskFlow === "today"
+                ? "These are the chores due today. Pick one to open or finish."
+                : "Search by chore name, room, zone, or person.";
+
+    return (
+      <div className="wd-guided-kiosk__sheet-backdrop" role="presentation" onClick={resetTaskFlow}>
+        <section
+          className="wd-guided-kiosk__sheet"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="tasks-flow-title"
+          onClick={(event) => event.stopPropagation()}
+        >
+          <header className="wd-guided-kiosk__sheet-head">
+            <div>
+              <p className="wd-guided-kiosk__eyebrow">Cleaning station</p>
+              <h2 id="tasks-flow-title">{title}</h2>
+              <p>{helperText}</p>
+            </div>
+            <button
+              type="button"
+              className="wd-guided-kiosk__icon-btn"
+              aria-label="Close cleaning flow"
+              onClick={resetTaskFlow}
+            >
+              <X className="h-4 w-4" aria-hidden />
+            </button>
+          </header>
+
+          {taskFlow === "add" ? (
+            <div className="wd-guided-kiosk__stack">
+              <label className="wd-guided-kiosk__field">
+                <span>What should be done?</span>
+                <input
+                  value={taskFlowTitle}
+                  onChange={(event) => setTaskFlowTitle(event.target.value)}
+                  placeholder="Example: Wipe kitchen counters"
+                  autoFocus
+                />
+              </label>
+              <div className="wd-guided-kiosk__choice-row" role="radiogroup" aria-label="Task type">
+                {taskTypes.map((type) => (
+                  <button
+                    key={type}
+                    type="button"
+                    className={
+                      taskFlowType === type
+                        ? "wd-guided-kiosk__pill wd-guided-kiosk__pill--active"
+                        : "wd-guided-kiosk__pill"
+                    }
+                    aria-pressed={taskFlowType === type}
+                    onClick={() => setTaskFlowType(type)}
+                  >
+                    {type === "chore" ? "Cleaning chore" : "Task"}
+                  </button>
+                ))}
+              </div>
+              <button type="button" className="wd-guided-kiosk__primary" onClick={createTaskFromFlow}>
+                Create and open details
+              </button>
+            </div>
+          ) : !taskFlowSelectedTask ? (
+            <div className="wd-guided-kiosk__stack">
+              <label className="wd-guided-kiosk__search">
+                <Search className="h-4 w-4" aria-hidden />
+                <input
+                  value={taskFlowSearch}
+                  onChange={(event) => setTaskFlowSearch(event.target.value)}
+                  placeholder="Search task, room, zone..."
+                  autoFocus
+                />
+              </label>
+              <div className="wd-guided-kiosk__chooser" role="listbox" aria-label="Choose task">
+                {taskFlowCandidates.length === 0 ? (
+                  <p className="wd-guided-kiosk__empty">No matching tasks. Try another search.</p>
+                ) : (
+                  taskFlowCandidates.map((task) => {
+                    const assigned = data.familyMembers.find((member) => member.id === task.assignedMemberId);
+                    return (
+                      <button
+                        key={task.id}
+                        type="button"
+                        className="wd-guided-kiosk__chooser-row"
+                        role="option"
+                        onClick={() => {
+                          if (taskFlow === "find" || taskFlow === "today" || taskFlow === "overdue") {
+                            resetTaskFlow();
+                            setSelectedTaskId(task.id);
+                            return;
+                          }
+                          setTaskFlowSelectedId(task.id);
+                        }}
+                      >
+                        <span>
+                          <strong>{task.title}</strong>
+                          <small>
+                            {task.zone || "Household"} · {assigned ? getMemberFullName(assigned) : "Unassigned"} · {task.status}
+                          </small>
+                        </span>
+                        <ChevronRight className="h-4 w-4" aria-hidden />
+                      </button>
+                    );
+                  })
+                )}
+              </div>
+            </div>
+          ) : taskFlow === "complete" ? (
+            <div className="wd-guided-kiosk__confirm">
+              <TaskFlowSummary task={taskFlowSelectedTask} members={data.familyMembers} />
+              <div className="wd-guided-kiosk__actions">
+                <button type="button" className="wd-guided-kiosk__secondary" onClick={() => setTaskFlowSelectedId("")}>
+                  Pick another
+                </button>
+                <button
+                  type="button"
+                  className="wd-guided-kiosk__primary"
+                  onClick={() => {
+                    completeTask(taskFlowSelectedTask);
+                    setTaskFlowComplete(`${taskFlowSelectedTask.title} was marked done.`);
+                    resetTaskFlow();
+                  }}
+                >
+                  Mark done
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className="wd-guided-kiosk__confirm">
+              <TaskFlowSummary task={taskFlowSelectedTask} members={data.familyMembers} />
+              <label className="wd-guided-kiosk__field">
+                <span>Assign to</span>
+                <select
+                  value={taskFlowAssigneeId}
+                  onChange={(event) => setTaskFlowAssigneeId(event.target.value)}
+                >
+                  <option value="">Unassigned</option>
+                  {data.familyMembers
+                    .filter((member) => member.status === "active" || member.status === "guest")
+                    .map((member) => (
+                      <option key={member.id} value={member.id}>
+                        {getMemberFullName(member)}
+                      </option>
+                    ))}
+                </select>
+              </label>
+              <div className="wd-guided-kiosk__actions">
+                <button type="button" className="wd-guided-kiosk__secondary" onClick={() => setTaskFlowSelectedId("")}>
+                  Pick another
+                </button>
+                <button type="button" className="wd-guided-kiosk__primary" onClick={() => assignTaskFromFlow(taskFlowSelectedTask)}>
+                  Save assignment
+                </button>
+              </div>
+            </div>
+          )}
+        </section>
+      </div>
+    );
+  }
+
+  const taskDetailDrawer = selectedTask ? (
+    <TaskDetailDrawer
+      adminSettings={data.adminSettings}
+      members={data.familyMembers}
+      onClose={() => setSelectedTaskId("")}
+      onComplete={completeTask}
+      onUpdate={(updates, message) =>
+        updateTaskWithActivity(selectedTask, updates, message)
+      }
+      task={selectedTask}
+    />
+  ) : null;
+
+  if (!hasEnteredTasks) {
+    return (
+      <TasksOpeningScreen
+        members={tasksEntryMembers}
+        onContinueHousehold={() => enterTasks(null)}
+        onSelectMember={(memberId) => enterTasks(memberId)}
+      />
+    );
+  }
+
+  if (!showFullWorkspace) {
+    return (
+      <div className="wd-guided-kiosk wd-guided-kiosk--tasks">
+        <section className="wd-guided-kiosk__hero" aria-labelledby="tasks-kiosk-title">
+          <div>
+            <p className="wd-guided-kiosk__eyebrow">Cleaning station</p>
+            <h1 id="tasks-kiosk-title">What do you want to do?</h1>
+            <p>
+              Pick one cleaning task. The next choice opens in a focused pop-up, then the next one.
+            </p>
+          </div>
+          <div className="wd-guided-kiosk__status">
+            <span>{openTasks.length} open</span>
+            <span>{todayItems.length} due today</span>
+            <span>{overdueItems.length} overdue</span>
+          </div>
+        </section>
+
+        {taskFlowComplete ? (
+          <section className="wd-guided-kiosk__complete" role="status">
+            <CheckCircle2 className="h-5 w-5" aria-hidden />
+            <p>{taskFlowComplete}</p>
+            <button type="button" onClick={() => setTaskFlowComplete(null)}>
+              Start another
+            </button>
+          </section>
+        ) : null}
+
+        <section className="wd-guided-kiosk__actions-grid" aria-label="Cleaning actions">
+          <button type="button" className="wd-guided-kiosk__action wd-guided-kiosk__action--primary" onClick={() => startTaskFlow("add")}>
+            <span className="wd-guided-kiosk__action-icon"><Plus className="h-5 w-5" aria-hidden /></span>
+            <span><strong>Add task</strong><small>Create, then open details</small></span>
+          </button>
+          <button type="button" className="wd-guided-kiosk__action" onClick={() => startTaskFlow("find")}>
+            <span className="wd-guided-kiosk__action-icon"><Search className="h-5 w-5" aria-hidden /></span>
+            <span><strong>Find task</strong><small>Search and open one task</small></span>
+          </button>
+          <button type="button" className="wd-guided-kiosk__action" onClick={() => startTaskFlow("complete")}>
+            <span className="wd-guided-kiosk__action-icon"><CheckCircle2 className="h-5 w-5" aria-hidden /></span>
+            <span><strong>Mark done</strong><small>Choose and confirm</small></span>
+          </button>
+          <button type="button" className="wd-guided-kiosk__action" onClick={() => startTaskFlow("overdue")}>
+            <span className="wd-guided-kiosk__action-icon"><AlertTriangle className="h-5 w-5" aria-hidden /></span>
+            <span><strong>Overdue chores</strong><small>Clear what is behind</small></span>
+          </button>
+          <button type="button" className="wd-guided-kiosk__action" onClick={() => startTaskFlow("unassigned")}>
+            <span className="wd-guided-kiosk__action-icon"><UserPlus className="h-5 w-5" aria-hidden /></span>
+            <span><strong>Unassigned tasks</strong><small>Give jobs to a person</small></span>
+          </button>
+          <button type="button" className="wd-guided-kiosk__action" onClick={() => startTaskFlow("assign")}>
+            <span className="wd-guided-kiosk__action-icon"><UserPlus className="h-5 w-5" aria-hidden /></span>
+            <span><strong>Assign task</strong><small>Pick task, then person</small></span>
+          </button>
+          <button type="button" className="wd-guided-kiosk__action" onClick={() => startTaskFlow("today")}>
+            <span className="wd-guided-kiosk__action-icon"><ClipboardList className="h-5 w-5" aria-hidden /></span>
+            <span><strong>Today’s chores</strong><small>Open a due task</small></span>
+          </button>
+          <button type="button" className="wd-guided-kiosk__action" onClick={() => setShowFullWorkspace(true)}>
+            <span className="wd-guided-kiosk__action-icon"><Table2 className="h-5 w-5" aria-hidden /></span>
+            <span><strong>Advanced workspace</strong><small>Filters, tables, kitchen tools</small></span>
+          </button>
+        </section>
+
+        {renderTaskFlowSheet()}
+        {taskDetailDrawer}
+      </div>
+    );
+  }
+
   return (
     <div className={PAGE_BG}>
       <WorkspacePageShell
@@ -363,20 +749,29 @@ export function TasksPage({
         tone="light"
       >
       <ModuleWorkspaceHeader
-        description="Kitchen duty and household cleaning checklists."
-        eyebrow="Cleaning"
+        description="Cleaning dashboard, kitchen duty, and household task views in one workspace."
+        eyebrow="Cleaning & Tasks"
         metrics={[
           { label: "Open", value: openTasks.length },
           { label: "Due today", value: todayItems.length },
           { label: "Overdue", value: overdueItems.length },
         ]}
-        title="Cleaning"
+        title="Cleaning & Tasks"
         tone="light"
       />
 
       <ModuleActionBar className={ACTION_BAR_SMARTHR} tone="light">
         <div className="flex flex-col gap-4">
           <div className="flex flex-wrap gap-2">
+            <Button
+              className={btnSecondaryLight}
+              onClick={() => setShowFullWorkspace(false)}
+              variant="secondary"
+              type="button"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Kiosk station
+            </Button>
             <Button
               className="text-[#637381] hover:bg-white"
               onClick={onOpenDashboard}
@@ -829,6 +1224,90 @@ export function TasksPage({
       ) : null}
     </WorkspacePageShell>
     </div>
+  );
+}
+
+function TasksOpeningScreen({
+  members,
+  onContinueHousehold,
+  onSelectMember,
+}: {
+  members: FamilyMember[];
+  onContinueHousehold: () => void;
+  onSelectMember: (memberId: string) => void;
+}) {
+  return (
+    <div className="fh-tasks-entry" aria-labelledby="fh-tasks-entry-title">
+      <section className="fh-tasks-entry__card">
+        <p className="fh-tasks-entry__eyebrow">Family Dashboard</p>
+        <h1 id="fh-tasks-entry-title" className="fh-tasks-entry__title">
+          Who is working on tasks?
+        </h1>
+        <p className="fh-tasks-entry__hint">Select your name to see your task workspace.</p>
+
+        <div className="fh-tasks-entry__members" aria-label="Choose family member">
+          {members.map((member) => {
+            const label = getMemberFullName(member);
+            const initial = label.trim().charAt(0).toUpperCase() || "?";
+            return (
+              <button
+                key={member.id}
+                type="button"
+                className="fh-tasks-entry__member-btn"
+                onClick={() => onSelectMember(member.id)}
+              >
+                <span className="fh-tasks-entry__avatar" aria-hidden>
+                  {initial}
+                </span>
+                <span>{label}</span>
+              </button>
+            );
+          })}
+          <button
+            type="button"
+            className="fh-tasks-entry__member-btn fh-tasks-entry__member-btn--household"
+            onClick={onContinueHousehold}
+          >
+            <span className="fh-tasks-entry__avatar" aria-hidden>
+              H
+            </span>
+            <span>Household / all tasks</span>
+          </button>
+        </div>
+      </section>
+    </div>
+  );
+}
+
+function TaskFlowSummary({
+  task,
+  members,
+}: {
+  task: Task;
+  members: FamilyMember[];
+}) {
+  const member = members.find((item) => item.id === task.assignedMemberId);
+  return (
+    <article className="wd-guided-kiosk__summary-card">
+      <div>
+        <p className="wd-guided-kiosk__eyebrow">Selected task</p>
+        <h3>{task.title}</h3>
+      </div>
+      <dl>
+        <div>
+          <dt>Zone</dt>
+          <dd>{task.zone || "Household"}</dd>
+        </div>
+        <div>
+          <dt>Assigned</dt>
+          <dd>{member ? getMemberFullName(member) : "Unassigned"}</dd>
+        </div>
+        <div>
+          <dt>Status</dt>
+          <dd>{task.status}</dd>
+        </div>
+      </dl>
+    </article>
   );
 }
 

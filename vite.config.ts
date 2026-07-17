@@ -8,6 +8,10 @@ export default defineConfig({
     react(),
     tailwindcss(),
     VitePWA({
+      // Prevent Workbox from registering a service worker during `npm run dev`.
+      devOptions: {
+        enabled: false,
+      },
       registerType: "autoUpdate",
       includeAssets: [
         "pwa-192.png",
@@ -102,10 +106,16 @@ export default defineConfig({
       },
     },
   },
+  optimizeDeps: {
+    entries: ["index.html"],
+  },
   server: {
     port: 5173,
     strictPort: true,
     host: "localhost",
+    watch: {
+      ignored: ["**/vendor/**", "**/node_modules/**"],
+    },
   },
   preview: {
     port: 4173,

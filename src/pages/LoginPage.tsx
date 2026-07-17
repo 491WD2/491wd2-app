@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Home, LogIn, Table2, X } from "lucide-react";
 import { useAuth } from "../auth";
 import { Button } from "../components/ui/Button";
 import { Card, CardHeader } from "../components/ui/Card";
@@ -8,6 +9,7 @@ import {
   WorkspacePageShell,
 } from "../components/workspace/ModuleWorkspace";
 import { getSupabaseBrowserClient } from "../lib/supabaseClient";
+import "../styles/guided-kiosk.css";
 
 type LoginPageProps = {
   onBack: () => void;
@@ -20,6 +22,8 @@ export function LoginPage({ onBack }: LoginPageProps) {
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [status, setStatus] = useState<string | null>(null);
+  const [authOpen, setAuthOpen] = useState(false);
+  const [showFullAuth, setShowFullAuth] = useState(false);
 
   const configured = supabaseConfigured;
   const client = getSupabaseBrowserClient();
@@ -80,19 +84,7 @@ export function LoginPage({ onBack }: LoginPageProps) {
   const formDisabled = !configured || busy || loading;
   const showSignedIn = Boolean(session && user);
 
-  return (
-    <WorkspacePageShell>
-      <ModuleWorkspaceHeader
-        description="Account session for future cloud sync. Your household workspace still loads from this browser only."
-        eyebrow="Access"
-        title="Sign in"
-        action={
-          <Button type="button" variant="ghost" onClick={onBack}>
-            Back to hub
-          </Button>
-        }
-      />
-
+  const authCard = (
       <Card tone="light">
         <CardHeader title="Cloud sign-in" eyebrow="Optional" tone="light" />
         <div className="space-y-4 text-sm leading-6 text-slate-600">
@@ -202,6 +194,90 @@ export function LoginPage({ onBack }: LoginPageProps) {
           )}
         </div>
       </Card>
+  );
+
+  if (!showFullAuth) {
+    return (
+      <div className="wd-guided-kiosk wd-guided-kiosk--login">
+        <section className="wd-guided-kiosk__hero" aria-labelledby="login-kiosk-title">
+          <div>
+            <p className="wd-guided-kiosk__eyebrow">Access</p>
+            <h1 id="login-kiosk-title">Cloud sign-in</h1>
+            <p>Choose whether to sign in, check cloud setup, or return to the household hub.</p>
+          </div>
+          <div className="wd-guided-kiosk__status">
+            <span>{configured ? "Cloud configured" : "Local only"}</span>
+            <span>{showSignedIn ? "Signed in" : "Signed out"}</span>
+            <span>Optional sync</span>
+          </div>
+        </section>
+
+        <section className="wd-guided-kiosk__actions-grid" aria-label="Sign in actions">
+          <button type="button" className="wd-guided-kiosk__action wd-guided-kiosk__action--primary" onClick={() => setAuthOpen(true)}>
+            <span className="wd-guided-kiosk__action-icon"><LogIn className="h-5 w-5" aria-hidden /></span>
+            <span><strong>Sign in</strong><small>Open account popup</small></span>
+          </button>
+          <button type="button" className="wd-guided-kiosk__action" onClick={onBack}>
+            <span className="wd-guided-kiosk__action-icon"><Home className="h-5 w-5" aria-hidden /></span>
+            <span><strong>Back to hub</strong><small>Return to household station</small></span>
+          </button>
+          <button type="button" className="wd-guided-kiosk__action" onClick={() => setShowFullAuth(true)}>
+            <span className="wd-guided-kiosk__action-icon"><Table2 className="h-5 w-5" aria-hidden /></span>
+            <span><strong>Account workspace</strong><small>Show complete account surface</small></span>
+          </button>
+        </section>
+
+        {authOpen ? (
+          <div className="wd-guided-kiosk__sheet-backdrop" role="presentation" onClick={() => setAuthOpen(false)}>
+            <section
+              className="wd-guided-kiosk__sheet"
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="login-flow-title"
+              onClick={(event) => event.stopPropagation()}
+            >
+              <header className="wd-guided-kiosk__sheet-head">
+                <div>
+                  <p className="wd-guided-kiosk__eyebrow">Access</p>
+                  <h2 id="login-flow-title">Account sign-in</h2>
+                  <p>Your household still loads locally if cloud sign-in is unavailable.</p>
+                </div>
+                <button
+                  type="button"
+                  className="wd-guided-kiosk__icon-btn"
+                  aria-label="Close sign-in"
+                  onClick={() => setAuthOpen(false)}
+                >
+                  <X className="h-4 w-4" aria-hidden />
+                </button>
+              </header>
+              <div className="rounded-[16px] bg-white p-4 text-slate-950">{authCard}</div>
+            </section>
+          </div>
+        ) : null}
+      </div>
+    );
+  }
+
+  return (
+    <WorkspacePageShell>
+      <ModuleWorkspaceHeader
+        description="Account session for future cloud sync. Your household workspace still loads from this browser only."
+        eyebrow="Access"
+        title="Sign in"
+        action={
+          <div className="flex flex-wrap gap-2">
+            <Button type="button" variant="secondary" onClick={() => setShowFullAuth(false)}>
+              Kiosk station
+            </Button>
+            <Button type="button" variant="ghost" onClick={onBack}>
+              Back to hub
+            </Button>
+          </div>
+        }
+      />
+
+      {authCard}
     </WorkspacePageShell>
   );
 }

@@ -5,7 +5,6 @@ export type QuickActionType =
   | "chore"
   | "event"
   | "note"
-  | "message"
   | "pantry";
 
 const ALLOWED_PARAM_KEYS = new Set(["type", "name", "title", "date", "time", "body"]);
@@ -20,7 +19,6 @@ export type QuickAction =
   | { type: "chore"; title: string }
   | { type: "event"; title: string; date?: string; time?: string }
   | { type: "note"; title: string }
-  | { type: "message"; title: string; body?: string }
   | { type: "pantry"; name: string };
 
 export type ParseQuickActionResult =
@@ -99,20 +97,6 @@ export function parseQuickActionSearchParams(
     return { ok: true, action: { type: "chore", title: value } };
   }
 
-  if (typeRaw === "message") {
-    const titleRaw = searchParams.get("title") ?? searchParams.get("name") ?? "";
-    const { value: title, error: titleErr } = clampText(titleRaw, "Title");
-    if (titleErr) {
-      return { ok: false, errors: [titleErr] };
-    }
-    const bodyRaw = searchParams.get("body") ?? "";
-    const { value: body, error: bodyErr } = clampText(bodyRaw, "Message body");
-    if (bodyErr) {
-      return { ok: false, errors: [bodyErr] };
-    }
-    return { ok: true, action: { type: "message", title, body: body || undefined } };
-  }
-
   if (typeRaw === "pantry") {
     const nameRaw = searchParams.get("name") ?? "";
     const { value, error } = clampText(nameRaw, "Name");
@@ -160,7 +144,7 @@ export function parseQuickActionSearchParams(
   return {
     ok: false,
     errors: [
-      `Unknown type "${typeRaw}". Use grocery, task, chore, event, note, message, or pantry.`,
+      `Unknown type "${typeRaw}". Use grocery, task, chore, event, note, or pantry.`,
     ],
   };
 }
@@ -194,11 +178,6 @@ export function validateQuickAction(action: QuickAction): string[] {
         errors.push("Note title is required.");
       }
       break;
-    case "message":
-      if (!action.title.trim()) {
-        errors.push("Message title is required.");
-      }
-      break;
     case "pantry":
       if (!action.name.trim()) {
         errors.push("Pantry item name is required.");
@@ -219,12 +198,6 @@ function applyQuickActionParams(u: URL, action: QuickAction) {
       break;
     case "chore":
       u.searchParams.set("title", action.title);
-      break;
-    case "message":
-      u.searchParams.set("title", action.title);
-      if (action.body) {
-        u.searchParams.set("body", action.body);
-      }
       break;
     case "pantry":
       u.searchParams.set("name", action.name);
@@ -280,10 +253,6 @@ export function getQuickActionPreviewText(action: QuickAction): string {
     }
     case "note":
       return `Add note: ${action.title || "(title needed)"}`;
-    case "message":
-      return action.body?.trim()
-        ? `Post message: ${action.title || "(title needed)"} — ${action.body.trim()}`
-        : `Post message: ${action.title || "(title needed)"}`;
     case "pantry":
       return `Add pantry item: ${action.name || "(name needed)"}`;
     default: {

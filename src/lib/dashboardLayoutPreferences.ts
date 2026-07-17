@@ -29,10 +29,9 @@ export const DASHBOARD_WIDGET_SIZE_OPTIONS: readonly {
  * Home command-center tiles (kitchen week lives in Today snapshot + Calendar; Quick Add in header / snapshot).
  */
 export const FAMILY_DASHBOARD_LAYOUT_DEFAULTS: readonly SmartDashboardWidgetLayout[] = [
-  { id: "messages", title: "Messages", size: "full", order: 10, visible: true },
   { id: "calendar", title: "Calendar", size: "lg", order: 20, visible: true },
   { id: "shopping", title: "Shopping", size: "md", order: 30, visible: true },
-  { id: "pantry", title: "Pantry & Inventory", size: "lg", order: 40, visible: true },
+  { id: "pantry", title: "Inventory", size: "lg", order: 40, visible: true },
   { id: "choresDueToday", title: "Chores due today", size: "sm", order: 45, visible: true },
   { id: "cleaning", title: "Cleaning", size: "md", order: 50, visible: true },
   { id: "notifications", title: "Notifications", size: "md", order: 60, visible: true },
@@ -40,7 +39,6 @@ export const FAMILY_DASHBOARD_LAYOUT_DEFAULTS: readonly SmartDashboardWidgetLayo
 
 /** Widgets rendered in the main 12-column grid (ordered by `order`). */
 export const DASHBOARD_GRID_WIDGET_IDS = new Set<string>([
-  "messages",
   "calendar",
   "shopping",
   "pantry",
@@ -99,7 +97,7 @@ function coerceWidgetRow(o: unknown, fallbackOrder: number): SmartDashboardWidge
 }
 
 /**
- * Converts pre-v2 saved ids (snake / hub names) into the current seven-widget model.
+ * Converts pre-v2 saved ids (snake / hub names) into the current widget model.
  */
 function migrateLegacyWidgetRows(rows: SmartDashboardWidgetLayout[]): SmartDashboardWidgetLayout[] {
   const out: SmartDashboardWidgetLayout[] = [];
@@ -113,7 +111,6 @@ function migrateLegacyWidgetRows(rows: SmartDashboardWidgetLayout[]): SmartDashb
       case "kitchenWeek":
         break;
       case "home_glance":
-        out.push({ ...w, id: "messages", title: "Messages" });
         break;
       case "pantry_hub":
         out.push({ ...w, id: "pantry", title: "Pantry" });

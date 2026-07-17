@@ -13,7 +13,6 @@ import type { TextColorPreset } from "../../lib/appearancePreferences";
 
 const PAGE_LABEL: Record<PageLayoutRouteKey, string> = {
   home: "Home",
-  messages: "Messages",
   calendar: "Calendar",
   shopping: "Shopping",
   pantry: "Pantry",
@@ -24,7 +23,6 @@ const PAGE_LABEL: Record<PageLayoutRouteKey, string> = {
 
 const PAGE_ORDER: PageLayoutRouteKey[] = [
   "home",
-  "messages",
   "calendar",
   "shopping",
   "pantry",

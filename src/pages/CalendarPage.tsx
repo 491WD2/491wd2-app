@@ -1,9 +1,12 @@
 import {
   CalendarDays,
+  CheckCircle2,
   ChevronLeft,
   ChevronRight,
   ExternalLink,
   Plus,
+  Search,
+  Table2,
   Trash2,
   X,
 } from "lucide-react";
@@ -41,11 +44,13 @@ import { useKioskShell } from "../components/layout/KioskShellContext";
 import { KioskPageTitle } from "../components/layout/KioskPageTitle";
 import { WidgetPageShell } from "../components/widgets";
 import { CalendarPlanningView } from "../components/calendar/CalendarPlanningView";
+import "../components/calendar/calendar-planner.css";
 import {
   trackCalendarEventAdd,
   trackCalendarEventEdit,
   trackCalendarView,
 } from "../lib/calendarPlannerAnalytics";
+import "../styles/guided-kiosk.css";
 
 const repeatRules: PlannerRepeatRule[] = [
   "Daily",
@@ -75,6 +80,7 @@ const categorySuggestions: Partial<Record<PlannerEventCategory, string[]>> = {
 };
 
 type CalendarViewMode = "plan" | "month" | "week" | "day" | "list";
+type CalendarGuidedFlow = "find" | "today";
 
 const VIEW_LABELS: Record<CalendarViewMode, string> = {
   plan: "Planning",
@@ -95,23 +101,23 @@ const ACTIVITY_TYPE_CHIPS: { label: string; category: PlannerEventCategory | "al
   { label: "Personal", category: "Personal" },
 ];
 
-/** SmartHR HTML bundle tokens — matches Dashboard / Messages */
-const PAGE_BG = "min-h-full bg-[#f7f7f7] text-[#1f1f1f] [-webkit-font-smoothing:antialiased]";
-const SM_LABEL = "text-[11px] font-semibold uppercase tracking-[0.12em] text-[#637381]";
+/** Calendar dark kiosk tokens — scoped to Calendar only. */
+const PAGE_BG = "fh-calendar-page min-h-full text-[#f7fbff] [-webkit-font-smoothing:antialiased]";
+const SM_LABEL = "fh-calendar-eyebrow text-[11px] font-semibold uppercase tracking-[0.12em]";
 const CARD_SHELL =
-  "rounded-[8px] border border-[#ededed] bg-white shadow-[0_1px_1px_rgba(0,0,0,0.2)]";
+  "fh-calendar-surface-card rounded-[24px] border shadow-[0_18px_44px_rgba(0,0,0,0.3)]";
 const SM_INPUT =
-  "min-h-10 w-full rounded-[8px] border border-[#ededed] bg-white px-3 py-2 text-[14px] text-[#1f1f1f] shadow-[0_1px_1px_rgba(0,0,0,0.06)] placeholder:text-[#8e8e8e] focus:border-[#FE9F43]/55 focus:outline-none focus:ring-2 focus:ring-[#FE9F43]/25";
+  "fh-calendar-input min-h-10 w-full rounded-[16px] border px-3 py-2 text-[14px] shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] focus:outline-none focus:ring-2";
 const CARD_CALENDAR =
-  "!rounded-[8px] !border-[#ededed] shadow-[0_1px_1px_rgba(0,0,0,0.12)]";
+  "fh-calendar-surface-card !rounded-[24px] shadow-[0_18px_44px_rgba(0,0,0,0.3)]";
 
 const btnPrimaryOrange =
-  "bg-gradient-to-r from-[#FF6F28] to-[#FF5325] font-semibold text-white shadow-[0_6px_15px_rgba(242,101,34,0.22)] hover:brightness-[1.03] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FE9F43]/45 focus-visible:ring-offset-2 focus-visible:ring-offset-[#f7f7f7]";
+  "fh-calendar-btn-primary border-transparent bg-gradient-to-r from-[#20e6a2] to-[#4fb7ff] font-semibold text-[#03101b] shadow-[0_12px_28px_rgba(32,230,162,0.18)] hover:brightness-[1.05] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4fb7ff]/45 focus-visible:ring-offset-2 focus-visible:ring-offset-[#050914]";
 const btnSecondaryLight =
-  "border-[#ededed] bg-white font-semibold text-[#637381] shadow-sm hover:bg-[#f8f9fa] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FE9F43]/25 focus-visible:ring-offset-2 focus-visible:ring-offset-[#f7f7f7]";
-const segmentInactiveLight = "text-[#637381] hover:bg-white hover:text-[#1f1f1f]";
+  "fh-calendar-btn-secondary border font-semibold shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4fb7ff]/35 focus-visible:ring-offset-2 focus-visible:ring-offset-[#050914]";
+const segmentInactiveLight = "fh-calendar-segment-inactive";
 const segmentActiveLight =
-  "bg-gradient-to-r from-[#FF6F28] to-[#FF5325] text-white shadow-sm";
+  "fh-calendar-segment-active";
 
 function pad2(n: number) {
   return String(n).padStart(2, "0");
@@ -180,6 +186,10 @@ export function CalendarPage({ data, setData }: PageProps) {
   const [memberFilter, setMemberFilter] = useState<string | "all">("all");
   const [showLinkedCalendars, setShowLinkedCalendars] = useState(true);
   const [editingEvent, setEditingEvent] = useState<PlannerEvent | undefined>();
+  const [showFullCalendar, setShowFullCalendar] = useState(false);
+  const [guidedFlow, setGuidedFlow] = useState<CalendarGuidedFlow | null>(null);
+  const [guidedSearch, setGuidedSearch] = useState("");
+  const [guidedMessage, setGuidedMessage] = useState<string | null>(null);
 
   const localEventsSorted = useMemo(
     () => [...data.planner].sort(sortEvents),
@@ -218,6 +228,25 @@ export function CalendarPage({ data, setData }: PageProps) {
   const upcomingPreview = useMemo(() => {
     return filteredPlanner.filter((e) => e.date >= today).slice(0, 6);
   }, [filteredPlanner, today]);
+  const todaysEvents = useMemo(
+    () => filteredPlanner.filter((event) => event.date?.slice(0, 10) === today),
+    [filteredPlanner, today],
+  );
+  const guidedEventMatches = useMemo(() => {
+    const query = guidedSearch.trim().toLowerCase();
+    return filteredPlanner
+      .filter((event) => {
+        if (!query) {
+          return true;
+        }
+        return (
+          event.title.toLowerCase().includes(query) ||
+          event.category.toLowerCase().includes(query) ||
+          (event.location ?? "").toLowerCase().includes(query)
+        );
+      })
+      .slice(0, 14);
+  }, [filteredPlanner, guidedSearch]);
 
   useEffect(() => {
     if (viewMode === "plan") {
@@ -396,7 +425,7 @@ export function CalendarPage({ data, setData }: PageProps) {
   const headerAction = (
     <div className="flex w-full flex-col gap-3 lg:w-auto lg:max-w-none lg:flex-row lg:flex-wrap lg:items-center lg:justify-end">
       <div
-        className="flex w-full flex-wrap gap-1 rounded-[8px] border border-[#ededed] bg-[#f8f9fa] p-1 sm:w-auto"
+        className="fh-calendar-view-switcher flex w-full flex-wrap gap-1 rounded-[18px] border p-1 sm:w-auto"
         role="group"
         aria-label="Calendar view"
       >
@@ -415,6 +444,9 @@ export function CalendarPage({ data, setData }: PageProps) {
         ))}
       </div>
       <div className="flex flex-wrap items-center gap-2">
+        <Button type="button" variant="secondary" className={btnSecondaryLight} onClick={() => setShowFullCalendar(false)}>
+          Kiosk station
+        </Button>
         <Button type="button" variant="secondary" className={btnSecondaryLight} onClick={goToday}>
           Today
         </Button>
@@ -426,6 +458,171 @@ export function CalendarPage({ data, setData }: PageProps) {
     </div>
   );
 
+  function openCalendarFlow(flow: CalendarGuidedFlow) {
+    setGuidedMessage(null);
+    setGuidedFlow(flow);
+    setGuidedSearch("");
+  }
+
+  function renderCalendarFlowSheet() {
+    if (!guidedFlow) {
+      return null;
+    }
+    const events = guidedFlow === "today" ? todaysEvents : guidedEventMatches;
+    return (
+      <div className="wd-guided-kiosk__sheet-backdrop" role="presentation" onClick={() => setGuidedFlow(null)}>
+        <section
+          className="wd-guided-kiosk__sheet"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="calendar-flow-title"
+          onClick={(event) => event.stopPropagation()}
+        >
+          <header className="wd-guided-kiosk__sheet-head">
+            <div>
+              <p className="wd-guided-kiosk__eyebrow">Calendar station</p>
+              <h2 id="calendar-flow-title">
+                {guidedFlow === "today" ? "Today’s activities" : "Find an activity"}
+              </h2>
+              <p>Pick an activity and the details pop-up opens next.</p>
+            </div>
+            <button
+              type="button"
+              className="wd-guided-kiosk__icon-btn"
+              aria-label="Close calendar flow"
+              onClick={() => setGuidedFlow(null)}
+            >
+              <X className="h-4 w-4" aria-hidden />
+            </button>
+          </header>
+
+          {guidedFlow === "find" ? (
+            <label className="wd-guided-kiosk__search">
+              <Search className="h-4 w-4" aria-hidden />
+              <input
+                type="search"
+                value={guidedSearch}
+                onChange={(event) => setGuidedSearch(event.target.value)}
+                placeholder="Search event, category, location..."
+                autoFocus
+              />
+            </label>
+          ) : null}
+
+          <div className="wd-guided-kiosk__chooser" role="listbox" aria-label="Calendar activities">
+            {events.length === 0 ? (
+              <p className="wd-guided-kiosk__empty">
+                {guidedFlow === "today" ? "No activities today." : "No matching activities."}
+              </p>
+            ) : (
+              events.map((event) => (
+                <button
+                  key={event.id}
+                  type="button"
+                  className="wd-guided-kiosk__chooser-row"
+                  role="option"
+                  onClick={() => {
+                    setEditingEvent(event);
+                    setGuidedFlow(null);
+                  }}
+                >
+                  <span>
+                    <strong>{event.title || "Untitled"}</strong>
+                    <small>{formatShortDate(event.date)} · {formatEventTime(event)} · {event.category}</small>
+                  </span>
+                  <ChevronRight className="h-4 w-4" aria-hidden />
+                </button>
+              ))
+            )}
+          </div>
+        </section>
+      </div>
+    );
+  }
+
+  const activityDrawer = editingEvent ? (
+    <ActivityDrawer
+      categoryOptions={calendarCategoryOptions}
+      event={editingEvent}
+      isExisting={data.planner.some((item) => item.id === editingEvent.id)}
+      members={data.familyMembers}
+      onCancel={() => setEditingEvent(undefined)}
+      onChange={setEditingEvent}
+      onDelete={() => deleteActivity(editingEvent)}
+      onSave={(event, addAnother) => {
+        const errors = saveActivity(event);
+        if (errors.length > 0) return errors;
+        setGuidedMessage(`${event.title || "Activity"} saved.`);
+        setEditingEvent(addAnother ? createDraftEvent(data.familyMembers) : undefined);
+        return [];
+      }}
+    />
+  ) : null;
+
+  if (!showFullCalendar) {
+    return (
+      <div className="wd-guided-kiosk wd-guided-kiosk--calendar fh-calendar-guided">
+        <section className="wd-guided-kiosk__hero" aria-labelledby="calendar-kiosk-title">
+          <div>
+            <p className="wd-guided-kiosk__eyebrow">Calendar station</p>
+            <h1 id="calendar-kiosk-title">What calendar step?</h1>
+            <p>
+              Add an activity, find one, or check today. Each choice opens the next focused pop-up.
+            </p>
+          </div>
+          <div className="wd-guided-kiosk__status">
+            <span>{todaysEvents.length} today</span>
+            <span>{upcomingPreview.length} upcoming</span>
+            <span>{data.calendarLinks.length} links</span>
+          </div>
+        </section>
+
+        {guidedMessage ? (
+          <section className="wd-guided-kiosk__complete" role="status">
+            <CheckCircle2 className="h-5 w-5" aria-hidden />
+            <p>{guidedMessage}</p>
+            <button type="button" onClick={() => setGuidedMessage(null)}>
+              Continue
+            </button>
+          </section>
+        ) : null}
+
+        <section className="wd-guided-kiosk__actions-grid" aria-label="Calendar actions">
+          <button type="button" className="wd-guided-kiosk__action wd-guided-kiosk__action--primary" onClick={openNewActivityDrawer}>
+            <span className="wd-guided-kiosk__action-icon"><Plus className="h-5 w-5" aria-hidden /></span>
+            <span><strong>Add activity</strong><small>Open event details</small></span>
+          </button>
+          <button type="button" className="wd-guided-kiosk__action" onClick={() => openCalendarFlow("find")}>
+            <span className="wd-guided-kiosk__action-icon"><Search className="h-5 w-5" aria-hidden /></span>
+            <span><strong>Find activity</strong><small>Search, then edit</small></span>
+          </button>
+          <button type="button" className="wd-guided-kiosk__action" onClick={() => openCalendarFlow("today")}>
+            <span className="wd-guided-kiosk__action-icon"><CalendarDays className="h-5 w-5" aria-hidden /></span>
+            <span><strong>Today</strong><small>See today’s events</small></span>
+          </button>
+          <button
+            type="button"
+            className="wd-guided-kiosk__action"
+            onClick={() => {
+              addCalendarLink();
+              setGuidedMessage("Calendar link draft added.");
+            }}
+          >
+            <span className="wd-guided-kiosk__action-icon"><ExternalLink className="h-5 w-5" aria-hidden /></span>
+            <span><strong>Add calendar link</strong><small>Create link draft</small></span>
+          </button>
+          <button type="button" className="wd-guided-kiosk__action" onClick={() => setShowFullCalendar(true)}>
+            <span className="wd-guided-kiosk__action-icon"><Table2 className="h-5 w-5" aria-hidden /></span>
+            <span><strong>Calendar workspace</strong><small>Month, week, list, links</small></span>
+          </button>
+        </section>
+
+        {renderCalendarFlowSheet()}
+        {activityDrawer}
+      </div>
+    );
+  }
+
   return (
     <div className={PAGE_BG}>
       <WorkspacePageShell
@@ -433,7 +630,7 @@ export function CalendarPage({ data, setData }: PageProps) {
           "motion-page flex flex-col gap-4 overflow-x-hidden px-[15px] pb-10 pt-0 sm:gap-5 sm:px-[30px] md:pb-10",
           DS_MAIN_COLUMN,
         )}
-        tone="light"
+        tone="premiumDark"
       >
         <header className={cn(CARD_SHELL, "p-5 sm:p-6")}>
           <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
@@ -444,10 +641,10 @@ export function CalendarPage({ data, setData }: PageProps) {
               />
               <div className="min-w-0">
                 <p className={SM_LABEL}>Household</p>
-                <h1 className="mt-1 text-[22px] font-medium leading-snug tracking-tight text-[#1f1f1f]">
+                <h1 className="mt-1 text-[22px] font-semibold leading-snug tracking-tight text-[#f7fbff]">
                   Calendar
                 </h1>
-                <p className="mt-1 max-w-xl text-[14px] leading-relaxed text-[#575757]">
+                <p className="mt-1 max-w-xl text-[14px] leading-relaxed text-[#a4b0ca]">
                   Chores, pantry reminders, member schedules, and household events — no meal planning.
                 </p>
               </div>
@@ -459,14 +656,14 @@ export function CalendarPage({ data, setData }: PageProps) {
         <div className="grid gap-4 lg:grid-cols-[minmax(260px,320px)_minmax(0,1fr)] xl:gap-6">
         {viewMode !== "plan" ? (
         <aside className="flex min-w-0 flex-col gap-4">
-          <Card className={CARD_CALENDAR} tone="light">
-            <CardHeader eyebrow="Activities" title="Upcoming Activities" tone="light" />
-            <p className="mb-3 text-sm text-[#575757]">
+          <Card className={CARD_CALENDAR} tone="premiumDark">
+            <CardHeader eyebrow="Activities" title="Upcoming Activities" tone="premiumDark" />
+            <p className="mb-3 text-sm text-[#a4b0ca]">
               Choose an activity to edit, or use Quick add for something new.
             </p>
             <div className="space-y-2">
               {upcomingPreview.length === 0 ? (
-                <p className="rounded-[8px] border border-[#ededed] bg-[#f8f9fa] px-3 py-4 text-center text-sm text-[#637381]">
+                <p className="fh-calendar-empty rounded-[16px] border px-3 py-4 text-center text-sm">
                   No upcoming activities.
                 </p>
               ) : (
@@ -491,18 +688,18 @@ export function CalendarPage({ data, setData }: PageProps) {
             </Button>
           </Card>
 
-          <Card className={CARD_CALENDAR} tone="light">
-            <CardHeader eyebrow="Filter" title="Activity types" tone="light" />
+          <Card className={CARD_CALENDAR} tone="premiumDark">
+            <CardHeader eyebrow="Filter" title="Activity types" tone="premiumDark" />
             <div className="flex flex-wrap gap-2">
               {ACTIVITY_TYPE_CHIPS.map((chip) => (
                 <button
                   key={chip.label}
                   type="button"
                   className={cn(
-                    "min-h-9 rounded-full border px-3 py-1.5 text-xs font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FE9F43]/40",
+                    "fh-calendar-filter-chip min-h-9 rounded-full border px-3 py-1.5 text-xs font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4fb7ff]/40",
                     categoryFilter === chip.category
-                      ? "border-[#F26522]/35 bg-gradient-to-r from-[#FF6F28]/15 to-[#FF5325]/15 text-[#c2410c]"
-                      : "border-[#ededed] bg-[#f8f9fa] text-[#637381] hover:border-[#dedede]",
+                      ? "fh-calendar-filter-chip--active"
+                      : "fh-calendar-filter-chip--idle",
                   )}
                   onClick={() =>
                     setCategoryFilter(chip.category === "all" ? "all" : chip.category)
@@ -514,8 +711,8 @@ export function CalendarPage({ data, setData }: PageProps) {
             </div>
           </Card>
 
-          <Card className={CARD_CALENDAR} tone="light">
-            <CardHeader eyebrow="Household" title="Assigned to" tone="light" />
+          <Card className={CARD_CALENDAR} tone="premiumDark">
+            <CardHeader eyebrow="Household" title="Assigned to" tone="premiumDark" />
             <Select
               value={memberFilter}
               onChange={(e) =>
@@ -546,7 +743,7 @@ export function CalendarPage({ data, setData }: PageProps) {
                   description="Drag chores and events, filter by member, and clear pantry reminders."
                 />
               ) : null}
-              <div className="flex items-center justify-between gap-3 rounded-[20px] border border-[var(--bd-border)] bg-[var(--bd-bg-card)] px-4 py-3 shadow-[var(--bd-shadow-card)]">
+              <div className="fh-calendar-week-nav flex items-center justify-between gap-3 rounded-[24px] border px-4 py-3">
                 <Button
                   type="button"
                   variant="secondary"
@@ -556,7 +753,7 @@ export function CalendarPage({ data, setData }: PageProps) {
                 >
                   <ChevronLeft className="h-5 w-5" />
                 </Button>
-                <p className="text-center text-sm font-bold text-[#1f1f1f] sm:text-base">
+                <p className="text-center text-sm font-bold text-[#f7fbff] sm:text-base">
                   {formatShortDate(weekStartIso)} – {formatShortDate(endOfWeekSundayIso(weekStartIso))}
                 </p>
                 <Button
@@ -580,8 +777,8 @@ export function CalendarPage({ data, setData }: PageProps) {
             </WidgetPageShell>
           ) : null}
           {viewMode !== "plan" ? (
-          <Card className={cn("overflow-hidden", CARD_CALENDAR)} tone="light">
-            <div className="mb-4 flex flex-col gap-3 border-b border-[#ededed] pb-4 sm:flex-row sm:items-center sm:justify-between">
+          <Card className={cn("fh-calendar-board-card overflow-hidden", CARD_CALENDAR)} tone="premiumDark">
+            <div className="fh-calendar-board-head mb-4 flex flex-col gap-3 border-b pb-4 sm:flex-row sm:items-center sm:justify-between">
               <div className="flex items-center gap-2">
                 {viewMode === "list" ? (
                   <div className="min-h-10 w-10 shrink-0" aria-hidden />
@@ -602,7 +799,7 @@ export function CalendarPage({ data, setData }: PageProps) {
                     <ChevronLeft className="h-5 w-5" />
                   </Button>
                 )}
-                <h2 className="min-w-0 flex-1 text-center text-lg font-semibold text-[#1f1f1f] sm:text-xl">
+                <h2 className="min-w-0 flex-1 text-center text-lg font-semibold text-[#f7fbff] sm:text-xl">
                   {viewMode === "month" && monthYearLabel(monthAnchor)}
                   {viewMode === "week" &&
                     `${formatShortDate(weekStartIso)} – ${formatShortDate(endOfWeekSundayIso(weekStartIso))}`}
@@ -683,9 +880,7 @@ export function CalendarPage({ data, setData }: PageProps) {
 
           {viewMode !== "plan" ? (
           <details
-            className={cn(
-              "group rounded-[8px] border border-[#ededed] bg-white shadow-[0_1px_1px_rgba(0,0,0,0.12)]",
-            )}
+            className="fh-calendar-linked-card group rounded-[24px] border shadow-[0_18px_44px_rgba(0,0,0,0.3)]"
             open={showLinkedCalendars}
             onToggle={(e) => setShowLinkedCalendars((e.target as HTMLDetailsElement).open)}
           >
@@ -693,17 +888,17 @@ export function CalendarPage({ data, setData }: PageProps) {
               <div className="flex items-center justify-between gap-3">
                 <div>
                   <p className={SM_LABEL}>Google Calendar</p>
-                  <p className="mt-1 text-base font-semibold text-[#1f1f1f]">Linked calendars</p>
-                  <p className="mt-1 text-sm text-[#575757]">
+                  <p className="mt-1 text-base font-semibold text-[#f7fbff]">Linked calendars</p>
+                  <p className="mt-1 text-sm text-[#a4b0ca]">
                     Optional embed or link — your local activities stay in FamilySite.
                   </p>
                 </div>
-                <CalendarDays className="h-6 w-6 shrink-0 text-[#637381] group-open:text-[#F26522]" />
+                <CalendarDays className="h-6 w-6 shrink-0 text-[#a4b0ca] group-open:text-[#20e6a2]" />
               </div>
             </summary>
-            <div className="border-t border-[#ededed] px-4 py-4 sm:px-5 sm:py-6">
+            <div className="border-t border-[rgba(150,170,210,0.14)] px-4 py-4 sm:px-5 sm:py-6">
               <div className="grid gap-4 xl:grid-cols-[1fr_0.95fr]">
-                <Card className={CARD_CALENDAR} tone="light">
+                <Card className={CARD_CALENDAR} tone="premiumDark">
                   <CardHeader
                     action={
                       <Button
@@ -718,7 +913,7 @@ export function CalendarPage({ data, setData }: PageProps) {
                     }
                     eyebrow="Saved links"
                     title="Calendar URLs"
-                    tone="light"
+                    tone="premiumDark"
                   />
                   <div className="space-y-3">
                     {data.calendarLinks.length === 0 ? (
@@ -749,8 +944,8 @@ export function CalendarPage({ data, setData }: PageProps) {
                     ))}
                   </div>
                 </Card>
-                <Card className={CARD_CALENDAR} tone="light">
-                  <CardHeader eyebrow="Preview" title="Embed" tone="light" />
+                <Card className={CARD_CALENDAR} tone="premiumDark">
+                  <CardHeader eyebrow="Preview" title="Embed" tone="premiumDark" />
                   {primaryCalendar ? (
                     <CalendarPreviewDark calendar={primaryCalendar} />
                   ) : (
@@ -771,7 +966,7 @@ export function CalendarPage({ data, setData }: PageProps) {
                       tone="light"
                     />
                   )}
-                  <p className="mt-4 text-sm leading-6 text-[#575757]">
+                  <p className="mt-4 text-sm leading-6 text-[#a4b0ca]">
                     Managed in Google Calendar. Updates there appear in this view.
                   </p>
                 </Card>
@@ -782,23 +977,7 @@ export function CalendarPage({ data, setData }: PageProps) {
         </main>
       </div>
 
-      {editingEvent ? (
-        <ActivityDrawer
-          categoryOptions={calendarCategoryOptions}
-          event={editingEvent}
-          isExisting={data.planner.some((item) => item.id === editingEvent.id)}
-          members={data.familyMembers}
-          onCancel={() => setEditingEvent(undefined)}
-          onChange={setEditingEvent}
-          onDelete={() => deleteActivity(editingEvent)}
-          onSave={(event, addAnother) => {
-            const errors = saveActivity(event);
-            if (errors.length > 0) return errors;
-            setEditingEvent(addAnother ? createDraftEvent(data.familyMembers) : undefined);
-            return [];
-          }}
-        />
-      ) : null}
+      {activityDrawer}
       </WorkspacePageShell>
     </div>
   );
@@ -819,7 +998,7 @@ function UpcomingActivityRow({
     <button
       type="button"
       className={cn(
-        "w-full rounded-[8px] border px-3 py-2.5 text-left shadow-[0_1px_1px_rgba(0,0,0,0.04)] transition hover:border-[#dedede] hover:bg-[#fafafa] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FE9F43]/45",
+        "fh-calendar-event-row w-full rounded-[16px] border px-3 py-2.5 text-left shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4fb7ff]/45",
         v.block,
       )}
       onClick={onOpen}
@@ -827,15 +1006,15 @@ function UpcomingActivityRow({
       <div className="flex items-start justify-between gap-2">
         <p className="line-clamp-2 text-sm font-semibold leading-snug">{event.title || "Untitled"}</p>
         {fresh ? (
-          <span className="shrink-0 rounded border border-[#ededed] bg-[#f8f9fa] px-1.5 py-0.5 text-[0.6rem] font-bold uppercase tracking-wide text-[#637381]">
+          <span className="fh-calendar-badge shrink-0 rounded border px-1.5 py-0.5 text-[0.6rem] font-bold uppercase tracking-wide">
             {fresh}
           </span>
         ) : null}
       </div>
-      <p className="mt-1 text-[0.7rem] text-[#637381]">
+      <p className="mt-1 text-[0.7rem] text-[#a4b0ca]">
         {formatShortDate(event.date)} · {formatEventTime(event)}
       </p>
-      <p className="mt-0.5 text-[0.7rem] text-[#575757]">{formatEventMembers(event, members)}</p>
+      <p className="mt-0.5 text-[0.7rem] text-[#c6d4ef]">{formatEventMembers(event, members)}</p>
     </button>
   );
 }
@@ -869,11 +1048,11 @@ function CalendarMonthGrid({
 
   return (
     <div className="overflow-x-auto">
-      <div className="grid grid-cols-7 gap-px rounded-[8px] border border-[#ededed] bg-[#ededed] p-px">
+      <div className="fh-calendar-month-grid grid grid-cols-7 gap-2 rounded-[24px] border p-2">
         {weekdays.map((w) => (
           <div
             key={w}
-            className="bg-[#f8f9fa] px-1 py-2 text-center text-[0.65rem] font-semibold uppercase tracking-wide text-[#637381]"
+            className="fh-calendar-month-weekday rounded-[14px] px-1 py-2 text-center text-[0.65rem] font-semibold uppercase tracking-wide"
           >
             {w}
           </div>
@@ -881,7 +1060,7 @@ function CalendarMonthGrid({
         {cells.map((day, idx) => {
           if (day === null) {
             return (
-              <div key={`e-${idx}`} className="min-h-[5.5rem] bg-[#fafafa]" aria-hidden />
+              <div key={`e-${idx}`} className="fh-calendar-month-blank min-h-[5.5rem] rounded-[18px]" aria-hidden />
             );
           }
           const iso = isoFromYmd(y, monthIndex, day);
@@ -895,22 +1074,22 @@ function CalendarMonthGrid({
             <div
               key={iso}
               className={cn(
-                "flex min-h-[5.5rem] flex-col border border-[#ededed] bg-white p-1",
-                isToday && "bg-orange-50/80 ring-1 ring-[#F26522]/30",
-                isSelected && "ring-2 ring-[#F26522]/50",
+                "fh-calendar-month-cell flex min-h-[5.5rem] flex-col rounded-[18px] border p-2",
+                isToday && "fh-calendar-month-cell--today",
+                isSelected && "fh-calendar-month-cell--selected",
               )}
             >
               <button
                 type="button"
                 className={cn(
-                  "mb-1 flex w-full items-center justify-between rounded-[6px] px-1 py-0.5 text-left text-xs font-semibold transition hover:bg-[#f8f9fa] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FE9F43]/45",
-                  isToday ? "text-[#c2410c]" : "text-[#637381]",
+                  "mb-1 flex w-full items-center justify-between rounded-[12px] px-1 py-0.5 text-left text-xs font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4fb7ff]/45",
+                  isToday ? "text-[#20e6a2]" : "text-[#a4b0ca]",
                 )}
                 onClick={() => onPickDay(iso)}
               >
                 <span>{day}</span>
                 {isToday ? (
-                  <span className="text-[0.6rem] font-bold uppercase tracking-wide text-[#F26522]">
+                  <span className="text-[0.6rem] font-bold uppercase tracking-wide text-[#20e6a2]">
                     Today
                   </span>
                 ) : null}
@@ -924,7 +1103,7 @@ function CalendarMonthGrid({
                       type="button"
                       title={ev.title}
                       className={cn(
-                        "truncate rounded-[4px] px-1 py-0.5 text-left text-[0.65rem] font-medium leading-tight transition hover:opacity-90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#FE9F43]/50",
+                        "fh-calendar-mini-event truncate rounded-[10px] px-2 py-1 text-left text-[0.65rem] font-semibold leading-tight transition hover:opacity-90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#4fb7ff]/50",
                         vis.block,
                       )}
                       onClick={(e) => {
@@ -937,7 +1116,7 @@ function CalendarMonthGrid({
                   );
                 })}
                 {more > 0 ? (
-                  <p className="px-1 text-[0.6rem] font-medium text-[#637381]">+{more} more</p>
+                  <p className="px-1 text-[0.6rem] font-medium text-[#a4b0ca]">+{more} more</p>
                 ) : null}
               </div>
             </div>
@@ -966,7 +1145,7 @@ function CalendarWeekColumns({
 
   return (
     <div className="overflow-x-auto">
-      <div className="grid min-w-[720px] grid-cols-7 gap-2">
+      <div className="fh-calendar-week-grid grid min-w-[720px] grid-cols-7 gap-3">
         {days.map((iso, i) => {
           const list = eventsByDate.get(iso) ?? [];
           const isToday = iso === todayIso;
@@ -974,26 +1153,26 @@ function CalendarWeekColumns({
             <div
               key={iso}
               className={cn(
-                "flex min-h-[280px] flex-col rounded-[8px] border border-[#ededed] bg-white p-2 shadow-[0_1px_1px_rgba(0,0,0,0.06)]",
-                isToday && "ring-1 ring-[#F26522]/35",
+                "fh-calendar-week-column flex min-h-[280px] flex-col rounded-[20px] border p-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]",
+                isToday && "fh-calendar-week-column--today",
               )}
             >
               <button
                 type="button"
                 className={cn(
-                  "mb-2 rounded-[8px] px-2 py-1.5 text-left text-xs font-semibold transition hover:bg-[#f8f9fa] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FE9F43]/45",
-                  isToday ? "text-[#c2410c]" : "text-[#1f1f1f]",
+                  "mb-2 rounded-[16px] px-2 py-1.5 text-left text-xs font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4fb7ff]/45",
+                  isToday ? "text-[#20e6a2]" : "text-[#f7fbff]",
                 )}
                 onClick={() => onSelectDay(iso)}
               >
-                <span className="block text-[0.65rem] uppercase tracking-wide text-[#637381]">
+                <span className="block text-[0.65rem] uppercase tracking-wide text-[#a4b0ca]">
                   {weekdayShort[i]}
                 </span>
                 <span className="text-base">{iso.slice(8, 10)}</span>
               </button>
               <div className="flex flex-col gap-1.5 overflow-y-auto">
                 {list.length === 0 ? (
-                  <p className="px-1 text-[0.65rem] text-[#94a3b8]">—</p>
+                  <p className="px-1 text-[0.65rem] text-[#66738f]">—</p>
                 ) : (
                   list.map((ev) => {
                     const vis = getActivityCategoryVisualForEvent(ev);
@@ -1002,7 +1181,7 @@ function CalendarWeekColumns({
                         key={ev.id}
                         type="button"
                         className={cn(
-                          "rounded-[6px] border px-2 py-1.5 text-left text-[0.7rem] font-medium leading-snug shadow-[0_1px_1px_rgba(0,0,0,0.04)] transition hover:opacity-95 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#FE9F43]/50",
+                          "fh-calendar-week-event rounded-[14px] border px-2 py-1.5 text-left text-[0.7rem] font-semibold leading-snug shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] transition hover:opacity-95 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#4fb7ff]/50",
                           vis.block,
                         )}
                         onClick={() => onEdit(ev)}
@@ -1060,7 +1239,7 @@ function CalendarDayPanel({
 
   return (
     <div className="space-y-3">
-      <p className={cn("text-sm font-medium", isToday ? "text-[#F26522]" : "text-[#637381]")}>
+      <p className={cn("text-sm font-medium", isToday ? "text-[#20e6a2]" : "text-[#a4b0ca]")}>
         {isToday ? "Today" : formatShortDate(dateIso)}
       </p>
       {sorted.map((ev) => {
@@ -1071,7 +1250,7 @@ function CalendarDayPanel({
             key={ev.id}
             type="button"
             className={cn(
-              "flex w-full flex-col rounded-[8px] border px-4 py-3 text-left shadow-[0_1px_1px_rgba(0,0,0,0.06)] transition hover:border-[#dedede] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FE9F43]/40",
+              "fh-calendar-day-event flex w-full flex-col rounded-[18px] border px-4 py-3 text-left shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4fb7ff]/40",
               vis.block,
             )}
             onClick={() => onEdit(ev)}
@@ -1079,7 +1258,7 @@ function CalendarDayPanel({
             <div className="flex flex-wrap items-start justify-between gap-2">
               <span className="font-semibold">{ev.title || "Untitled"}</span>
               {fresh ? (
-                <span className="rounded border border-[#ededed] bg-white/80 px-2 py-0.5 text-[0.65rem] font-bold uppercase tracking-wide text-[#637381]">
+                <span className="fh-calendar-badge rounded border px-2 py-0.5 text-[0.65rem] font-bold uppercase tracking-wide">
                   {fresh}
                 </span>
               ) : null}
@@ -1129,7 +1308,7 @@ function CalendarListAgenda({
     <div className="space-y-8">
       {groups.map((g) => (
         <section key={g.label}>
-          <h3 className="mb-3 border-b border-[#ededed] pb-2 text-xs font-semibold uppercase tracking-[0.18em] text-[#637381]">
+          <h3 className="mb-3 border-b border-[rgba(150,170,210,0.14)] pb-2 text-xs font-semibold uppercase tracking-[0.18em] text-[#a4b0ca]">
             {g.label}
           </h3>
           <div className="space-y-2">
@@ -1198,21 +1377,21 @@ function LocalActivityRow({
   const vis = getActivityCategoryVisualForEvent(event);
   const fresh = getPlannerEventFreshnessBadge(event);
   return (
-    <div className="grid gap-3 rounded-[8px] border border-[#ededed] bg-white p-4 shadow-[0_1px_1px_rgba(0,0,0,0.08)] md:grid-cols-[1fr_auto_auto_auto_auto] md:items-center">
+    <div className="fh-calendar-agenda-row grid gap-3 rounded-[18px] border p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] md:grid-cols-[1fr_auto_auto_auto_auto] md:items-center">
       <div className="min-w-0">
-        <p className="font-semibold text-[#1f1f1f]">{event.title || "Untitled"}</p>
-        <p className="mt-1 text-sm text-[#575757]">
+        <p className="font-semibold text-[#f7fbff]">{event.title || "Untitled"}</p>
+        <p className="mt-1 text-sm text-[#a4b0ca]">
           {formatEventTime(event)} · {event.location || "No location"}
         </p>
       </div>
       <span className={cn("justify-self-start rounded-full border px-2 py-0.5 text-[0.65rem] font-semibold", vis.chip)}>
         {event.category}
       </span>
-      <p className="text-sm text-[#575757]">{formatEventMembers(event, members)}</p>
-      <p className="text-sm tabular-nums text-[#637381]">{formatShortDate(event.date)}</p>
+      <p className="text-sm text-[#c6d4ef]">{formatEventMembers(event, members)}</p>
+      <p className="text-sm tabular-nums text-[#a4b0ca]">{formatShortDate(event.date)}</p>
       <div className="flex flex-wrap items-center gap-2 justify-self-end">
         {fresh ? (
-          <span className="rounded border border-[#ededed] bg-[#f8f9fa] px-2 py-0.5 text-[0.65rem] font-bold uppercase text-[#637381]">
+          <span className="fh-calendar-badge rounded border px-2 py-0.5 text-[0.65rem] font-bold uppercase">
             {fresh}
           </span>
         ) : null}
@@ -1234,7 +1413,7 @@ function CalendarLinkEditorDark({
   onRemove: () => void;
 }) {
   return (
-    <div className="space-y-3 rounded-[8px] border border-[#ededed] bg-[#f8f9fa] p-4">
+    <div className="fh-calendar-link-editor space-y-3 rounded-[18px] border p-4">
       <div className="grid gap-3 lg:grid-cols-2">
         <CalendarFieldDark label="Display name">
           <Input
@@ -1267,8 +1446,8 @@ function CalendarLinkEditorDark({
           />
         </CalendarFieldDark>
       </div>
-      <div className="flex flex-wrap items-center justify-between gap-2 border-t border-[#ededed] pt-3">
-        <p className="text-xs text-[#637381]">
+      <div className="flex flex-wrap items-center justify-between gap-2 border-t border-[rgba(150,170,210,0.14)] pt-3">
+        <p className="text-xs text-[#a4b0ca]">
           Saved {formatShortDate(calendar.createdAt)} · Updated {formatShortDate(calendar.updatedAt)}
         </p>
         <div className="flex flex-wrap gap-2">
@@ -1291,9 +1470,9 @@ function CalendarLinkEditorDark({
 function CalendarPreviewDark({ calendar }: { calendar: CalendarLink }) {
   if (isValidGoogleCalendarEmbedUrl(calendar.embedUrl)) {
     return (
-      <div className="overflow-hidden rounded-[8px] border border-[#ededed] bg-white p-2 shadow-[0_1px_1px_rgba(0,0,0,0.06)]">
+      <div className="fh-calendar-preview-frame overflow-hidden rounded-[18px] border p-2 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
         <iframe
-          className="h-[min(78vh,680px)] min-h-[300px] w-full rounded-[6px] border border-[#ededed] bg-white sm:min-h-[360px] md:min-h-[420px]"
+          className="h-[min(78vh,680px)] min-h-[300px] w-full rounded-[14px] border border-[rgba(150,170,210,0.14)] bg-white sm:min-h-[360px] md:min-h-[420px]"
           loading="lazy"
           src={calendar.embedUrl}
           title={calendar.name}
@@ -1350,7 +1529,7 @@ function CalendarFieldDark({ label, children }: { label: string; children: React
 }
 
 const calendarDrawerSection =
-  "rounded-[8px] border border-[#ededed] bg-white p-4 shadow-[0_1px_1px_rgba(0,0,0,0.06)] sm:p-5";
+  "fh-calendar-drawer-section rounded-[20px] border p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] sm:p-5";
 
 function ActivityDrawer({
   categoryOptions,
@@ -1421,7 +1600,7 @@ function ActivityDrawer({
         role="dialog"
         aria-labelledby={eventDrawerTitleId}
         aria-modal="true"
-        className="!border-[#ededed] !bg-white !text-[#1f1f1f] !shadow-[0_24px_80px_rgba(0,0,0,0.12)] lg:max-w-4xl"
+        className="fh-calendar-drawer !border-[rgba(150,170,210,0.18)] !bg-[#07101f] !text-[#f7fbff] !shadow-[0_24px_90px_rgba(0,0,0,0.5)] lg:max-w-4xl"
       >
         <DrawerHeader
           eyebrow={isExisting ? "Edit activity" : "New activity"}
@@ -1429,7 +1608,7 @@ function ActivityDrawer({
           titleId={eventDrawerTitleId}
           trailing={
             <Button
-              className="text-[#637381] hover:bg-[#f8f9fa] hover:text-[#1f1f1f]"
+              className="text-[#a4b0ca] hover:bg-white/10 hover:text-[#f7fbff]"
               onClick={onCancel}
               variant="ghost"
             >
@@ -1439,9 +1618,9 @@ function ActivityDrawer({
           }
         />
 
-        <DrawerBody className="space-y-5 !bg-[#f7f7f7]">
+        <DrawerBody className="space-y-5 !bg-[#050914]">
           {errors.length > 0 ? (
-            <div className="rounded-[8px] border border-rose-200 bg-rose-50 p-3 text-sm text-rose-900">
+            <div className="rounded-[18px] border border-rose-400/30 bg-rose-500/12 p-3 text-sm text-rose-100">
               {errors.map((error) => (
                 <p key={error}>{error}</p>
               ))}
@@ -1500,7 +1679,7 @@ function ActivityDrawer({
                 onChange={(c) => update({ location: c.target.value })}
               />
             </CalendarFieldDark>
-            <label className="flex min-h-11 items-center gap-3 text-sm font-medium text-[#1f1f1f] md:col-span-2">
+            <label className="flex min-h-11 items-center gap-3 text-sm font-medium text-[#f7fbff] md:col-span-2">
               <input
                 checked={Boolean(event.isAllDay)}
                 className="h-5 w-5 accent-[#F26522]"
@@ -1513,12 +1692,12 @@ function ActivityDrawer({
 
           <button
             type="button"
-            className="flex w-full items-center justify-between rounded-[8px] border border-[#ededed] bg-white px-4 py-3 text-left text-sm font-semibold text-[#1f1f1f] shadow-[0_1px_1px_rgba(0,0,0,0.06)] transition hover:bg-[#fafafa] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FE9F43]/45"
+            className="fh-calendar-drawer-toggle flex w-full items-center justify-between rounded-[18px] border px-4 py-3 text-left text-sm font-semibold shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4fb7ff]/45"
             onClick={() => setAdvancedOpen((o) => !o)}
             aria-expanded={advancedOpen}
           >
             Advanced options
-            <span className="text-[#637381]">{advancedOpen ? "−" : "+"}</span>
+            <span className="text-[#a4b0ca]">{advancedOpen ? "−" : "+"}</span>
           </button>
 
           {advancedOpen ? (
@@ -1565,7 +1744,7 @@ function ActivityDrawer({
                     ))}
                   </Select>
                 </CalendarFieldDark>
-                <label className="flex min-h-11 items-center gap-3 text-sm font-medium text-[#1f1f1f]">
+                <label className="flex min-h-11 items-center gap-3 text-sm font-medium text-[#f7fbff]">
                   <input
                     checked={Boolean(event.repeatEnabled)}
                     className="h-5 w-5 accent-[#F26522]"
@@ -1591,8 +1770,8 @@ function ActivityDrawer({
               </section>
 
               <section className={cn(calendarDrawerSection, "space-y-3")}>
-                <div className="flex items-center justify-between gap-3 border-b border-[#ededed] pb-3">
-                  <h3 className="text-sm font-semibold text-[#1f1f1f]">Prep checklist</h3>
+                <div className="flex items-center justify-between gap-3 border-b border-[rgba(150,170,210,0.14)] pb-3">
+                  <h3 className="text-sm font-semibold text-[#f7fbff]">Prep checklist</h3>
                   <Button className={btnSecondaryLight} onClick={() => addPrepItem()} variant="secondary" type="button">
                     Add item
                   </Button>
@@ -1615,7 +1794,7 @@ function ActivityDrawer({
                 <div className="space-y-2">
                   {(event.prepChecklist ?? []).map((item) => (
                     <div
-                      className="grid gap-2 rounded-[8px] border border-[#ededed] bg-[#f8f9fa] p-3 md:grid-cols-[auto_1fr_auto]"
+                      className="fh-calendar-prep-row grid gap-2 rounded-[18px] border p-3 md:grid-cols-[auto_1fr_auto]"
                       key={item.id}
                     >
                       <input
@@ -1630,7 +1809,7 @@ function ActivityDrawer({
                         onChange={(c) => updatePrepItem(item.id, { text: c.target.value })}
                       />
                       <Button
-                        className="text-[#637381] hover:bg-white hover:text-[#1f1f1f]"
+                        className="text-[#a4b0ca] hover:bg-white/10 hover:text-[#f7fbff]"
                         onClick={() => removePrepItem(item.id)}
                         variant="ghost"
                         type="button"
@@ -1640,7 +1819,7 @@ function ActivityDrawer({
                     </div>
                   ))}
                   {(event.prepChecklist ?? []).length === 0 ? (
-                    <p className="text-sm text-[#637381]">No prep items yet.</p>
+                    <p className="text-sm text-[#a4b0ca]">No prep items yet.</p>
                   ) : null}
                 </div>
               </section>
@@ -1692,10 +1871,10 @@ function MemberMultiSelectDark({
   );
 
   return (
-    <div className="grid gap-2 rounded-[8px] border border-[#ededed] bg-[#f8f9fa] p-3">
+    <div className="fh-calendar-member-select grid gap-2 rounded-[18px] border p-3">
       {roster.map((member) => (
         <label
-          className="flex items-center justify-between gap-3 text-sm text-[#1f1f1f]"
+          className="flex items-center justify-between gap-3 text-sm text-[#f7fbff]"
           key={member.id}
         >
           {getMemberFullName(member)}

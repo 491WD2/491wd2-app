@@ -6,7 +6,6 @@ import type {
   HomeCardNavigationTarget,
   HomeDashboardEventRow,
   HomeDashboardHouseholdMetric,
-  HomeDashboardMessageRow,
   HomeDashboardPantryRow,
   HomeDashboardQuickCard,
   HomeDashboardRecommendationRow,
@@ -40,8 +39,6 @@ export function resolveHomeCardNavigation(cardId: HomeDashboardCardId): HomeCard
       return { kind: "module", moduleId: "chores", path: "/tasks", pageLabel: "Chores" };
     case "calendar":
       return { kind: "module", moduleId: "calendar", path: "/calendar", pageLabel: "Calendar" };
-    case "messages":
-      return { kind: "module", moduleId: "messages", path: "/messages", pageLabel: "Messages" };
     case "notes":
     default:
       return { kind: "planned", moduleId: "notes", pageLabel: "Notes" };
@@ -107,19 +104,6 @@ export const HOME_DASHBOARD_QUICK_PRIMARY: HomeDashboardQuickCard[] = [
 /** Secondary shortcuts — same card family, slightly quieter chrome. */
 export const HOME_DASHBOARD_QUICK_SECONDARY: HomeDashboardQuickCard[] = [
   {
-    id: "messages",
-    tier: "secondary",
-    category: "Communication",
-    surface: "live",
-    statusLabel: "Live",
-    countLabel: "3 unread (sample)",
-    nextAction: "Open messages",
-    title: "Messages",
-    description: "Post or review household messages.",
-    icon: "◆",
-    href: "/messages",
-  },
-  {
     id: "notes",
     tier: "secondary",
     category: "Reference",
@@ -175,7 +159,6 @@ export const HOME_DASHBOARD_SNAPSHOT: HomeDashboardSnapshotMetric[] = [
 export const HOME_DASHBOARD_ASSISTANT_ACTIONS: HomeDashboardAssistantAction[] = [
   { id: "chores", label: "Add chore" },
   { id: "shopping", label: "Add shopping item", emphasis: "primary" },
-  { id: "messages", label: "Add message" },
   { id: "calendar", label: "Add calendar event" },
   { id: "add-pantry", label: "Add pantry item" },
   { id: "notes", label: "Add household note" },
@@ -216,14 +199,6 @@ export const HOME_DASHBOARD_METRICS: HomeDashboardHouseholdMetric[] = [
     icon: "◷",
   },
   {
-    id: "messages-unread",
-    label: "Messages",
-    value: 3,
-    chip: "3 unread",
-    tone: "red",
-    icon: "◆",
-  },
-  {
     id: "notes-pinned",
     label: "Notes",
     value: 6,
@@ -253,39 +228,6 @@ export const HOME_DASHBOARD_EVENTS: HomeDashboardEventRow[] = [
   { id: "e1", dateLabel: "Thu", title: "Trash night", time: "7:00 PM", tone: "orange" },
   { id: "e2", dateLabel: "Sat", title: "Grocery pickup", time: "10:30 AM", tone: "blue" },
   { id: "e3", dateLabel: "Sun", title: "Family calendar review", time: "6:00 PM", tone: "purple" },
-];
-
-export const HOME_DASHBOARD_MESSAGES: HomeDashboardMessageRow[] = [
-  {
-    id: "m1",
-    name: "Stella",
-    avatarPath: "/family/stella.png",
-    preview: "Can someone grab milk on the way home?",
-    time: "9:12a",
-    unread: true,
-  },
-  {
-    id: "m2",
-    name: "Paca",
-    avatarPath: "/family/paca.png",
-    preview: "Chore board updated for the weekend.",
-    time: "Yesterday",
-  },
-  {
-    id: "m3",
-    name: "Jeremiah",
-    avatarPath: "/family/jeremiah.png",
-    preview: "Pantry scan added olive oil.",
-    time: "Mon",
-    unread: true,
-  },
-  {
-    id: "m4",
-    name: "Lorraine",
-    avatarPath: "/family/lorraine.png",
-    preview: "Calendar invite sent for Sunday review.",
-    time: "Mon",
-  },
 ];
 
 export const HOME_DASHBOARD_ACTIVITY_FEED: HomeDashboardActivityFeedRow[] = [
@@ -336,7 +278,6 @@ export const HOME_DASHBOARD_SUGGESTIONS: HomeDashboardSuggestion[] = [
 export const HOME_DASHBOARD_ACTIVITY: HomeDashboardActivityRow[] = [
   { id: "a1", time: "9:12a", label: "Pantry", detail: "Adjusted quantity · Oats" },
   { id: "a2", time: "Yesterday", label: "Shopping", detail: "Added · Paper towels" },
-  { id: "a3", time: "Yesterday", label: "Messages", detail: "House note · Trash night" },
   { id: "a4", time: "Mon", label: "Chores", detail: "Completed · Kitchen counters" },
 ];
 
@@ -386,15 +327,6 @@ export function buildHomeDashboardSearchSuggestions(): HomeDashboardSearchSugges
     targetId: "calendar" as const,
   }));
 
-  const messages = HOME_DASHBOARD_MESSAGES.map((message) => ({
-    id: `message-${message.id}`,
-    title: message.name,
-    category: "Messages",
-    description: message.preview,
-    actionLabel: "Open messages",
-    targetId: "messages" as const,
-  }));
-
   const recommendations = HOME_DASHBOARD_RECOMMENDATIONS.map((item) => ({
     id: `recommend-${item.id}`,
     title: item.title,
@@ -428,7 +360,6 @@ export function buildHomeDashboardSearchSuggestions(): HomeDashboardSearchSugges
     ...pantryItems,
     ...shoppingItems,
     ...events,
-    ...messages,
     ...recommendations,
     ...activity,
     ...chores,
@@ -512,21 +443,6 @@ export const HOME_SIMPLE_ACTIONS: HomeSimpleActionCard[] = [
     secondaryTargetId: "chores",
     primaryFallbackStatus: "Chore board will open next.",
     secondaryFallbackStatus: "Chore board will open next.",
-  },
-  {
-    id: "add-message",
-    title: "Add Message",
-    description: "Household message board",
-    icon: "◆",
-    tone: "red",
-    primaryAction: "Read Notes",
-    secondaryAction: "Take Note",
-    primaryActionIcon: "≡",
-    secondaryActionIcon: "✎",
-    primaryTargetId: "messages",
-    secondaryTargetId: "notes",
-    primaryFallbackStatus: "Messages will open next.",
-    secondaryFallbackStatus: "Notes will be built next.",
   },
   {
     id: "add-calendar-event",

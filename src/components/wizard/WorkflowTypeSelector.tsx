@@ -2,7 +2,6 @@ import {
   CalendarDays,
   Camera,
   ClipboardList,
-  MessageSquare,
   Refrigerator,
   ShoppingCart,
   StickyNote,
@@ -12,7 +11,6 @@ import { cn } from "../../lib/utils";
 export type WorkflowPickType =
   | "grocery"
   | "chore"
-  | "message"
   | "event"
   | "pantry"
   | "note"
@@ -35,12 +33,6 @@ const cards: {
     title: "Add shopping item",
     description: "Put something on the household shopping list.",
     icon: ShoppingCart,
-  },
-  {
-    type: "message",
-    title: "Add message",
-    description: "Post to the household message board.",
-    icon: MessageSquare,
   },
   {
     type: "event",

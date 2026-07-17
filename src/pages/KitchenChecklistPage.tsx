@@ -1,4 +1,4 @@
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, CheckCircle2, ClipboardList, ListChecks, StickyNote, Table2, X } from "lucide-react";
 import { useId, useMemo, useState } from "react";
 import type { KitchenDutyCompletion, KitchenChecklistItem } from "../data/familyData";
 import { Button } from "../components/ui/Button";
@@ -22,6 +22,7 @@ import { getMemberColor } from "../lib/memberColors";
 import { cn, findMemberById, getMemberFullName } from "../lib/utils";
 import { useDrawerEscape } from "../hooks/useDrawerEscape";
 import type { PageProps } from "./pageTypes";
+import "../styles/guided-kiosk.css";
 
 /** SmartHR light — warm accents (no teal/cyan). */
 const PAGE_BG =
@@ -107,6 +108,9 @@ export function KitchenChecklistPage({
     item: KitchenChecklistItem;
     key: number;
   } | null>(null);
+  const [showFullKitchen, setShowFullKitchen] = useState(false);
+  const [guidedFlow, setGuidedFlow] = useState<"assignment" | "checklist" | null>(null);
+  const [guidedMessage, setGuidedMessage] = useState<string | null>(null);
   useDrawerEscape(Boolean(notesSession), () => setNotesSession(null));
 
   function toggleKitchenChecklistItem(itemId: string) {
@@ -191,6 +195,7 @@ export function KitchenChecklistPage({
         },
       );
     });
+    setGuidedMessage(kitchenCompletedToday ? "Kitchen duty marked not complete." : "Kitchen duty marked complete.");
   }
 
   function markAllChecklistDone() {
@@ -198,6 +203,7 @@ export function KitchenChecklistPage({
       ...current,
       kitchenChecklist: markAllVisibleKitchenChecklistForDate(current.kitchenChecklist, today),
     }));
+    setGuidedMessage("All visible kitchen tasks marked done.");
   }
 
   function resetChecklistToday() {
@@ -205,6 +211,177 @@ export function KitchenChecklistPage({
       ...current,
       kitchenChecklist: resetKitchenChecklistCheckedForDate(current.kitchenChecklist, today),
     }));
+    setGuidedMessage("Kitchen checklist reset for today.");
+  }
+
+  const notesDrawer = notesSession ? (
+    <KitchenTaskNotesDrawer
+      key={notesSession.key}
+      item={notesSession.item}
+      titleIdBase={titleId}
+      setData={setData}
+      onClose={() => setNotesSession(null)}
+    />
+  ) : null;
+
+  function renderKitchenFlowSheet() {
+    if (!guidedFlow) {
+      return null;
+    }
+
+    return (
+      <div className="wd-guided-kiosk__sheet-backdrop" role="presentation" onClick={() => setGuidedFlow(null)}>
+        <section
+          className="wd-guided-kiosk__sheet"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="kitchen-flow-title"
+          onClick={(event) => event.stopPropagation()}
+        >
+          <header className="wd-guided-kiosk__sheet-head">
+            <div>
+              <p className="wd-guided-kiosk__eyebrow">Kitchen station</p>
+              <h2 id="kitchen-flow-title">
+                {guidedFlow === "assignment" ? "Today’s assignment" : "Kitchen checklist"}
+              </h2>
+              <p>Make one kitchen choice, then continue to the next popup or completion.</p>
+            </div>
+            <button
+              type="button"
+              className="wd-guided-kiosk__icon-btn"
+              aria-label="Close kitchen flow"
+              onClick={() => setGuidedFlow(null)}
+            >
+              <X className="h-4 w-4" aria-hidden />
+            </button>
+          </header>
+
+          {guidedFlow === "assignment" ? (
+            <div className="wd-guided-kiosk__confirm">
+              <article className="wd-guided-kiosk__summary-card">
+                <div>
+                  <p className="wd-guided-kiosk__eyebrow">Assigned today</p>
+                  <h3>{kitchenTodayMember ? getMemberFullName(kitchenTodayMember) : "No kitchen duty assigned today."}</h3>
+                </div>
+                <dl>
+                  <div>
+                    <dt>Date</dt>
+                    <dd>{friendlyToday}</dd>
+                  </div>
+                  <div>
+                    <dt>Checklist</dt>
+                    <dd>{checklistProgress.completed}/{checklistProgress.total}</dd>
+                  </div>
+                  <div>
+                    <dt>Status</dt>
+                    <dd>{kitchenCompletedToday ? "Complete" : "Open"}</dd>
+                  </div>
+                </dl>
+              </article>
+              {todayKitchenDay && kitchenTodayMember ? (
+                <button type="button" className="wd-guided-kiosk__primary" onClick={toggleKitchenTodayDone}>
+                  {kitchenCompletedToday ? "Undo complete" : "Mark complete"}
+                </button>
+              ) : null}
+            </div>
+          ) : (
+            <div className="wd-guided-kiosk__chooser" role="list" aria-label="Kitchen checklist items">
+              {visibleChecklist.length === 0 ? (
+                <p className="wd-guided-kiosk__empty">No checklist tasks to show.</p>
+              ) : (
+                visibleChecklist.map((item) => {
+                  const checked = item.checkedDate === today;
+                  return (
+                    <div key={item.id} className="wd-guided-kiosk__chooser-row">
+                      <span>
+                        <strong>{item.label}</strong>
+                        <small>{checked ? "Done today" : "Open today"}</small>
+                      </span>
+                      <span className="flex flex-wrap gap-2">
+                        <button
+                          type="button"
+                          className="wd-guided-kiosk__secondary"
+                          onClick={() =>
+                            setNotesSession({
+                              item,
+                              key: Date.now(),
+                            })
+                          }
+                        >
+                          Notes
+                        </button>
+                        <button
+                          type="button"
+                          className="wd-guided-kiosk__primary"
+                          onClick={() => toggleKitchenChecklistItem(item.id)}
+                        >
+                          {checked ? "Undo" : "Done"}
+                        </button>
+                      </span>
+                    </div>
+                  );
+                })
+              )}
+            </div>
+          )}
+        </section>
+      </div>
+    );
+  }
+
+  if (!showFullKitchen) {
+    return (
+      <div className="wd-guided-kiosk wd-guided-kiosk--kitchen">
+        <section className="wd-guided-kiosk__hero" aria-labelledby="kitchen-kiosk-title">
+          <div>
+            <p className="wd-guided-kiosk__eyebrow">Kitchen station</p>
+            <h1 id="kitchen-kiosk-title">What kitchen step?</h1>
+            <p>Choose the assignment or checklist, then finish one step at a time.</p>
+          </div>
+          <div className="wd-guided-kiosk__status">
+            <span>{friendlyToday}</span>
+            <span>{checklistProgress.completed}/{checklistProgress.total} done</span>
+            <span>{kitchenCompletedToday ? "Duty complete" : "Duty open"}</span>
+          </div>
+        </section>
+
+        {guidedMessage ? (
+          <section className="wd-guided-kiosk__complete" role="status">
+            <CheckCircle2 className="h-5 w-5" aria-hidden />
+            <p>{guidedMessage}</p>
+            <button type="button" onClick={() => setGuidedMessage(null)}>
+              Continue
+            </button>
+          </section>
+        ) : null}
+
+        <section className="wd-guided-kiosk__actions-grid" aria-label="Kitchen actions">
+          <button type="button" className="wd-guided-kiosk__action wd-guided-kiosk__action--primary" onClick={() => setGuidedFlow("assignment")}>
+            <span className="wd-guided-kiosk__action-icon"><ClipboardList className="h-5 w-5" aria-hidden /></span>
+            <span><strong>Today’s duty</strong><small>Review and mark complete</small></span>
+          </button>
+          <button type="button" className="wd-guided-kiosk__action" onClick={() => setGuidedFlow("checklist")}>
+            <span className="wd-guided-kiosk__action-icon"><ListChecks className="h-5 w-5" aria-hidden /></span>
+            <span><strong>Checklist</strong><small>Tap each kitchen task</small></span>
+          </button>
+          <button type="button" className="wd-guided-kiosk__action" onClick={markAllChecklistDone}>
+            <span className="wd-guided-kiosk__action-icon"><CheckCircle2 className="h-5 w-5" aria-hidden /></span>
+            <span><strong>Mark all done</strong><small>Complete visible tasks</small></span>
+          </button>
+          <button type="button" className="wd-guided-kiosk__action" onClick={resetChecklistToday}>
+            <span className="wd-guided-kiosk__action-icon"><StickyNote className="h-5 w-5" aria-hidden /></span>
+            <span><strong>Reset today</strong><small>Clear today’s checks</small></span>
+          </button>
+          <button type="button" className="wd-guided-kiosk__action" onClick={() => setShowFullKitchen(true)}>
+            <span className="wd-guided-kiosk__action-icon"><Table2 className="h-5 w-5" aria-hidden /></span>
+            <span><strong>Advanced checklist</strong><small>Open detailed list</small></span>
+          </button>
+        </section>
+
+        {renderKitchenFlowSheet()}
+        {notesDrawer}
+      </div>
+    );
   }
 
   return (
@@ -230,6 +407,14 @@ export function KitchenChecklistPage({
                 Home
               </Button>
             ) : null}
+            <Button
+              type="button"
+              variant="secondary"
+              className={cn("min-h-11 shrink-0 text-sm", btnSecondaryLight)}
+              onClick={() => setShowFullKitchen(false)}
+            >
+              Kiosk station
+            </Button>
             <div className="min-w-0">
               <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#637381]">
                 Kitchen checklist
@@ -385,15 +570,7 @@ export function KitchenChecklistPage({
         </section>
       </div>
 
-      {notesSession ? (
-        <KitchenTaskNotesDrawer
-          key={notesSession.key}
-          item={notesSession.item}
-          titleIdBase={titleId}
-          setData={setData}
-          onClose={() => setNotesSession(null)}
-        />
-      ) : null}
+      {notesDrawer}
       </WorkspacePageShell>
     </div>
   );
