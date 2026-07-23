@@ -10,12 +10,14 @@ const REPAIR_COLOR_THEMES: (typeof memberColorThemes)[number][] = [
   "purple",
   "green",
   "orange",
+  "emerald",
 ];
 
 /** Legacy demo labels → canonical names (case-insensitive match on `name`). */
 const DEMO_NAME_RENAMES: Record<string, string> = {
   mom: "Lorraine",
-  dad: "Herschel",
+  dad: "Hershel",
+  herschel: "Hershel",
   avery: "Stella",
 };
 
@@ -42,9 +44,9 @@ export type RepairFamilyMembersResult = {
 };
 
 /**
- * Safe roster repair: rename Mom/Dad/Avery → Lorraine/Herschel/Stella when no name
- * conflict; clear `animalIcon` on canonical members; append missing Lorraine…Jeremiah.
- * Member IDs are preserved; no other `FamilyData` fields are modified here.
+ * Safe roster repair: rename Mom/Dad/Herschel/Avery → Lorraine/Hershel/Stella when no name
+ * conflict; clear `animalIcon` on canonical members; append missing canonical names
+ * (including Selena). Member IDs are preserved; no other `FamilyData` fields are modified here.
  */
 export function repairCanonicalFamilyMembers(
   existing: FamilyMember[],

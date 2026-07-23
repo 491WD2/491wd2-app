@@ -1,0 +1,104 @@
+/**
+ * FamilyHub clean light tokens — FoodFlow / pantry-dashboard inspired.
+ * Overrides the previous liquid-glass dark defaults for the household app shell.
+ * Dark mode remains available via `.dark`.
+ */
+
+:root {
+  color-scheme: light;
+
+  /* —— FamilyHub clean palette —— */
+  --fh-bg: #f5f7f6;
+  --fh-surface: #ffffff;
+  --fh-surface-muted: #f8faf9;
+  --fh-accent: #2f9e5b;
+  --fh-accent-soft: #e8f7ee;
+  --fh-accent-strong: #248a4c;
+  --fh-warning: #e67e22;
+  --fh-danger: #d64545;
+  --fh-info: #3b82a8;
+  --fh-border: #e2e8e6;
+  --fh-border-strong: #cbd5d1;
+  --fh-text: #14201b;
+  --fh-text-secondary: #4b5c55;
+  --fh-text-muted: #6b7c74;
+  --fh-text-on-accent: #ffffff;
+  --fh-radius-card: 20px;
+  --fh-radius-control: 12px;
+  --fh-shadow-card: 0 1px 2px rgba(20, 32, 27, 0.06), 0 8px 24px rgba(20, 32, 27, 0.04);
+
+  /* Liquid-glass aliases → light (keeps older var consumers working) */
+  --lg-bg-0: var(--fh-bg);
+  --lg-bg-1: #eef2f0;
+  --lg-bg-2: #e6ece9;
+  --lg-glass: rgba(255, 255, 255, 0.92);
+  --lg-glass-strong: #ffffff;
+  --lg-glass-muted: rgba(20, 32, 27, 0.04);
+  --lg-border: var(--fh-border);
+  --lg-border-strong: var(--fh-border-strong);
+  --lg-text: var(--fh-text);
+  --lg-text-soft: var(--fh-text-secondary);
+  --lg-text-muted: var(--fh-text-muted);
+  --lg-cyan: var(--fh-accent);
+  --lg-blue: #3b82a8;
+  --lg-mint: #2f9e5b;
+  --lg-violet: #6b8f71;
+  --lg-pink: #e67e22;
+  --lg-amber: #e67e22;
+  --lg-radius-xl: 24px;
+  --lg-radius-lg: 20px;
+  --lg-radius-md: 14px;
+  --lg-shadow: var(--fh-shadow-card);
+  --lg-shadow-soft: 0 1px 2px rgba(20, 32, 27, 0.05);
+  --lg-surface: var(--fh-surface);
+  --lg-surface-muted: var(--fh-surface-muted);
+
+  /* BankDash / widget bridge → light */
+  --bd-bg-app: var(--fh-bg);
+  --bd-bg-card: var(--fh-surface);
+  --bd-bg-card-muted: var(--fh-surface-muted);
+  --bd-bg-input: #ffffff;
+  --bd-bg-header: rgba(255, 255, 255, 0.94);
+  --bd-primary: var(--fh-accent);
+  --bd-primary-hover: var(--fh-accent-strong);
+  --bd-primary-soft: var(--fh-accent-soft);
+  --bd-primary-ring: rgba(47, 158, 91, 0.35);
+  --bd-text-heading: var(--fh-text);
+  --bd-text-body: var(--fh-text-secondary);
+  --bd-text-muted: var(--fh-text-muted);
+  --bd-text-inverse: #ffffff;
+  --bd-success: var(--fh-accent);
+  --bd-danger: var(--fh-danger);
+  --bd-warning: var(--fh-warning);
+  --bd-info: var(--fh-info);
+  --bd-border: var(--fh-border);
+  --bd-border-strong: var(--fh-border-strong);
+  --bd-radius-card: var(--fh-radius-card);
+  --bd-radius-widget: 18px;
+  --bd-radius-control: var(--fh-radius-control);
+  --bd-shadow-card: var(--fh-shadow-card);
+  --bd-shadow-card-hover: 0 4px 16px rgba(20, 32, 27, 0.08);
+  --bd-shadow-header: 0 1px 0 rgba(20, 32, 27, 0.04);
+
+  --fh-widget-radius: var(--bd-radius-widget);
+  --fh-widget-pad: 20px;
+  --fh-widget-gap: clamp(14px, 1.5vw, 20px);
+  --fh-widget-accent: var(--fh-accent);
+  --fh-widget-bg: var(--fh-bg);
+  --fh-widget-panel: var(--fh-surface);
+  --fh-widget-border: var(--fh-border);
+  --fh-widget-shadow: var(--fh-shadow-card);
+
+  /* App shell appearance bridge */
+  --fs-primary: var(--fh-accent);
+  --fs-gradient-start: var(--fh-accent);
+  --fs-gradient-end: var(--fh-accent-strong);
+  --fs-page-bg: var(--fh-bg);
+  --fs-card-bg: var(--fh-surface);
+  --fs-sidebar-active-bg: var(--fh-accent-soft);
+  --fs-sidebar-active-text: var(--fh-accent-strong);
+  --fs-text: var(--fh-text);
+  --fs-text-muted: var(--fh-text-muted);
+  --app-shell-gradient: linear-gradient(180deg, #ffffff 0%, var(--fh-bg) 40%, #eef2f0 100%);
+  --app-shell-fallback: var(--fh-bg);
+}

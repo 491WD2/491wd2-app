@@ -30,10 +30,10 @@
   --aux-brown: #b54708;
   --aux-light: #f8fafc;
   --aux-dark: #101828;
-  --aux-text: #101828;
-  --aux-muted: #667085;
+  --aux-text: #0f172a;
+  --aux-muted: #475569;
   --aux-card: #ffffff;
-  --aux-border: rgba(16, 24, 40, 0.08);
+  --aux-border: rgba(15, 23, 42, 0.14);
   --aux-radius: 1.05rem;
   --aux-title: "SUSE", "Open Sans", sans-serif;
   --aux-body: "Open Sans", sans-serif;
@@ -211,6 +211,12 @@
 .adminux-app aside[aria-label="Primary navigation"] button {
   position: relative;
   border-radius: 0.85rem !important;
+  color: #334155;
+  font-weight: 600;
+}
+
+.adminux-app aside[aria-label="Primary navigation"] button:hover {
+  color: #0f172a;
 }
 
 .adminux-app aside[aria-label="Primary navigation"] button[aria-current="page"] {
@@ -1651,7 +1657,7 @@ table.aux-table tbody tr:hover {
 .adminux-app main select,
 .adminux-app main textarea {
   border-radius: 0.8rem;
-  border: 1px solid rgba(59, 110, 245, 0.2);
+  border: 1px solid rgba(15, 23, 42, 0.18);
   background: #fff;
   color: var(--aux-text);
   padding: 0.65rem 0.85rem;
@@ -1659,6 +1665,13 @@ table.aux-table tbody tr:hover {
   font-family: var(--aux-body);
   outline: none;
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.adminux-app .form-control::placeholder,
+.adminux-app main input::placeholder,
+.adminux-app main textarea::placeholder {
+  color: #64748b;
+  opacity: 1;
 }
 
 .adminux-app .form-control:focus,
@@ -1973,7 +1986,7 @@ table.aux-table tbody tr:hover {
 .adminux-app .form-floating > textarea:focus ~ label,
 .adminux-app .form-floating > textarea:not(:placeholder-shown) ~ label {
   transform: scale(0.82) translateY(-0.35rem) translateX(0.1rem);
-  opacity: 0.85;
+  opacity: 1;
   color: var(--aux-theme);
 }
 

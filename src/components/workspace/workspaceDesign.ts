@@ -35,7 +35,7 @@ export const wrkPageTitleClassName =
   "text-2xl font-semibold tracking-tight text-white sm:text-[1.75rem]";
 
 export const wrkSupportingTextClassName =
-  "text-sm leading-relaxed text-slate-300/80";
+  "text-sm leading-relaxed text-slate-200";
 
 /** Compact KPI / metric cell */
 export const wrkMetricCellClassName =

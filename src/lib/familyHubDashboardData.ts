@@ -1,4 +1,11 @@
-import type { FamilyData, FamilyMember, PantryItem, PlannerEvent, Task } from "../data/familyData";
+import type {
+  FamilyData,
+  FamilyMember,
+  PantryItem,
+  PlannerEvent,
+  Task,
+} from "../data/familyData";
+import { WAKE_PAGE_MEMBER_DISPLAY_ORDER } from "../data/familyData";
 import { buildMemberProgress } from "./memberTasksEngine";
 import { getChoreDueDate } from "./choreTrackerUtils";
 import {
@@ -51,6 +58,9 @@ export type FamilyHubEventRow = {
   when: string;
   category: string;
   emoji: string;
+  location?: string;
+  assigneeLabel: string;
+  isToday: boolean;
 };
 
 export type FamilyHubSuggestion = {
@@ -117,7 +127,11 @@ export function buildFamilyHubDashboardModel(
   const choresOverdue = openTasks.filter((t) => getChoreDueDate(t) < todayIso);
 
   const upcomingEvents = [...data.planner]
-    .filter((e) => e.date >= todayIso)
+    .filter((e) => {
+      if (e.id === "plan-pack-lebanon-2026-27") return false;
+      const end = (e.endDate ?? e.date).slice(0, 10);
+      return end >= todayIso || (e.repeatEnabled && e.repeatRule === "Weekly");
+    })
     .sort((a, b) => `${a.date}${a.time}`.localeCompare(`${b.date}${b.time}`))
     .slice(0, 8);
 
@@ -176,13 +190,30 @@ export function buildFamilyHubDashboardModel(
       };
     });
 
-  const upcomingEventRows: FamilyHubEventRow[] = upcomingEvents.map((event) => ({
-    id: event.id,
-    title: event.title,
-    when: formatEventWhen(event),
-    category: event.category,
-    emoji: "📅",
-  }));
+  const upcomingEventRows: FamilyHubEventRow[] = upcomingEvents.map((event) => {
+    const assigneeIds = [
+      event.assignedMemberId,
+      ...(event.assignedMemberIds ?? []),
+    ].filter(Boolean);
+    const uniqueIds = [...new Set(assigneeIds)];
+    const labels = uniqueIds
+      .map((id) => memberName(data, id, ""))
+      .filter(Boolean);
+    const assigneeLabel =
+      labels.length > 0
+        ? labels.join(", ")
+        : (event.assignedPerson?.trim() || "Family");
+    return {
+      id: event.id,
+      title: event.title,
+      when: formatEventWhen(event),
+      category: event.category,
+      emoji: "📅",
+      location: event.location?.trim() || undefined,
+      assigneeLabel,
+      isToday: event.date === todayIso,
+    };
+  });
 
   const suggestions = buildFamilyHubSuggestions({
     expiringCount: expiringItems.length,
@@ -330,4 +361,45 @@ function buildFamilyHubSuggestions(input: {
   }
 
   return out.slice(0, 5);
+}
+
+/** First-name aliases so Herschel seed data still matches the Hershel wake slot. */
+const WAKE_NAME_ALIASES: Record<string, string[]> = {
+  hershel: ["hershel", "herschel"],
+};
+
+function firstNameKey(name: string): string {
+  return name.trim().split(/\s+/)[0]?.toLowerCase() ?? "";
+}
+
+/**
+ * Active/away members ordered for the wake-page buttons.
+ * Prefers {@link WAKE_PAGE_MEMBER_DISPLAY_ORDER}, then any remaining roster members.
+ */
+export function orderWakePageMembers(members: FamilyMember[]): FamilyMember[] {
+  const active = (members ?? []).filter(
+    (m) => m && (m.status === "active" || m.status === "away"),
+  );
+  const used = new Set<string>();
+  const ordered: FamilyMember[] = [];
+
+  for (const label of WAKE_PAGE_MEMBER_DISPLAY_ORDER) {
+    const key = label.toLowerCase();
+    const aliases = WAKE_NAME_ALIASES[key] ?? [key];
+    const found = active.find((m) => {
+      if (used.has(m.id)) return false;
+      return aliases.includes(firstNameKey(m.name ?? ""));
+    });
+    if (found) {
+      ordered.push(found);
+      used.add(found.id);
+    }
+  }
+
+  for (const m of active) {
+    if (!used.has(m.id)) {
+      ordered.push(m);
+    }
+  }
+  return ordered;
 }

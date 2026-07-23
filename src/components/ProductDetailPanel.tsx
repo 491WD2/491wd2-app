@@ -407,7 +407,7 @@ export function ProductDetailPanel({
             className="wd-product-detail__btn wd-product-detail__btn--pantry"
             onClick={onAddToPantry}
           >
-            Add to Pantry
+            Add to Inventory
           </button>
           {onUsedUp ? (
             <button

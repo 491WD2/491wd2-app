@@ -80,6 +80,29 @@ export function getPantryItemDisplayImageSrc(item: PantryItem): string {
   );
 }
 
+/** Emoji / caption fallback when no product photo URL is stored (demo placeholders). */
+export function getPantryItemPlaceholderEmoji(item: PantryItem): string {
+  const caption = item.itemPhotoCaption?.trim();
+  if (caption && /[\u{1F300}-\u{1FAFF}]/u.test(caption)) {
+    return caption;
+  }
+  const category = (item.category ?? "").toLowerCase();
+  if (category.includes("dairy")) return "🥛";
+  if (category.includes("drink")) return "🧃";
+  if (category.includes("produce") || category.includes("fruit") || category.includes("vegetable")) {
+    return "🥬";
+  }
+  if (category.includes("meat") || category.includes("deli") || category.includes("seafood")) {
+    return "🥩";
+  }
+  if (category.includes("frozen") || category.includes("breakfast")) return "🧊";
+  if (category.includes("dessert") || category.includes("ice")) return "🍦";
+  if (category.includes("pasta") || category.includes("cereal")) return "🍝";
+  if (category.includes("spread") || category.includes("canned")) return "🥫";
+  if (category.includes("snack")) return "🍿";
+  return "📦";
+}
+
 /**
  * Shelf-style group heading (e.g. `PANTRY - Wall 1 / Shelf 3`).
  * Falls back to the full location label when wall/shelf are not set.

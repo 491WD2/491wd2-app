@@ -1,13 +1,16 @@
 import {
+  Bell,
   CalendarDays,
   CheckCircle2,
   ChevronLeft,
   ChevronRight,
   ExternalLink,
+  Filter,
   Plus,
   Search,
   Table2,
   Trash2,
+  Users,
   X,
 } from "lucide-react";
 import { useEffect, useId, useMemo, useState, type ReactNode } from "react";
@@ -31,18 +34,36 @@ import {
   DrawerPanel,
 } from "../components/workspace/DrawerShell";
 import { EmptyStatePanel, WorkspacePageShell } from "../components/workspace/ModuleWorkspace";
+import {
+  FamilyAvatarStack,
+  ScheduleCard,
+  SegmentedModeBar,
+  SoftStatusBadge,
+  StickyNote,
+  UpcomingPanel,
+} from "../components/schedule";
 import { createActivity } from "../lib/activity";
 import { DS_MAIN_COLUMN } from "../lib/designSystem";
 import { getActivityCategoryVisualForEvent } from "../lib/calendarActivityStyles";
+import { getChoreDueDate } from "../lib/choreTrackerUtils";
 import { getCalendarCategories, mergeLists, selectOptionsWithCurrent } from "../lib/customization";
+import {
+  hasHouseholdCalendarPack,
+  mergeHouseholdCalendarIntoData,
+} from "../lib/householdCalendarSeed";
 import { getPlannerEventFreshnessBadge } from "../lib/plannerActivityBadges";
+import {
+  expandPlannerEventsForRange,
+  expandWeeklyUpcoming,
+  formatPlannerRangeLabel,
+  plannerEventIsUpcoming,
+} from "../lib/plannerRecurrence";
 import { membersForAssignmentSelect } from "../lib/memberAssignment";
 import { formatShortDate, cn, getMemberFullName } from "../lib/utils";
+import { addDaysToIso as addDaysLocal } from "../lib/dashboardWeek";
 import { useDrawerEscape } from "../hooks/useDrawerEscape";
 import type { PageProps } from "./pageTypes";
 import { useKioskShell } from "../components/layout/KioskShellContext";
-import { KioskPageTitle } from "../components/layout/KioskPageTitle";
-import { WidgetPageShell } from "../components/widgets";
 import { CalendarPlanningView } from "../components/calendar/CalendarPlanningView";
 import "../components/calendar/calendar-planner.css";
 import {
@@ -51,6 +72,7 @@ import {
   trackCalendarView,
 } from "../lib/calendarPlannerAnalytics";
 import "../styles/guided-kiosk.css";
+import "../styles/schedule-dashboard.css";
 
 const repeatRules: PlannerRepeatRule[] = [
   "Daily",
@@ -81,43 +103,120 @@ const categorySuggestions: Partial<Record<PlannerEventCategory, string[]>> = {
 
 type CalendarViewMode = "plan" | "month" | "week" | "day" | "list";
 type CalendarGuidedFlow = "find" | "today";
+type CalendarDashboardMode = "schedule" | "tasks" | "board" | "projects" | "notes";
 
 const VIEW_LABELS: Record<CalendarViewMode, string> = {
-  plan: "Planning",
+  plan: "Board",
   month: "Month",
   week: "Week",
   day: "Day",
   list: "List",
 };
 
+const DASHBOARD_MODES: { id: CalendarDashboardMode; label: string }[] = [
+  { id: "schedule", label: "Schedule Planner" },
+  { id: "tasks", label: "Task List" },
+  { id: "board", label: "Household Board" },
+  { id: "projects", label: "Projects" },
+  { id: "notes", label: "Notes" },
+];
+
 /** Chips map household-friendly labels → stored category values */
 const ACTIVITY_TYPE_CHIPS: { label: string; category: PlannerEventCategory | "all" }[] = [
   { label: "All", category: "all" },
-  { label: "Household", category: "Family" },
   { label: "School", category: "School" },
-  { label: "Work", category: "Work" },
-  { label: "Cleaning", category: "Sports" },
-  { label: "Shopping", category: "Errand" },
-  { label: "Personal", category: "Personal" },
+  { label: "No School", category: "No School" },
+  { label: "Activities", category: "Activity" },
+  { label: "Travel", category: "Travel" },
+  { label: "Chores", category: "Chores" },
+  { label: "Household", category: "Household" },
 ];
 
-/** Calendar dark kiosk tokens — scoped to Calendar only. */
-const PAGE_BG = "fh-calendar-page min-h-full text-[#f7fbff] [-webkit-font-smoothing:antialiased]";
+/** Light schedule-dashboard tokens — scoped to Calendar. */
+const PAGE_BG =
+  "fh-sched fh-calendar-page min-h-full text-slate-900 [-webkit-font-smoothing:antialiased]";
 const SM_LABEL = "fh-calendar-eyebrow text-[11px] font-semibold uppercase tracking-[0.12em]";
-const CARD_SHELL =
-  "fh-calendar-surface-card rounded-[24px] border shadow-[0_18px_44px_rgba(0,0,0,0.3)]";
+const CARD_SHELL = "fh-calendar-surface-card rounded-[18px] border shadow-sm";
 const SM_INPUT =
-  "fh-calendar-input min-h-10 w-full rounded-[16px] border px-3 py-2 text-[14px] shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] focus:outline-none focus:ring-2";
-const CARD_CALENDAR =
-  "fh-calendar-surface-card !rounded-[24px] shadow-[0_18px_44px_rgba(0,0,0,0.3)]";
+  "fh-calendar-input min-h-10 w-full rounded-[14px] border px-3 py-2 text-[14px] focus:outline-none focus:ring-2";
+const CARD_CALENDAR = "fh-calendar-surface-card !rounded-[18px] shadow-sm";
 
 const btnPrimaryOrange =
-  "fh-calendar-btn-primary border-transparent bg-gradient-to-r from-[#20e6a2] to-[#4fb7ff] font-semibold text-[#03101b] shadow-[0_12px_28px_rgba(32,230,162,0.18)] hover:brightness-[1.05] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4fb7ff]/45 focus-visible:ring-offset-2 focus-visible:ring-offset-[#050914]";
+  "fh-calendar-btn-primary border-transparent bg-gradient-to-r from-[#3b6ef5] to-[#0d9488] font-semibold text-white shadow-[0_10px_22px_rgba(59,110,245,0.22)] hover:brightness-[1.04] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3b6ef5]/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#f4f7fb]";
 const btnSecondaryLight =
-  "fh-calendar-btn-secondary border font-semibold shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4fb7ff]/35 focus-visible:ring-offset-2 focus-visible:ring-offset-[#050914]";
+  "fh-calendar-btn-secondary border font-semibold shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3b6ef5]/30 focus-visible:ring-offset-2 focus-visible:ring-offset-[#f4f7fb]";
 const segmentInactiveLight = "fh-calendar-segment-inactive";
-const segmentActiveLight =
-  "fh-calendar-segment-active";
+const segmentActiveLight = "fh-calendar-segment-active";
+
+function masterPlannerId(id: string): string {
+  return id.replace(/__(occ|day)__\d{4}-\d{2}-\d{2}$/, "");
+}
+
+function isTravelEvent(event: PlannerEvent): boolean {
+  const category = (event.category ?? "").toLowerCase();
+  const tags = (event.tags ?? []).map((t) => t.toLowerCase());
+  if (category === "travel" || tags.includes("travel")) return true;
+  const title = (event.title ?? "").toLowerCase();
+  return title.includes("trip") || title.includes("travel");
+}
+
+function isTentativeEvent(event: PlannerEvent): boolean {
+  if (event.isTentative) return true;
+  const tags = (event.tags ?? []).map((t) => t.toLowerCase());
+  if (tags.includes("tentative")) return true;
+  const blob = `${event.title ?? ""} ${event.notes ?? ""} ${event.location ?? ""}`.toLowerCase();
+  return blob.includes("tentative") || blob.includes("not confirmed");
+}
+
+function isSchoolMarkerEvent(event: PlannerEvent): boolean {
+  const category = (event.category ?? "").toLowerCase();
+  const tags = (event.tags ?? []).map((t) => t.toLowerCase());
+  const title = (event.title ?? "").toLowerCase();
+  if (category === "no school" || tags.includes("no-school") || title.includes("no school")) {
+    return true;
+  }
+  if (title.includes("first day of school") || title.includes("last day of school")) {
+    return true;
+  }
+  if (category === "school" && (title.includes("first day") || title.includes("last day"))) {
+    return true;
+  }
+  return false;
+}
+
+function noSchoolReason(event: PlannerEvent): string {
+  if (event.noSchoolReason?.trim()) return event.noSchoolReason.trim();
+  const notes = (event.notes ?? "").trim();
+  if (notes) return notes;
+  const title = (event.title ?? "").toLowerCase();
+  if (title.includes("first day")) return "First day";
+  if (title.includes("last day")) return "Last day";
+  if (title.includes("conference")) return "Conferences";
+  if (title.includes("holiday")) return "Holiday";
+  if (title.includes("staff") || title.includes("in-service") || title.includes("inservice")) {
+    return "Staff In-Service / Preparation";
+  }
+  if (title.includes("break")) return "Break";
+  if (title.includes("weather")) return "Weather closure";
+  return "No School";
+}
+
+function stickyVariantForEvent(event: PlannerEvent): "dark" | "blue" | "yellow" | "green" {
+  if (event.stickyColor) return event.stickyColor;
+  const blob = `${event.title ?? ""} ${event.notes ?? ""} ${event.noSchoolReason ?? ""}`.toLowerCase();
+  if (blob.includes("first day") || blob.includes("last day")) return "green";
+  if (blob.includes("conference")) return "blue";
+  if (blob.includes("staff") || blob.includes("in-service") || blob.includes("preparation")) {
+    return "yellow";
+  }
+  return "dark";
+}
+
+function stickyTitleForEvent(event: PlannerEvent): string {
+  const title = (event.title ?? "").trim();
+  if (/first day|last day/i.test(title)) return title;
+  return "No School";
+}
 
 function pad2(n: number) {
   return String(n).padStart(2, "0");
@@ -169,7 +268,7 @@ function initialViewMode(kioskShell: boolean): CalendarViewMode {
   return "month";
 }
 
-export function CalendarPage({ data, setData }: PageProps) {
+export function CalendarPage({ data, setData, navigateWithinApp }: PageProps) {
   const kioskShell = useKioskShell();
   const primaryCalendar = data.calendarLinks[0];
   const admin = data.adminSettings;
@@ -182,14 +281,28 @@ export function CalendarPage({ data, setData }: PageProps) {
   const [selectedDate, setSelectedDate] = useState(today);
   const [monthAnchor, setMonthAnchor] = useState(() => new Date(`${today}T12:00:00`));
   const [viewMode, setViewMode] = useState<CalendarViewMode>(() => initialViewMode(Boolean(kioskShell)));
+  const [dashboardMode, setDashboardMode] = useState<CalendarDashboardMode>("schedule");
   const [categoryFilter, setCategoryFilter] = useState<PlannerEventCategory | "all">("all");
   const [memberFilter, setMemberFilter] = useState<string | "all">("all");
-  const [showLinkedCalendars, setShowLinkedCalendars] = useState(true);
+  const [showFilters, setShowFilters] = useState(false);
+  const [toolbarSearch, setToolbarSearch] = useState("");
+  const [showLinkedCalendars, setShowLinkedCalendars] = useState(false);
   const [editingEvent, setEditingEvent] = useState<PlannerEvent | undefined>();
-  const [showFullCalendar, setShowFullCalendar] = useState(false);
+  /** Schedule dashboard is the default; guided station remains available. */
+  const [showFullCalendar, setShowFullCalendar] = useState(true);
   const [guidedFlow, setGuidedFlow] = useState<CalendarGuidedFlow | null>(null);
   const [guidedSearch, setGuidedSearch] = useState("");
   const [guidedMessage, setGuidedMessage] = useState<string | null>(null);
+
+  const activeMembers = useMemo(
+    () => data.familyMembers.filter((m) => m.status === "active"),
+    [data.familyMembers],
+  );
+
+  const notificationCount = useMemo(
+    () => (data.notifications ?? []).filter((n) => n && !n.dismissedAt && !n.readAt).length,
+    [data.notifications],
+  );
 
   const localEventsSorted = useMemo(
     () => [...data.planner].sort(sortEvents),
@@ -197,23 +310,68 @@ export function CalendarPage({ data, setData }: PageProps) {
   );
 
   const filteredPlanner = useMemo(() => {
+    const query = toolbarSearch.trim().toLowerCase();
     return localEventsSorted.filter((event) => {
-      if (categoryFilter !== "all" && event.category !== categoryFilter) {
+      if (event.id === "plan-pack-lebanon-2026-27") {
         return false;
+      }
+      if (categoryFilter !== "all") {
+        if (categoryFilter === "Household") {
+          if (event.category !== "Household" && event.category !== "Family") {
+            return false;
+          }
+        } else if (event.category !== categoryFilter) {
+          return false;
+        }
       }
       if (memberFilter !== "all") {
         const ids = event.assignedMemberIds ?? [];
-        if (!ids.includes(memberFilter)) {
+        if (!ids.includes(memberFilter) && event.assignedMemberId !== memberFilter) {
+          return false;
+        }
+      }
+      if (query) {
+        const tagHay = (event.tags ?? []).join(" ");
+        const hay =
+          `${event.title} ${event.category} ${event.location ?? ""} ${event.notes ?? ""} ${tagHay}`.toLowerCase();
+        if (!hay.includes(query)) {
           return false;
         }
       }
       return true;
     });
-  }, [localEventsSorted, categoryFilter, memberFilter]);
+  }, [localEventsSorted, categoryFilter, memberFilter, toolbarSearch]);
+
+  const displayRange = useMemo(() => {
+    const weekStart = startOfWeekMondayIso(selectedDate);
+    if (viewMode === "week" || viewMode === "plan") {
+      return {
+        start: weekStart,
+        end: endOfWeekSundayIso(weekStart),
+      };
+    }
+    if (viewMode === "day") {
+      return { start: selectedDate, end: selectedDate };
+    }
+    if (viewMode === "month") {
+      const y = monthAnchor.getFullYear();
+      const m = monthAnchor.getMonth() + 1;
+      const start = isoFromYmd(y, m, 1);
+      const end = isoFromYmd(y, m, daysInMonth(y, m));
+      return { start, end };
+    }
+    // list / agenda — expand next ~120 days for weekly + ranges
+    return { start: today, end: addDaysLocal(today, 120) };
+  }, [viewMode, selectedDate, monthAnchor, today]);
+
+  const expandedPlanner = useMemo(
+    () => expandPlannerEventsForRange(filteredPlanner, displayRange.start, displayRange.end),
+    [filteredPlanner, displayRange.start, displayRange.end],
+  );
 
   const eventsByDate = useMemo(() => {
     const m = new Map<string, PlannerEvent[]>();
-    for (const e of filteredPlanner) {
+    for (const e of expandedPlanner) {
       const d = e.date?.trim().slice(0, 10);
       if (!d) continue;
       if (!m.has(d)) m.set(d, []);
@@ -223,14 +381,52 @@ export function CalendarPage({ data, setData }: PageProps) {
       arr.sort((a, b) => compareEventStart(a, b));
     }
     return m;
-  }, [filteredPlanner]);
+  }, [expandedPlanner]);
 
   const upcomingPreview = useMemo(() => {
-    return filteredPlanner.filter((e) => e.date >= today).slice(0, 6);
+    const rows: PlannerEvent[] = [];
+    for (const event of filteredPlanner) {
+      if (!plannerEventIsUpcoming(event, today)) continue;
+      if (event.repeatEnabled && event.repeatRule === "Weekly") {
+        rows.push(...expandWeeklyUpcoming(event, today, 3));
+        continue;
+      }
+      if (event.endDate && event.endDate >= today && event.date < today) {
+        rows.push({ ...event, date: today });
+        continue;
+      }
+      if (event.date >= today || (event.endDate && event.endDate >= today)) {
+        rows.push(event);
+      }
+    }
+    return rows.sort(sortEvents).slice(0, 8);
   }, [filteredPlanner, today]);
+  const schoolStickyEvents = useMemo(() => {
+    return filteredPlanner
+      .filter((event) => isSchoolMarkerEvent(event))
+      .filter((event) => event.date >= today)
+      .slice(0, 6);
+  }, [filteredPlanner, today]);
+  const travelUpcoming = useMemo(() => {
+    return filteredPlanner
+      .filter((event) => isTravelEvent(event) && plannerEventIsUpcoming(event, today))
+      .slice(0, 5);
+  }, [filteredPlanner, today]);
+  const choresDueSoon = useMemo(() => {
+    return (data.tasks ?? [])
+      .filter((task) => {
+        if (!task || task.status === "Done" || task.status === "Completed" || task.status === "Skipped") {
+          return false;
+        }
+        const due = getChoreDueDate(task);
+        if (!due) return false;
+        return due >= today && due <= addDaysIso(today, 7);
+      })
+      .slice(0, 5);
+  }, [data.tasks, today]);
   const todaysEvents = useMemo(
-    () => filteredPlanner.filter((event) => event.date?.slice(0, 10) === today),
-    [filteredPlanner, today],
+    () => expandedPlanner.filter((event) => event.date?.slice(0, 10) === today),
+    [expandedPlanner, today],
   );
   const guidedEventMatches = useMemo(() => {
     const query = guidedSearch.trim().toLowerCase();
@@ -253,6 +449,43 @@ export function CalendarPage({ data, setData }: PageProps) {
       trackCalendarView();
     }
   }, [viewMode]);
+
+  /** First-run empty calendar only — never overwrites existing events. */
+  useEffect(() => {
+    if ((data.planner ?? []).length > 0) return;
+    const result = mergeHouseholdCalendarIntoData(data);
+    if (result.addedCount === 0) return;
+    setData(result.data);
+    setGuidedMessage(
+      `Loaded ${result.addedCount} family calendar dates (school, activities, travel).`,
+    );
+    // Intentional one-shot when planner is empty
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  function loadFamilyCalendarDates() {
+    const result = mergeHouseholdCalendarIntoData(data);
+    setData(result.data);
+    if (result.addedCount === 0) {
+      setGuidedMessage(
+        hasHouseholdCalendarPack(data.planner)
+          ? "Family calendar dates are already loaded — nothing new to add."
+          : "No new family calendar dates to add (duplicates skipped).",
+      );
+      return;
+    }
+    setGuidedMessage(
+      `Added ${result.addedCount} family calendar date${result.addedCount === 1 ? "" : "s"}${
+        result.skippedCount > 0 ? ` (${result.skippedCount} already present)` : ""
+      }.`,
+    );
+  }
+
+  function openPlannerEvent(event: PlannerEvent) {
+    const masterId = masterPlannerId(event.id);
+    const master = data.planner.find((item) => item.id === masterId) ?? event;
+    setEditingEvent({ ...master, id: masterId });
+  }
 
   function openNewActivityDrawer() {
     setEditingEvent(createDraftEvent(data.familyMembers));
@@ -422,39 +655,56 @@ export function CalendarPage({ data, setData }: PageProps) {
 
   const weekStartIso = useMemo(() => startOfWeekMondayIso(selectedDate), [selectedDate]);
 
+  function goApp(href: string) {
+    if (navigateWithinApp) {
+      navigateWithinApp(href);
+      return;
+    }
+    window.location.assign(href);
+  }
+
+  function handleDashboardMode(mode: CalendarDashboardMode) {
+    if (mode === "projects") {
+      goApp("/projects");
+      return;
+    }
+    if (mode === "notes") {
+      goApp("/messages");
+      return;
+    }
+    if (mode === "tasks") {
+      setDashboardMode("tasks");
+      return;
+    }
+    if (mode === "board") {
+      setDashboardMode("board");
+      setViewMode("plan");
+      return;
+    }
+    setDashboardMode("schedule");
+    if (viewMode === "plan") {
+      setViewMode(kioskShell ? "plan" : "month");
+    }
+  }
+
   const headerAction = (
-    <div className="flex w-full flex-col gap-3 lg:w-auto lg:max-w-none lg:flex-row lg:flex-wrap lg:items-center lg:justify-end">
-      <div
-        className="fh-calendar-view-switcher flex w-full flex-wrap gap-1 rounded-[18px] border p-1 sm:w-auto"
-        role="group"
-        aria-label="Calendar view"
-      >
-        {(["plan", "month", "week", "day", "list"] as CalendarViewMode[]).map((mode) => (
-          <button
-            key={mode}
-            type="button"
-            className={cn(
-              "min-h-10 flex-1 rounded-[6px] px-3 py-2 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FE9F43]/45 focus-visible:ring-offset-2 focus-visible:ring-offset-[#f7f7f7] sm:flex-none sm:px-4",
-              viewMode === mode ? segmentActiveLight : segmentInactiveLight,
-            )}
-            onClick={() => setViewMode(mode)}
-          >
-            {VIEW_LABELS[mode]}
-          </button>
-        ))}
-      </div>
-      <div className="flex flex-wrap items-center gap-2">
-        <Button type="button" variant="secondary" className={btnSecondaryLight} onClick={() => setShowFullCalendar(false)}>
-          Kiosk station
-        </Button>
-        <Button type="button" variant="secondary" className={btnSecondaryLight} onClick={goToday}>
-          Today
-        </Button>
-        <Button type="button" variant="primary" className={btnPrimaryOrange} onClick={openNewActivityDrawer}>
-          <Plus className="h-4 w-4" aria-hidden />
-          Add Activity
-        </Button>
-      </div>
+    <div className="fh-calendar-view-switcher flex w-full flex-wrap gap-1 rounded-[14px] border p-1 sm:w-auto">
+      {(["month", "week", "day", "list", "plan"] as CalendarViewMode[]).map((mode) => (
+        <button
+          key={mode}
+          type="button"
+          className={cn(
+            "min-h-9 flex-1 rounded-[10px] px-3 py-1.5 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3b6ef5]/40 sm:flex-none",
+            viewMode === mode ? segmentActiveLight : segmentInactiveLight,
+          )}
+          onClick={() => {
+            setViewMode(mode);
+            setDashboardMode(mode === "plan" ? "board" : "schedule");
+          }}
+        >
+          {VIEW_LABELS[mode]}
+        </button>
+      ))}
     </div>
   );
 
@@ -623,143 +873,268 @@ export function CalendarPage({ data, setData }: PageProps) {
     );
   }
 
+  const upcomingPanel = (
+    <UpcomingPanel
+      sections={[
+        {
+          id: "school",
+          label: "School notes",
+          content:
+            schoolStickyEvents.length > 0 ? (
+              <ul className="fh-sched-upcoming__list">
+                {schoolStickyEvents.map((event) => (
+                  <li key={event.id}>
+                    <StickyNote
+                      title={stickyTitleForEvent(event)}
+                      dateLabel={formatShortDate(event.date)}
+                      reason={noSchoolReason(event)}
+                      variant={stickyVariantForEvent(event)}
+                      onClick={() => openPlannerEvent(event)}
+                    />
+                  </li>
+                ))}
+              </ul>
+            ) : null,
+        },
+        {
+          id: "activities",
+          label: "Upcoming activities",
+          content:
+            upcomingPreview.filter((e) => !isTravelEvent(e) && !schoolStickyEvents.includes(e)).length >
+            0 ? (
+              <ul className="fh-sched-upcoming__list">
+                {upcomingPreview
+                  .filter((e) => !isTravelEvent(e) && !schoolStickyEvents.some((s) => s.id === e.id))
+                  .slice(0, 5)
+                  .map((event) => (
+                    <li key={event.id}>
+                      <ScheduleCard
+                        title={event.title || "Untitled"}
+                        meta={`${formatShortDate(event.date)} · ${formatEventTime(event)}`}
+                        tone={isTravelEvent(event) ? "travel" : "pastel-teal"}
+                        badges={[{ label: event.category || "Activity", tone: "teal" }]}
+                        onClick={() => openPlannerEvent(event)}
+                      />
+                    </li>
+                  ))}
+              </ul>
+            ) : null,
+        },
+        {
+          id: "travel",
+          label: "Travel",
+          content:
+            travelUpcoming.length > 0 ? (
+              <ul className="fh-sched-upcoming__list">
+                {travelUpcoming.map((event) => (
+                  <li key={event.id}>
+                    <ScheduleCard
+                      title={event.title || "Travel"}
+                      meta={`${formatPlannerRangeLabel(event)}${event.location ? ` · ${event.location}` : ""}`}
+                      tone="travel"
+                      tentative={isTentativeEvent(event)}
+                      badges={[
+                        { label: "Travel", tone: "lavender" },
+                        {
+                          label: formatEventMembers(event, data.familyMembers),
+                          tone: "teal",
+                        },
+                      ]}
+                      onClick={() => openPlannerEvent(event)}
+                    />
+                  </li>
+                ))}
+              </ul>
+            ) : null,
+        },
+        {
+          id: "chores",
+          label: "Chores due soon",
+          content:
+            choresDueSoon.length > 0 ? (
+              <ul className="fh-sched-upcoming__list">
+                {choresDueSoon.map((task) => (
+                  <li key={task.id}>
+                    <ScheduleCard
+                      title={task.title || "Chore"}
+                      meta={`Due ${formatShortDate(getChoreDueDate(task))}`}
+                      tone="pastel-green"
+                      badges={[{ label: "Chore", tone: "green" }]}
+                      onClick={() => goApp("/tasks")}
+                    />
+                  </li>
+                ))}
+              </ul>
+            ) : null,
+        },
+      ]}
+      emptyText="No upcoming school notes, activities, travel, or chores yet."
+      headerAction={
+        notificationCount > 0 ? (
+          <button
+            type="button"
+            className="fh-sched-btn fh-sched-btn--ghost"
+            onClick={() => goApp("/notifications")}
+            aria-label={`${notificationCount} notifications`}
+          >
+            <Bell className="h-4 w-4" aria-hidden />
+            <SoftStatusBadge tone="rose">{notificationCount}</SoftStatusBadge>
+          </button>
+        ) : null
+      }
+    />
+  );
+
   return (
     <div className={PAGE_BG}>
       <WorkspacePageShell
         className={cn(
-          "motion-page flex flex-col gap-4 overflow-x-hidden px-[15px] pb-10 pt-0 sm:gap-5 sm:px-[30px] md:pb-10",
+          "motion-page flex flex-col gap-3 overflow-x-hidden px-[15px] pb-10 pt-3 sm:gap-4 sm:px-[24px] md:pb-10",
           DS_MAIN_COLUMN,
         )}
-        tone="premiumDark"
+        tone="light"
       >
-        <header className={cn(CARD_SHELL, "p-5 sm:p-6")}>
-          <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-            <div className="flex min-w-0 gap-3">
-              <div
-                className="h-14 w-1 shrink-0 rounded-full bg-gradient-to-b from-[#FF6F28] to-[#FF5325]"
-                aria-hidden
-              />
-              <div className="min-w-0">
-                <p className={SM_LABEL}>Household</p>
-                <h1 className="mt-1 text-[22px] font-semibold leading-snug tracking-tight text-[#f7fbff]">
-                  Calendar
-                </h1>
-                <p className="mt-1 max-w-xl text-[14px] leading-relaxed text-[#a4b0ca]">
-                  Chores, pantry reminders, member schedules, and household events — no meal planning.
-                </p>
-              </div>
-            </div>
-            {headerAction}
-          </div>
-        </header>
+        <SegmentedModeBar
+          options={DASHBOARD_MODES}
+          value={dashboardMode}
+          onChange={handleDashboardMode}
+          aria-label="Calendar workspace modes"
+        />
 
-        <div className="grid gap-4 lg:grid-cols-[minmax(260px,320px)_minmax(0,1fr)] xl:gap-6">
-        {viewMode !== "plan" ? (
-        <aside className="flex min-w-0 flex-col gap-4">
-          <Card className={CARD_CALENDAR} tone="premiumDark">
-            <CardHeader eyebrow="Activities" title="Upcoming Activities" tone="premiumDark" />
-            <p className="mb-3 text-sm text-[#a4b0ca]">
-              Choose an activity to edit, or use Quick add for something new.
-            </p>
-            <div className="space-y-2">
-              {upcomingPreview.length === 0 ? (
-                <p className="fh-calendar-empty rounded-[16px] border px-3 py-4 text-center text-sm">
-                  No upcoming activities.
-                </p>
-              ) : (
-                upcomingPreview.map((event) => (
-                  <UpcomingActivityRow
-                    key={event.id}
-                    event={event}
-                    members={data.familyMembers}
-                    onOpen={() => setEditingEvent(event)}
-                  />
-                ))
-              )}
-            </div>
-            <Button
-              className={cn("mt-4 w-full", btnPrimaryOrange)}
-              type="button"
-              variant="primary"
-              onClick={openNewActivityDrawer}
-            >
+        <div className="fh-sched-toolbar" role="toolbar" aria-label="Calendar toolbar">
+          <div className="fh-sched-toolbar__group">
+            <button type="button" className="fh-sched-btn fh-sched-btn--primary" onClick={openNewActivityDrawer}>
               <Plus className="h-4 w-4" aria-hidden />
-              Quick add
-            </Button>
-          </Card>
-
-          <Card className={CARD_CALENDAR} tone="premiumDark">
-            <CardHeader eyebrow="Filter" title="Activity types" tone="premiumDark" />
-            <div className="flex flex-wrap gap-2">
-              {ACTIVITY_TYPE_CHIPS.map((chip) => (
-                <button
-                  key={chip.label}
-                  type="button"
-                  className={cn(
-                    "fh-calendar-filter-chip min-h-9 rounded-full border px-3 py-1.5 text-xs font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4fb7ff]/40",
-                    categoryFilter === chip.category
-                      ? "fh-calendar-filter-chip--active"
-                      : "fh-calendar-filter-chip--idle",
-                  )}
-                  onClick={() =>
-                    setCategoryFilter(chip.category === "all" ? "all" : chip.category)
-                  }
-                >
-                  {chip.label}
-                </button>
-              ))}
-            </div>
-          </Card>
-
-          <Card className={CARD_CALENDAR} tone="premiumDark">
-            <CardHeader eyebrow="Household" title="Assigned to" tone="premiumDark" />
-            <Select
-              value={memberFilter}
-              onChange={(e) =>
-                setMemberFilter(e.target.value === "all" ? "all" : e.target.value)
-              }
-              className={cn("min-h-11", SM_INPUT)}
+              Add activity
+            </button>
+            <button type="button" className="fh-sched-btn" onClick={goToday}>
+              Today
+            </button>
+          </div>
+          <label className="fh-sched-search">
+            <Search className="h-4 w-4 shrink-0 text-slate-400" aria-hidden />
+            <input
+              type="search"
+              value={toolbarSearch}
+              onChange={(e) => setToolbarSearch(e.target.value)}
+              placeholder="Find activity"
+              aria-label="Find activity"
+            />
+          </label>
+          <div className="fh-sched-toolbar__group">
+            <button
+              type="button"
+              className="fh-sched-btn"
+              aria-pressed={memberFilter !== "all"}
+              onClick={() => setMemberFilter(memberFilter === "all" ? (activeMembers[0]?.id ?? "all") : "all")}
             >
-              <option value="all">Everyone</option>
-              {data.familyMembers
-                .filter((m) => m.status === "active")
-                .map((m) => (
-                  <option key={m.id} value={m.id}>
-                    {getMemberFullName(m)}
-                  </option>
-                ))}
-            </Select>
-          </Card>
-        </aside>
+              <Users className="h-4 w-4" aria-hidden />
+              Group by family member
+            </button>
+            <button
+              type="button"
+              className="fh-sched-btn"
+              aria-pressed={showFilters}
+              onClick={() => setShowFilters((v) => !v)}
+            >
+              <Filter className="h-4 w-4" aria-hidden />
+              Filter
+            </button>
+          </div>
+          <div className="fh-sched-toolbar__spacer" />
+          <FamilyAvatarStack
+            members={activeMembers}
+            selectedId={memberFilter}
+            onSelect={(id) => setMemberFilter(id)}
+          />
+          {notificationCount > 0 ? (
+            <button
+              type="button"
+              className="fh-sched-btn"
+              onClick={() => goApp("/notifications")}
+              aria-label={`${notificationCount} notifications`}
+            >
+              <Bell className="h-4 w-4" aria-hidden />
+              <SoftStatusBadge tone="rose">{notificationCount}</SoftStatusBadge>
+            </button>
+          ) : null}
+            <button type="button" className="fh-sched-btn" onClick={loadFamilyCalendarDates}>
+              Load family calendar dates
+            </button>
+            <button type="button" className="fh-sched-btn fh-sched-btn--ghost" onClick={() => setShowFullCalendar(false)}>
+              Station
+            </button>
+        </div>
+
+        {showFilters ? (
+          <div className={cn(CARD_SHELL, "flex flex-wrap gap-2 p-3")}>
+            {ACTIVITY_TYPE_CHIPS.map((chip) => (
+              <button
+                key={chip.label}
+                type="button"
+                className={cn(
+                  "fh-calendar-filter-chip min-h-9 rounded-full border px-3 py-1.5 text-xs font-semibold transition",
+                  categoryFilter === chip.category
+                    ? "fh-calendar-filter-chip--active"
+                    : "fh-calendar-filter-chip--idle",
+                )}
+                onClick={() => setCategoryFilter(chip.category === "all" ? "all" : chip.category)}
+              >
+                {chip.label}
+              </button>
+            ))}
+          </div>
         ) : null}
 
-        <main className={cn("min-w-0 space-y-4", viewMode === "plan" && "lg:col-span-full")}>
-          {viewMode === "plan" ? (
-            <WidgetPageShell className="!min-h-0 !p-0 !bg-transparent lg:col-span-full">
-              {kioskShell ? (
-                <KioskPageTitle
-                  eyebrow="Household planning"
-                  title="Weekly board"
-                  description="Drag chores and events, filter by member, and clear pantry reminders."
-                />
+        {dashboardMode === "tasks" ? (
+          <div className="fh-sched-placeholder">
+            <strong>Task List</strong>
+            <p>
+              Household chores and tasks live in Cleaning / Kitchen. Open the task list to manage
+              what’s due today, overdue, and this week.
+            </p>
+            <button type="button" className="fh-sched-btn fh-sched-btn--primary" onClick={() => goApp("/tasks")}>
+              Open Task List
+            </button>
+          </div>
+        ) : null}
+
+        {dashboardMode === "board" || (dashboardMode === "schedule" && viewMode === "plan") ? (
+          <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_minmax(260px,300px)]">
+            <main className="fh-sched-workspace min-w-0">
+              <div className="fh-sched-workspace__head">
+                <h2 className="fh-sched-workspace__title">Household Board</h2>
+                {headerAction}
+              </div>
+              {dashboardMode === "board" && viewMode !== "plan" ? (
+                <div className="fh-sched-placeholder mb-4">
+                  <strong>Kanban-style chore board</strong>
+                  <p>
+                    A full household kanban is planned for Cleaning. Use the weekly planning board
+                    below for now, or open Cleaning for chore workflows.
+                  </p>
+                  <button type="button" className="fh-sched-btn" onClick={() => goApp("/tasks")}>
+                    Open Cleaning / Chores
+                  </button>
+                </div>
               ) : null}
-              <div className="fh-calendar-week-nav flex items-center justify-between gap-3 rounded-[24px] border px-4 py-3">
+              <div className="fh-calendar-week-nav mb-3 flex items-center justify-between gap-3 rounded-[14px] border px-3 py-2">
                 <Button
                   type="button"
                   variant="secondary"
-                  className={cn(btnSecondaryLight, "min-h-10 px-2")}
+                  className={cn(btnSecondaryLight, "min-h-9 px-2")}
                   onClick={navPrev}
                   aria-label="Previous week"
                 >
                   <ChevronLeft className="h-5 w-5" />
                 </Button>
-                <p className="text-center text-sm font-bold text-[#f7fbff] sm:text-base">
+                <p className="text-center text-sm font-bold text-slate-800 sm:text-base">
                   {formatShortDate(weekStartIso)} – {formatShortDate(endOfWeekSundayIso(weekStartIso))}
                 </p>
                 <Button
                   type="button"
                   variant="secondary"
-                  className={cn(btnSecondaryLight, "min-h-10 px-2")}
+                  className={cn(btnSecondaryLight, "min-h-9 px-2")}
                   onClick={navNext}
                   aria-label="Next week"
                 >
@@ -771,251 +1146,232 @@ export function CalendarPage({ data, setData }: PageProps) {
                 setData={setData}
                 todayIso={today}
                 weekStartIso={weekStartIso}
-                onEditEvent={setEditingEvent}
+                onEditEvent={openPlannerEvent}
                 onAddEvent={openNewActivityDrawer}
               />
-            </WidgetPageShell>
-          ) : null}
-          {viewMode !== "plan" ? (
-          <Card className={cn("fh-calendar-board-card overflow-hidden", CARD_CALENDAR)} tone="premiumDark">
-            <div className="fh-calendar-board-head mb-4 flex flex-col gap-3 border-b pb-4 sm:flex-row sm:items-center sm:justify-between">
-              <div className="flex items-center gap-2">
-                {viewMode === "list" ? (
-                  <div className="min-h-10 w-10 shrink-0" aria-hidden />
-                ) : (
-                  <Button
-                    type="button"
-                    variant="secondary"
-                    className={cn(btnSecondaryLight, "min-h-10 px-2")}
-                    onClick={navPrev}
-                    aria-label={
-                      viewMode === "month"
-                        ? "Previous month"
-                        : viewMode === "week"
-                          ? "Previous week"
-                          : "Previous day"
-                    }
-                  >
-                    <ChevronLeft className="h-5 w-5" />
-                  </Button>
-                )}
-                <h2 className="min-w-0 flex-1 text-center text-lg font-semibold text-[#f7fbff] sm:text-xl">
-                  {viewMode === "month" && monthYearLabel(monthAnchor)}
-                  {viewMode === "week" &&
-                    `${formatShortDate(weekStartIso)} – ${formatShortDate(endOfWeekSundayIso(weekStartIso))}`}
-                  {viewMode === "day" &&
-                    new Intl.DateTimeFormat(undefined, {
-                      weekday: "long",
-                      month: "long",
-                      day: "numeric",
-                      year: "numeric",
-                    }).format(new Date(`${selectedDate}T12:00:00`))}
-                  {viewMode === "list" && "Agenda"}
-                </h2>
-                {viewMode === "list" ? (
-                  <div className="min-h-10 w-10 shrink-0" aria-hidden />
-                ) : (
-                  <Button
-                    type="button"
-                    variant="secondary"
-                    className={cn(btnSecondaryLight, "min-h-10 px-2")}
-                    onClick={navNext}
-                    aria-label={
-                      viewMode === "week"
-                        ? "Next week"
-                        : viewMode === "month"
-                          ? "Next month"
-                          : "Next day"
-                    }
-                  >
-                    <ChevronRight className="h-5 w-5" />
-                  </Button>
-                )}
-              </div>
-            </div>
+            </main>
+            {upcomingPanel}
+          </div>
+        ) : null}
 
-            {viewMode === "month" ? (
-              <CalendarMonthGrid
-                eventsByDate={eventsByDate}
-                monthAnchor={monthAnchor}
-                selectedIso={selectedDate}
-                todayIso={today}
-                onPickDay={(iso) => {
-                  setSelectedDate(iso);
-                  setMonthAnchor(new Date(`${iso}T12:00:00`));
-                }}
-                onEdit={(ev) => setEditingEvent(ev)}
-              />
-            ) : null}
-            {viewMode === "week" ? (
-              <CalendarWeekColumns
-                eventsByDate={eventsByDate}
-                weekStartIso={weekStartIso}
-                todayIso={today}
-                onEdit={(ev) => setEditingEvent(ev)}
-                onSelectDay={setSelectedDate}
-              />
-            ) : null}
-            {viewMode === "day" ? (
-              <CalendarDayPanel
-                dateIso={selectedDate}
-                events={eventsByDate.get(selectedDate) ?? []}
-                members={data.familyMembers}
-                todayIso={today}
-                onAdd={openNewActivityDrawer}
-                onEdit={(ev) => setEditingEvent(ev)}
-              />
-            ) : null}
-            {viewMode === "list" ? (
-              <CalendarListAgenda
-                members={data.familyMembers}
-                todayIso={today}
-                events={filteredPlanner}
-                onEdit={(ev) => setEditingEvent(ev)}
-                onAdd={openNewActivityDrawer}
-              />
-            ) : null}
-          </Card>
-          ) : null}
-
-          {viewMode !== "plan" ? (
-          <details
-            className="fh-calendar-linked-card group rounded-[24px] border shadow-[0_18px_44px_rgba(0,0,0,0.3)]"
-            open={showLinkedCalendars}
-            onToggle={(e) => setShowLinkedCalendars((e.target as HTMLDetailsElement).open)}
-          >
-            <summary className="cursor-pointer list-none px-4 py-4 sm:px-5">
-              <div className="flex items-center justify-between gap-3">
-                <div>
-                  <p className={SM_LABEL}>Google Calendar</p>
-                  <p className="mt-1 text-base font-semibold text-[#f7fbff]">Linked calendars</p>
-                  <p className="mt-1 text-sm text-[#a4b0ca]">
-                    Optional embed or link — your local activities stay in FamilySite.
-                  </p>
+        {dashboardMode === "schedule" && viewMode !== "plan" ? (
+          <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_minmax(260px,300px)]">
+            <main className="fh-sched-workspace min-w-0 space-y-4">
+              {guidedMessage ? (
+                <div className="flex flex-wrap items-center justify-between gap-2 rounded-[14px] border border-teal-200 bg-teal-50 px-3 py-2 text-sm font-semibold text-teal-900">
+                  <p>{guidedMessage}</p>
+                  <button type="button" className="fh-sched-btn" onClick={() => setGuidedMessage(null)}>
+                    Dismiss
+                  </button>
                 </div>
-                <CalendarDays className="h-6 w-6 shrink-0 text-[#a4b0ca] group-open:text-[#20e6a2]" />
+              ) : null}
+              <div className="fh-sched-workspace__head">
+                <div>
+                  <p className={SM_LABEL}>FamilyHub</p>
+                  <h2 className="fh-sched-workspace__title">Schedule Planner</h2>
+                </div>
+                {headerAction}
               </div>
-            </summary>
-            <div className="border-t border-[rgba(150,170,210,0.14)] px-4 py-4 sm:px-5 sm:py-6">
-              <div className="grid gap-4 xl:grid-cols-[1fr_0.95fr]">
-                <Card className={CARD_CALENDAR} tone="premiumDark">
-                  <CardHeader
-                    action={
+
+              <Card className={cn("fh-calendar-board-card overflow-hidden", CARD_CALENDAR)} tone="light">
+                <div className="fh-calendar-board-head mb-4 flex flex-col gap-3 border-b pb-4 sm:flex-row sm:items-center sm:justify-between">
+                  <div className="flex items-center gap-2">
+                    {viewMode === "list" ? (
+                      <div className="min-h-10 w-10 shrink-0" aria-hidden />
+                    ) : (
                       <Button
-                        className={cn(btnPrimaryOrange, "min-h-10")}
                         type="button"
-                        variant="primary"
-                        onClick={addCalendarLink}
+                        variant="secondary"
+                        className={cn(btnSecondaryLight, "min-h-10 px-2")}
+                        onClick={navPrev}
+                        aria-label={
+                          viewMode === "month"
+                            ? "Previous month"
+                            : viewMode === "week"
+                              ? "Previous week"
+                              : "Previous day"
+                        }
                       >
-                        <Plus className="h-4 w-4" />
-                        Add link
+                        <ChevronLeft className="h-5 w-5" />
                       </Button>
-                    }
-                    eyebrow="Saved links"
-                    title="Calendar URLs"
-                    tone="premiumDark"
+                    )}
+                    <h2 className="min-w-0 flex-1 text-center text-lg font-semibold text-slate-900 sm:text-xl">
+                      {viewMode === "month" && monthYearLabel(monthAnchor)}
+                      {viewMode === "week" &&
+                        `${formatShortDate(weekStartIso)} – ${formatShortDate(endOfWeekSundayIso(weekStartIso))}`}
+                      {viewMode === "day" &&
+                        new Intl.DateTimeFormat(undefined, {
+                          weekday: "long",
+                          month: "long",
+                          day: "numeric",
+                          year: "numeric",
+                        }).format(new Date(`${selectedDate}T12:00:00`))}
+                      {viewMode === "list" && "Agenda"}
+                    </h2>
+                    {viewMode === "list" ? (
+                      <div className="min-h-10 w-10 shrink-0" aria-hidden />
+                    ) : (
+                      <Button
+                        type="button"
+                        variant="secondary"
+                        className={cn(btnSecondaryLight, "min-h-10 px-2")}
+                        onClick={navNext}
+                        aria-label={
+                          viewMode === "week"
+                            ? "Next week"
+                            : viewMode === "month"
+                              ? "Next month"
+                              : "Next day"
+                        }
+                      >
+                        <ChevronRight className="h-5 w-5" />
+                      </Button>
+                    )}
+                  </div>
+                </div>
+
+                {viewMode === "month" ? (
+                  <CalendarMonthGrid
+                    eventsByDate={eventsByDate}
+                    monthAnchor={monthAnchor}
+                    selectedIso={selectedDate}
+                    todayIso={today}
+                    onPickDay={(iso) => {
+                      setSelectedDate(iso);
+                      setMonthAnchor(new Date(`${iso}T12:00:00`));
+                    }}
+                    onEdit={openPlannerEvent}
                   />
-                  <div className="space-y-3">
-                    {data.calendarLinks.length === 0 ? (
-                      <EmptyStatePanel
+                ) : null}
+                {viewMode === "week" ? (
+                  <CalendarWeekColumns
+                    eventsByDate={eventsByDate}
+                    weekStartIso={weekStartIso}
+                    todayIso={today}
+                    onEdit={openPlannerEvent}
+                    onSelectDay={setSelectedDate}
+                  />
+                ) : null}
+                {viewMode === "day" ? (
+                  <CalendarDayPanel
+                    dateIso={selectedDate}
+                    events={eventsByDate.get(selectedDate) ?? []}
+                    members={data.familyMembers}
+                    todayIso={today}
+                    onAdd={openNewActivityDrawer}
+                    onEdit={openPlannerEvent}
+                  />
+                ) : null}
+                {viewMode === "list" ? (
+                  <CalendarListAgenda
+                    members={data.familyMembers}
+                    todayIso={today}
+                    events={expandedPlanner.filter((e) => e.date >= today).slice(0, 80)}
+                    onEdit={openPlannerEvent}
+                    onAdd={openNewActivityDrawer}
+                  />
+                ) : null}
+              </Card>
+
+              <details
+                className="fh-calendar-linked-card group rounded-[18px] border"
+                open={showLinkedCalendars}
+                onToggle={(e) => setShowLinkedCalendars((e.target as HTMLDetailsElement).open)}
+              >
+                <summary className="cursor-pointer list-none px-4 py-4 sm:px-5">
+                  <div className="flex items-center justify-between gap-3">
+                    <div>
+                      <p className={SM_LABEL}>Google Calendar</p>
+                      <p className="mt-1 text-base font-semibold text-slate-900">Linked calendars</p>
+                      <p className="mt-1 text-sm text-slate-500">
+                        Optional embed — local activities stay in FamilyHub.
+                      </p>
+                    </div>
+                    <CalendarDays className="h-6 w-6 shrink-0 text-slate-400 group-open:text-teal-600" />
+                  </div>
+                </summary>
+                <div className="border-t border-slate-200 px-4 py-4 sm:px-5 sm:py-6">
+                  <div className="grid gap-4 xl:grid-cols-[1fr_0.95fr]">
+                    <Card className={CARD_CALENDAR} tone="light">
+                      <CardHeader
                         action={
                           <Button
-                            className={btnPrimaryOrange}
+                            className={cn(btnPrimaryOrange, "min-h-10")}
                             type="button"
                             variant="primary"
                             onClick={addCalendarLink}
                           >
                             <Plus className="h-4 w-4" />
-                            Add calendar link
+                            Add link
                           </Button>
                         }
-                        text="Add a share link or Google Calendar embed."
-                        title="No linked calendars"
+                        eyebrow="Saved links"
+                        title="Calendar URLs"
                         tone="light"
                       />
-                    ) : null}
-                    {data.calendarLinks.map((calendar) => (
-                      <CalendarLinkEditorDark
-                        calendar={calendar}
-                        key={calendar.id}
-                        onRemove={() => removeCalendarLink(calendar.id)}
-                        onUpdate={(updates) => updateCalendarLink(calendar.id, updates)}
-                      />
-                    ))}
+                      <div className="space-y-3">
+                        {data.calendarLinks.length === 0 ? (
+                          <EmptyStatePanel
+                            action={
+                              <Button
+                                className={btnPrimaryOrange}
+                                type="button"
+                                variant="primary"
+                                onClick={addCalendarLink}
+                              >
+                                <Plus className="h-4 w-4" />
+                                Add calendar link
+                              </Button>
+                            }
+                            text="Add a share link or Google Calendar embed."
+                            title="No linked calendars"
+                            tone="light"
+                          />
+                        ) : null}
+                        {data.calendarLinks.map((calendar) => (
+                          <CalendarLinkEditorDark
+                            calendar={calendar}
+                            key={calendar.id}
+                            onRemove={() => removeCalendarLink(calendar.id)}
+                            onUpdate={(updates) => updateCalendarLink(calendar.id, updates)}
+                          />
+                        ))}
+                      </div>
+                    </Card>
+                    <Card className={CARD_CALENDAR} tone="light">
+                      <CardHeader eyebrow="Preview" title="Embed" tone="light" />
+                      {primaryCalendar ? (
+                        <CalendarPreviewDark calendar={primaryCalendar} />
+                      ) : (
+                        <EmptyStatePanel
+                          action={
+                            <Button
+                              className={btnSecondaryLight}
+                              type="button"
+                              variant="secondary"
+                              onClick={addCalendarLink}
+                            >
+                              <Plus className="h-4 w-4" />
+                              Add calendar link
+                            </Button>
+                          }
+                          text="Add an embed-safe Google Calendar URL to preview here."
+                          title="Nothing to preview"
+                          tone="light"
+                        />
+                      )}
+                    </Card>
                   </div>
-                </Card>
-                <Card className={CARD_CALENDAR} tone="premiumDark">
-                  <CardHeader eyebrow="Preview" title="Embed" tone="premiumDark" />
-                  {primaryCalendar ? (
-                    <CalendarPreviewDark calendar={primaryCalendar} />
-                  ) : (
-                    <EmptyStatePanel
-                      action={
-                        <Button
-                          className={btnSecondaryLight}
-                          type="button"
-                          variant="secondary"
-                          onClick={addCalendarLink}
-                        >
-                          <Plus className="h-4 w-4" />
-                          Add calendar link
-                        </Button>
-                      }
-                      text="Add an embed-safe Google Calendar URL to preview here."
-                      title="Nothing to preview"
-                      tone="light"
-                    />
-                  )}
-                  <p className="mt-4 text-sm leading-6 text-[#a4b0ca]">
-                    Managed in Google Calendar. Updates there appear in this view.
-                  </p>
-                </Card>
-              </div>
-            </div>
-          </details>
-          ) : null}
-        </main>
-      </div>
+                </div>
+              </details>
+            </main>
+            {upcomingPanel}
+          </div>
+        ) : null}
 
-      {activityDrawer}
+        {activityDrawer}
       </WorkspacePageShell>
     </div>
-  );
-}
-
-function UpcomingActivityRow({
-  event,
-  members,
-  onOpen,
-}: {
-  event: PlannerEvent;
-  members: FamilyMember[];
-  onOpen: () => void;
-}) {
-  const v = getActivityCategoryVisualForEvent(event);
-  const fresh = getPlannerEventFreshnessBadge(event);
-  return (
-    <button
-      type="button"
-      className={cn(
-        "fh-calendar-event-row w-full rounded-[16px] border px-3 py-2.5 text-left shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4fb7ff]/45",
-        v.block,
-      )}
-      onClick={onOpen}
-    >
-      <div className="flex items-start justify-between gap-2">
-        <p className="line-clamp-2 text-sm font-semibold leading-snug">{event.title || "Untitled"}</p>
-        {fresh ? (
-          <span className="fh-calendar-badge shrink-0 rounded border px-1.5 py-0.5 text-[0.6rem] font-bold uppercase tracking-wide">
-            {fresh}
-          </span>
-        ) : null}
-      </div>
-      <p className="mt-1 text-[0.7rem] text-[#a4b0ca]">
-        {formatShortDate(event.date)} · {formatEventTime(event)}
-      </p>
-      <p className="mt-0.5 text-[0.7rem] text-[#c6d4ef]">{formatEventMembers(event, members)}</p>
-    </button>
   );
 }
 
@@ -1096,6 +1452,28 @@ function CalendarMonthGrid({
               </button>
               <div className="flex min-h-0 flex-1 flex-col gap-0.5 overflow-hidden">
                 {show.map((ev) => {
+                  if (isSchoolMarkerEvent(ev)) {
+                    return (
+                      <button
+                        key={ev.id}
+                        type="button"
+                        title={`${stickyTitleForEvent(ev)} — ${noSchoolReason(ev)}`}
+                        className={cn(
+                          "fh-sticky truncate !min-h-0 !rotate-0 px-1.5 py-1 text-left text-[0.6rem] font-bold leading-tight",
+                          `fh-sticky--${stickyVariantForEvent(ev)}`,
+                        )}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onEdit(ev);
+                        }}
+                      >
+                        <span className="block truncate">{stickyTitleForEvent(ev)}</span>
+                        <span className="fh-sticky__reason !mt-0.5 !border-0 !pt-0 !normal-case opacity-90">
+                          {noSchoolReason(ev)}
+                        </span>
+                      </button>
+                    );
+                  }
                   const vis = getActivityCategoryVisualForEvent(ev);
                   return (
                     <button
@@ -1103,20 +1481,23 @@ function CalendarMonthGrid({
                       type="button"
                       title={ev.title}
                       className={cn(
-                        "fh-calendar-mini-event truncate rounded-[10px] px-2 py-1 text-left text-[0.65rem] font-semibold leading-tight transition hover:opacity-90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#4fb7ff]/50",
+                        "fh-calendar-mini-event truncate rounded-[10px] px-2 py-1 text-left text-[0.65rem] font-semibold leading-tight transition hover:opacity-90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#3b6ef5]/50",
                         vis.block,
+                        isTentativeEvent(ev) && "fh-sched-card--tentative",
+                        isTravelEvent(ev) && "fh-sched-card--travel",
                       )}
                       onClick={(e) => {
                         e.stopPropagation();
                         onEdit(ev);
                       }}
                     >
+                      {isTentativeEvent(ev) ? "Tentative · " : ""}
                       {ev.title || "Untitled"}
                     </button>
                   );
                 })}
                 {more > 0 ? (
-                  <p className="px-1 text-[0.6rem] font-medium text-[#a4b0ca]">+{more} more</p>
+                  <p className="px-1 text-[0.6rem] font-medium text-slate-500">+{more} more</p>
                 ) : null}
               </div>
             </div>
@@ -1181,12 +1562,20 @@ function CalendarWeekColumns({
                         key={ev.id}
                         type="button"
                         className={cn(
-                          "fh-calendar-week-event rounded-[14px] border px-2 py-1.5 text-left text-[0.7rem] font-semibold leading-snug shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] transition hover:opacity-95 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#4fb7ff]/50",
+                          "fh-calendar-week-event rounded-[14px] border px-2 py-1.5 text-left text-[0.7rem] font-semibold leading-snug transition hover:opacity-95 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#3b6ef5]/50",
                           vis.block,
+                          isTentativeEvent(ev) && "fh-sched-card--tentative",
+                          isTravelEvent(ev) && "fh-sched-card--travel",
+                          isSchoolMarkerEvent(ev) &&
+                            `fh-sticky !min-h-0 !rotate-0 fh-sticky--${stickyVariantForEvent(ev)}`,
                         )}
                         onClick={() => onEdit(ev)}
                       >
-                        <span className="line-clamp-2">{ev.title || "Untitled"}</span>
+                        <span className="line-clamp-2">
+                          {isSchoolMarkerEvent(ev)
+                            ? `${stickyTitleForEvent(ev)} · ${noSchoolReason(ev)}`
+                            : `${isTentativeEvent(ev) ? "Tentative · " : ""}${ev.title || "Untitled"}`}
+                        </span>
                         <span className="mt-0.5 block text-[0.65rem] opacity-80">
                           {formatEventTime(ev)}
                         </span>
@@ -1250,14 +1639,21 @@ function CalendarDayPanel({
             key={ev.id}
             type="button"
             className={cn(
-              "fh-calendar-day-event flex w-full flex-col rounded-[18px] border px-4 py-3 text-left shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4fb7ff]/40",
+              "fh-calendar-day-event flex w-full flex-col rounded-[18px] border px-4 py-3 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3b6ef5]/40",
               vis.block,
+              isTentativeEvent(ev) && "fh-sched-card--tentative",
+              isTravelEvent(ev) && "fh-sched-card--travel",
             )}
             onClick={() => onEdit(ev)}
           >
             <div className="flex flex-wrap items-start justify-between gap-2">
-              <span className="font-semibold">{ev.title || "Untitled"}</span>
-              {fresh ? (
+              <span className="font-semibold">
+                {isTentativeEvent(ev) ? "Tentative · " : ""}
+                {ev.title || "Untitled"}
+              </span>
+              {isTentativeEvent(ev) ? (
+                <span className="fh-soft-badge fh-soft-badge--tentative">Tentative</span>
+              ) : fresh ? (
                 <span className="fh-calendar-badge rounded border px-2 py-0.5 text-[0.65rem] font-bold uppercase tracking-wide">
                   {fresh}
                 </span>
@@ -1918,6 +2314,8 @@ function createDraftEvent(members: FamilyMember[]): PlannerEvent {
     repeatRule: undefined,
     location: "",
     notes: "",
+    tags: [],
+    isTentative: false,
     prepChecklist: [],
     reminderSettings: [],
     createdAt: now,
@@ -1939,6 +2337,11 @@ function normalizeEventForSave(event: PlannerEvent, members: FamilyMember[]): Pl
     time: startTime,
     startTime,
     endTime: event.isAllDay ? "" : event.endTime,
+    endDate: event.endDate?.trim() || undefined,
+    tags: event.tags ?? [],
+    isTentative: Boolean(event.isTentative),
+    noSchoolReason: event.noSchoolReason,
+    stickyColor: event.stickyColor,
     repeatRule: event.repeatEnabled ? event.repeatRule : undefined,
     updatedAt: new Date().toISOString(),
     createdAt: event.createdAt || new Date().toISOString(),

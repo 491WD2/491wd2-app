@@ -6,34 +6,41 @@
 
 /** Canonical hex — documentation, CSS, and parity checks for class literals below. */
 export const SMARTHR_UI_COLORS = {
-  primary: "#F26522",
-  primaryGradientStart: "#FF6F28",
-  primaryGradientEnd: "#FF5325",
-  primaryTransparent: "#FEF1EB",
-  accent: "#FE9F43",
-  accentSoftBg: "rgba(254, 159, 67, 0.2)",
-  border: "#E5E7EB",
+  primary: "#2F9E5B",
+  primaryGradientStart: "#2F9E5B",
+  primaryGradientEnd: "#248A4C",
+  primaryTransparent: "#E8F7EE",
+  accent: "#2F9E5B",
+  accentSoftBg: "rgba(47, 158, 91, 0.16)",
+  border: "#E2E8E6",
   /** Template `gray-300` — hover edge on bordered chips */
-  borderHover: "#D1D5DB",
+  borderHover: "#CBD5D1",
   /** Template `bg-dark-transparent` — menubar / sidebar row hover */
   menubarHoverWash: "#E8E9EA",
   /** Legacy gray-200; prefer `border` for new work */
   borderLegacy: "#ededed",
-  pageBg: "#f7f7f7",
-  lightBg: "#F8F9FA",
+  pageBg: "#F5F7F6",
+  lightBg: "#F8FAF9",
   lightHover: "#f3f4f6",
   cardBg: "#ffffff",
-  text: "#1f1f1f",
-  textBody: "#575757",
-  textMuted: "#6B7280",
+  /** Near slate-900 — primary copy on pastel shells */
+  text: "#14201B",
+  /** slate-700 — body / secondary */
+  textBody: "#4B5C55",
+  /** slate-600 — muted/helper (still readable on white) */
+  textMuted: "#6B7C74",
   /** Sidebar icon / caption — aligns with `--fs-text-muted` fallback */
-  textMutedSidebar: "#637381",
-  textNav: "#4B5563",
-  textGroupLabel: "#94a3b8",
+  textMutedSidebar: "#6B7C74",
+  /** Inactive nav — slate-700 */
+  textNav: "#334155",
+  /** Section group labels — slate-500 (not lighter) */
+  textGroupLabel: "#64748b",
   /** Overdue chore rail / emphasis */
   choreOverdue: "#d97706",
-  placeholder: "#6B7280",
-  labelUpper: "#637381",
+  /** Placeholders — slate-500 */
+  placeholder: "#64748b",
+  /** Uppercase form/section labels */
+  labelUpper: "#334155",
   /** Sheet / drawer chrome on dark shell */
   sheetDarkBg: "#1c2028",
 } as const;
@@ -44,19 +51,19 @@ function cnClasses(...parts: string[]): string {
 
 /** Inline gradient only (pair with borders / text colors in callers) */
 export const SMARTHR_GRADIENT_PRIMARY_INLINE =
-  "bg-gradient-to-r from-[#FF6F28] to-[#FF5325]";
+  "bg-gradient-to-r from-[#2F9E5B] to-[#248A4C]";
 
 export const SMARTHR_FOCUS_RING =
-  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FE9F43]/45 focus-visible:ring-offset-2 focus-visible:ring-offset-[#f7f7f7]";
+  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2F9E5B]/45 focus-visible:ring-offset-2 focus-visible:ring-offset-[#F5F7F6]";
 
-export const SMARTHR_FOCUS_RING_ACCENT_40 = "focus-visible:ring-[#FE9F43]/40";
-export const SMARTHR_FOCUS_RING_ACCENT_45 = "focus-visible:ring-[#FE9F43]/45";
-export const SMARTHR_FOCUS_RING_ACCENT_50 = "focus-visible:ring-[#FE9F43]/50";
-export const SMARTHR_FOCUS_RING_ACCENT_INSET_55 = "focus-visible:ring-[#FE9F43]/55";
+export const SMARTHR_FOCUS_RING_ACCENT_40 = "focus-visible:ring-[#2F9E5B]/40";
+export const SMARTHR_FOCUS_RING_ACCENT_45 = "focus-visible:ring-[#2F9E5B]/45";
+export const SMARTHR_FOCUS_RING_ACCENT_50 = "focus-visible:ring-[#2F9E5B]/50";
+export const SMARTHR_FOCUS_RING_ACCENT_INSET_55 = "focus-visible:ring-[#2F9E5B]/55";
 
 /** Primary gradient (buttons, active tabs) */
 export const SMARTHR_GRADIENT_PRIMARY =
-  "bg-gradient-to-r from-[#FF6F28] to-[#FF5325] text-white shadow-[0_6px_15px_rgba(242,101,34,0.22)] hover:brightness-[1.03]";
+  "bg-gradient-to-r from-[#2F9E5B] to-[#248A4C] text-white shadow-[0_6px_15px_rgba(47,158,91,0.22)] hover:brightness-[1.03]";
 
 /** Header “cloud” primary — dark shell */
 export const SMARTHR_HEADER_PRIMARY_BTN_DARK = cnClasses(
@@ -69,7 +76,7 @@ export const SMARTHR_HEADER_PRIMARY_BTN_DARK = cnClasses(
 
 /** Header “cloud” primary — light shell */
 export const SMARTHR_HEADER_PRIMARY_BTN_LIGHT = cnClasses(
-  "border-[#FF6F28]/35",
+  "border-[#2F9E5B]/35",
   SMARTHR_GRADIENT_PRIMARY_INLINE,
   "text-white",
   "hover:brightness-[1.03]",
@@ -78,7 +85,7 @@ export const SMARTHR_HEADER_PRIMARY_BTN_LIGHT = cnClasses(
 
 /** Page column canvas */
 export const SMARTHR_PAGE_BG =
-  "min-h-full bg-[#f7f7f7] text-[#1f1f1f] [-webkit-font-smoothing:antialiased]";
+  "min-h-full bg-[#F5F7F6] text-[#14201B] [-webkit-font-smoothing:antialiased]";
 
 /** Card radius — matches template `border-radius-xl` (~8px) */
 export const SMARTHR_RADIUS_CARD = "rounded-[8px]";
@@ -112,20 +119,19 @@ export const SMARTHR_WELL = cnClasses(
 
 /** Eyebrow / section kicker */
 export const SMARTHR_LABEL =
-  "text-[11px] font-semibold uppercase tracking-[0.12em] text-[#637381]";
+  "text-[11px] font-semibold uppercase tracking-[0.12em] text-[#334155]";
 
-export const SMARTHR_TITLE = "text-[#1f1f1f]";
-export const SMARTHR_BODY = "text-[#6B7280]";
-export const SMARTHR_MUTED = "text-[#6B7280]";
+export const SMARTHR_TITLE = "text-[#0f172a]";
+export const SMARTHR_BODY = "text-[#334155]";
+export const SMARTHR_MUTED = "text-[#475569]";
 
 /** Form controls — light surfaces */
 export const SMARTHR_INPUT = cnClasses(
   "min-h-10 w-full",
   SMARTHR_RADIUS_CARD,
-  "border",
-  SMARTHR_BORDER_DEFAULT,
-  "bg-white px-3 py-2 text-[14px] text-[#1f1f1f] shadow-[0_1px_1px_rgba(0,0,0,0.06)]",
-  "placeholder:text-[#6B7280] focus:border-[#FE9F43]/55 focus:outline-none focus:ring-2 focus:ring-[#FE9F43]/25",
+  "border border-[#CBD5E1]",
+  "bg-white px-3 py-2 text-[14px] text-[#0f172a] shadow-[0_1px_1px_rgba(0,0,0,0.06)]",
+  "placeholder:text-[#64748b] focus:border-[#FE9F43]/70 focus:outline-none focus:ring-2 focus:ring-[#FE9F43]/30",
 );
 
 export const SMARTHR_TEXTAREA = `${SMARTHR_INPUT} min-h-[7rem] resize-y py-3 leading-relaxed`;
@@ -134,7 +140,7 @@ export const SMARTHR_SELECT = `${SMARTHR_INPUT} cursor-pointer appearance-none`;
 
 /** Secondary button — white chip */
 export const SMARTHR_BTN_SECONDARY =
-  "border-[#E5E7EB] bg-white font-semibold text-[#575757] shadow-sm hover:bg-[#f8f9fa]";
+  "border-[#E5E7EB] bg-white font-semibold text-[#334155] shadow-sm hover:bg-[#f8f9fa]";
 
 /** Accent rail (page hero) */
 export const SMARTHR_ACCENT_RAIL =
@@ -155,7 +161,7 @@ export const SMARTHR_TABLE = "w-full border-collapse text-left text-[14px] text-
 export const SMARTHR_TABLE_HEAD_ROW = cnClasses(
   "border-b",
   SMARTHR_BORDER_DEFAULT,
-  "bg-[#f8f9fa] text-[11px] font-semibold uppercase tracking-[0.08em] text-[#637381]",
+  "bg-[#f8f9fa] text-[11px] font-semibold uppercase tracking-[0.08em] text-[#475569]",
 );
 
 export const SMARTHR_TABLE_CELL = "px-3 py-3 align-middle";
@@ -187,7 +193,7 @@ export const SMARTHR_HEADER_BAR_MIN_H = "min-h-[50px]";
 
 /** Kicker line (household / module) — template `text-gray-500` + tight caps */
 export const SMARTHR_HEADER_KICKER = cnClasses(
-  "truncate text-[0.65rem] font-semibold uppercase tracking-[0.22em] text-[#6B7280]",
+  "truncate text-[0.65rem] font-semibold uppercase tracking-[0.22em] text-[#475569]",
   "dark:text-zinc-500",
 );
 
@@ -198,14 +204,14 @@ export const SMARTHR_HEADER_TITLE = cnClasses(
 
 /** Secondary line under title */
 export const SMARTHR_HEADER_SUBTITLE = cnClasses(
-  "truncate text-xs font-medium text-[#6B7280] dark:text-zinc-400",
+  "truncate text-xs font-medium text-[#475569] dark:text-zinc-400",
 );
 
 /** Template `btn-menubar` — light shell */
 export const SMARTHR_HEADER_ICON_BTN_LIGHT = cnClasses(
   "rounded-[5px] border",
   SMARTHR_BORDER_DEFAULT,
-  "bg-white text-[#6B7280] shadow-sm transition",
+  "bg-white text-[#475569] shadow-sm transition",
   "hover:bg-[#E8E9EA] hover:text-[#111827] hover:border-[#D1D5DB]",
 );
 
@@ -272,7 +278,7 @@ export const SMARTHR_MOBILE_SHEET_BOTTOM_LIGHT = cnClasses(
 export const SMARTHR_HUB_CARD_TITLE =
   "text-[17px] font-semibold leading-snug tracking-tight text-[#1f1f1f] sm:text-[18px]";
 
-export const SMARTHR_HUB_MUTED = "text-[13px] text-[#6B7280]";
+export const SMARTHR_HUB_MUTED = "text-[13px] text-[#475569]";
 
 export const SMARTHR_HUB_WIDGET_ICON = cnClasses(
   "flex h-11 w-11 shrink-0 items-center justify-center rounded-full sm:h-12 sm:w-12",
@@ -298,9 +304,9 @@ export const SMARTHR_DASH_HOME_SCOPE_DIVIDER = cnClasses(
 );
 
 /** Eyebrow for kitchen duty, glance metrics, etc. */
-export const SMARTHR_DASH_KICKER = "text-[11px] font-bold uppercase tracking-[0.12em] text-[#637381]";
+export const SMARTHR_DASH_KICKER = "text-[11px] font-bold uppercase tracking-[0.12em] text-[#475569]";
 
-export const SMARTHR_DASH_STATUS_DATE = "text-[12px] leading-snug text-[#6B7280] sm:text-[13px]";
+export const SMARTHR_DASH_STATUS_DATE = "text-[12px] leading-snug text-[#475569] sm:text-[13px]";
 
 export const SMARTHR_DASH_STATUS_TIME =
   "mt-0.5 text-[16px] font-semibold tabular-nums leading-snug text-[#1f1f1f] sm:text-[17px]";
@@ -363,12 +369,12 @@ export const SMARTHR_DASH_BACKUP_CALLOUT = cnClasses(
   "mt-3 flex flex-col gap-2 rounded-[8px] border border-dashed border-[#FE9F43]/40 bg-[#fef0e9] px-3 py-2.5 sm:flex-row sm:items-center sm:justify-between",
 );
 
-export const SMARTHR_DASH_BACKUP_CALLOUT_TEXT = "text-[13px] leading-snug text-[#575757]";
+export const SMARTHR_DASH_BACKUP_CALLOUT_TEXT = "text-[13px] leading-snug text-[#334155]";
 
 export const SMARTHR_DASH_BACKUP_CALLOUT_BTN = cnClasses(
   "shrink-0 rounded-[8px] border",
   SMARTHR_BORDER_DEFAULT,
-  "bg-white px-3 py-2 text-[12px] font-semibold text-[#637381] shadow-sm hover:bg-[#f8f9fa] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FE9F43]/40",
+  "bg-white px-3 py-2 text-[12px] font-semibold text-[#475569] shadow-sm hover:bg-[#f8f9fa] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FE9F43]/40",
 );
 
 /** Date/time readout — compact “status” surface */
@@ -388,15 +394,15 @@ export const SMARTHR_DASH_MEMBER_CHIP = cnClasses(
 export const SMARTHR_DASH_MEMBER_NAME = cnClasses("truncate text-[12px] font-semibold", SMARTHR_TITLE);
 
 export const SMARTHR_DASH_PILL_CAPTION = cnClasses(
-  "shrink-0 rounded-md border bg-white px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-[#637381]",
+  "shrink-0 rounded-md border bg-white px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-[#475569]",
   SMARTHR_BORDER_DEFAULT,
 );
 
 /** Muted icon on light dashboard chips (Scan, etc.) */
-export const SMARTHR_DASH_ICON_MUTED = "text-[#637381]";
+export const SMARTHR_DASH_ICON_MUTED = "text-[#475569]";
 
 /** Long-form empty states / helper copy */
-export const SMARTHR_DASH_BODY_PARAGRAPH = "text-[14px] leading-relaxed text-[#575757]";
+export const SMARTHR_DASH_BODY_PARAGRAPH = "text-[14px] leading-relaxed text-[#334155]";
 
 export const SMARTHR_DASH_LINK_ACCENT = cnClasses(
   "rounded-sm text-[13px] font-semibold text-[#F26522] underline-offset-2 hover:underline",
@@ -404,11 +410,11 @@ export const SMARTHR_DASH_LINK_ACCENT = cnClasses(
 );
 
 export const SMARTHR_DASH_LINK_MUTED = cnClasses(
-  "rounded-sm text-[13px] font-semibold text-[#637381] underline-offset-2 hover:underline",
+  "rounded-sm text-[13px] font-semibold text-[#475569] underline-offset-2 hover:underline",
   "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF6F28]/35 focus-visible:ring-offset-2",
 );
 
-export const SMARTHR_DASH_CHECKLIST_META = "mt-1 text-[13px] tabular-nums text-[#575757]";
+export const SMARTHR_DASH_CHECKLIST_META = "mt-1 text-[13px] tabular-nums text-[#334155]";
 
 export const SMARTHR_DASH_KITCHEN_SUBLINE_STRONG = "font-semibold text-[#F26522]";
 
@@ -416,7 +422,7 @@ export const SMARTHR_DASH_KITCHEN_HEADLINE_DEFAULT =
   "mt-1 text-[14px] font-semibold leading-snug text-[#1f1f1f] sm:text-[15px]";
 
 export const SMARTHR_DASH_KITCHEN_HEADLINE_MUTED =
-  "mt-1 text-[14px] font-semibold leading-snug text-[#637381] sm:text-[15px]";
+  "mt-1 text-[14px] font-semibold leading-snug text-[#475569] sm:text-[15px]";
 
 export const SMARTHR_DASH_KITCHEN_HEADLINE_SUCCESS =
   "mt-1 text-[14px] font-semibold leading-snug text-emerald-700 sm:text-[15px]";
@@ -448,7 +454,7 @@ export const SMARTHR_HUB_TILE_QTY = cnClasses(
   SMARTHR_TITLE,
 );
 
-export const SMARTHR_HUB_NOTE_TINY = "mt-1 line-clamp-2 text-[11px] text-[#6B7280]";
+export const SMARTHR_HUB_NOTE_TINY = "mt-1 line-clamp-2 text-[11px] text-[#475569]";
 
 /** Shopping category tabs */
 export const SMARTHR_HUB_TABLIST_DIVIDER = cnClasses(
@@ -465,7 +471,7 @@ export const SMARTHR_HUB_TAB_ACTIVE = cnClasses(
   "text-white shadow-[0_1px_1px_rgba(0,0,0,0.12)]",
 );
 
-export const SMARTHR_HUB_TAB_IDLE = "text-[#6B7280] hover:bg-[#f7f7f7]";
+export const SMARTHR_HUB_TAB_IDLE = "text-[#475569] hover:bg-[#f7f7f7]";
 
 export const SMARTHR_HUB_LIST_SHELL = cnClasses(SMARTHR_RADIUS_CARD, "border", SMARTHR_BORDER_DEFAULT, SMARTHR_SHADOW_CARD);
 
@@ -485,7 +491,7 @@ export const SMARTHR_HUB_CHECKBOX = cnClasses(
 );
 
 export const SMARTHR_HUB_STORE_BADGE = cnClasses(
-  "shrink-0 rounded-md border bg-[#f7f7f7] px-2 py-0.5 text-[12px] font-medium capitalize text-[#575757]",
+  "shrink-0 rounded-md border bg-[#f7f7f7] px-2 py-0.5 text-[12px] font-medium capitalize text-[#334155]",
   SMARTHR_BORDER_DEFAULT,
 );
 
@@ -493,7 +499,7 @@ export const SMARTHR_HUB_ITEM_TITLE = cnClasses("text-[15px] font-semibold", SMA
 
 /** Week strip nav */
 export const SMARTHR_HUB_CHEVRON_BTN = cnClasses(
-  "inline-flex h-9 w-9 items-center justify-center rounded-[8px] border bg-white text-[#4B5563] shadow-sm transition hover:bg-[#fafafa]",
+  "inline-flex h-9 w-9 items-center justify-center rounded-[8px] border bg-white text-[#334155] shadow-sm transition hover:bg-[#fafafa]",
   SMARTHR_BORDER_DEFAULT,
   "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FE9F43]/40",
 );
@@ -514,7 +520,7 @@ export const SMARTHR_HUB_DAY_NUM_SELECTED = "text-[#c2410c]";
 export const SMARTHR_HUB_DAY_NUM_IDLE = SMARTHR_TITLE;
 
 export const SMARTHR_HUB_DAY_CAPTION =
-  "mt-1 line-clamp-2 rounded-md bg-[#f7f7f7] px-1 py-0.5 text-[10px] font-medium leading-tight text-[#575757]";
+  "mt-1 line-clamp-2 rounded-md bg-[#f7f7f7] px-1 py-0.5 text-[10px] font-medium leading-tight text-[#334155]";
 
 /** Accent text links in hub headers (alias of dash link) */
 export const SMARTHR_HUB_LINK_ACCENT = SMARTHR_DASH_LINK_ACCENT;
@@ -537,18 +543,18 @@ export const SMARTHR_HUB_MSG_BELL_PRIMARY = "text-[#FE9F43]";
 
 export const SMARTHR_HUB_MSG_BELL_MUTED = "text-[#b0b8c1]";
 
-export const SMARTHR_HUB_PIN_LABEL = "ml-2 text-[11px] font-semibold uppercase tracking-wide text-[#637381]";
+export const SMARTHR_HUB_PIN_LABEL = "ml-2 text-[11px] font-semibold uppercase tracking-wide text-[#475569]";
 
 export const SMARTHR_HUB_TITLE_SHARED = "text-[#242424]";
 
-export const SMARTHR_HUB_TITLE_MUTED = "text-[#575757]";
+export const SMARTHR_HUB_TITLE_MUTED = "text-[#334155]";
 
-export const SMARTHR_HUB_ASSIGNMENT_META = "text-[#637381]";
+export const SMARTHR_HUB_ASSIGNMENT_META = "text-[#475569]";
 
-export const SMARTHR_HUB_ASSIGNMENT_META_SOFT = "text-[#6B7280]";
+export const SMARTHR_HUB_ASSIGNMENT_META_SOFT = "text-[#475569]";
 
 export const SMARTHR_HUB_ALERT_ROW_READ =
-  "rounded-[8px] border border-[#E5E7EB]/70 bg-[#fafafa] text-[#575757]";
+  "rounded-[8px] border border-[#E5E7EB]/70 bg-[#fafafa] text-[#334155]";
 
 export const SMARTHR_HUB_CHORE_TRACKER_LINK = cnClasses(
   SMARTHR_DASH_LINK_ACCENT,
@@ -561,7 +567,7 @@ export const SMARTHR_HUB_SECTION_OVERDUE = "mb-2 text-[12px] font-semibold upper
 export const SMARTHR_HUB_CHORE_PAST_DUE_KICKER =
   "mb-0.5 text-[11px] font-semibold uppercase tracking-wide text-[#92400e]";
 
-export const SMARTHR_HUB_SECTION_DUE = cnClasses("mb-2 text-[12px] font-semibold uppercase tracking-[0.08em]", "text-[#637381]");
+export const SMARTHR_HUB_SECTION_DUE = cnClasses("mb-2 text-[12px] font-semibold uppercase tracking-[0.08em]", "text-[#475569]");
 
 export const SMARTHR_HUB_META_SEPARATOR = "text-[#d4d4d4]";
 
@@ -569,7 +575,7 @@ export const SMARTHR_HUB_META_SEPARATOR = "text-[#d4d4d4]";
 export const SMARTHR_HUB_CHORE_SELECT = cnClasses(SMARTHR_SELECT, "min-h-11 min-w-[9rem] text-[14px] font-medium");
 
 /** Notifications panel — light shell */
-export const SMARTHR_HUB_ALERT_HEADER = cnClasses("text-[15px] font-semibold tracking-tight", "text-[#637381]");
+export const SMARTHR_HUB_ALERT_HEADER = cnClasses("text-[15px] font-semibold tracking-tight", "text-[#475569]");
 
 export const SMARTHR_HUB_ALERT_COUNT_BADGE =
   "rounded-md bg-[#E8E9EA] px-2 py-0.5 text-[13px] font-semibold tabular-nums text-[#1f1f1f]";
@@ -584,7 +590,7 @@ export const SMARTHR_HUB_ALERT_ROW_DEFAULT = cnClasses("rounded-[8px] border px-
 
 export const SMARTHR_HUB_ALERT_DISMISS = cnClasses(
   "min-h-10 shrink-0 rounded-[8px] px-3 py-2 text-[0.65rem] font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FE9F43]/50 focus-visible:ring-offset-2 focus-visible:ring-offset-white",
-  "text-[#4B5563] hover:bg-[#f3f4f6] hover:text-[#1f1f1f]",
+  "text-[#334155] hover:bg-[#f3f4f6] hover:text-[#1f1f1f]",
 );
 
 export const SMARTHR_HUB_ALERT_VIEW_ALL = cnClasses(
@@ -605,7 +611,7 @@ export const SMARTHR_HUB_LAYOUT_DONE_BTN = cnClasses(
   SMARTHR_TITLE,
 );
 
-export const SMARTHR_HUB_LAYOUT_RESET_GHOST = "min-h-11 flex-1 font-semibold text-[#575757] hover:bg-[#f0f0f0] sm:flex-none";
+export const SMARTHR_HUB_LAYOUT_RESET_GHOST = "min-h-11 flex-1 font-semibold text-[#334155] hover:bg-[#f0f0f0] sm:flex-none";
 
 export const SMARTHR_HUB_LAYOUT_ROW_WELL = cnClasses(
   "flex flex-col gap-3 rounded-[8px] border bg-[#fafafa] p-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between sm:gap-2 sm:p-3.5",
@@ -615,7 +621,7 @@ export const SMARTHR_HUB_LAYOUT_ROW_WELL = cnClasses(
 export const SMARTHR_HUB_LAYOUT_DRAG_RING = "ring-2 ring-[#FE9F43]/55 ring-offset-2 ring-offset-[#f7f7f7]";
 
 export const SMARTHR_HUB_LAYOUT_GRIP_ACTIVE = cnClasses(
-  "flex shrink-0 touch-none flex-col justify-center rounded-[6px] border bg-white px-1 py-2 shadow-sm select-none cursor-grab text-[#637381] hover:border-[#FE9F43]/40 hover:text-[#F26522] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FE9F43]/55 active:cursor-grabbing",
+  "flex shrink-0 touch-none flex-col justify-center rounded-[6px] border bg-white px-1 py-2 shadow-sm select-none cursor-grab text-[#475569] hover:border-[#FE9F43]/40 hover:text-[#F26522] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FE9F43]/55 active:cursor-grabbing",
   SMARTHR_BORDER_DEFAULT,
 );
 
@@ -654,10 +660,10 @@ export const SMARTHR_SIDEBAR_NAV_ROW_BASE = cnClasses(
 );
 
 export const SMARTHR_SIDEBAR_ACTIVE_BG =
-  "bg-[var(--fs-sidebar-active-bg,rgba(254,159,67,0.08))]";
+  "bg-[var(--fs-sidebar-active-bg,#E8F7EE)]";
 
 export const SMARTHR_SIDEBAR_ACTIVE_TEXT =
-  "text-[var(--fs-sidebar-active-text,#FE9F43)]";
+  "text-[var(--fs-sidebar-active-text,#248A4C)]";
 
 /** Template `hover:bg-dark-transparent` — subtle row wash */
 export const SMARTHR_ROW_HOVER_WASH = "hover:bg-[#E8E9EA]";
@@ -666,16 +672,16 @@ export const SMARTHR_SIDEBAR_ROW_HOVER = SMARTHR_ROW_HOVER_WASH;
 
 /** Full-width row in mobile module picker — light idle */
 export const SMARTHR_MOBILE_MENU_ROW_LIGHT_IDLE = cnClasses(
-  "border border-transparent bg-[#F8F9FA] text-[#4B5563]",
+  "border border-transparent bg-[#F8F9FA] text-[#334155]",
   SMARTHR_ROW_HOVER_WASH,
   "hover:border-[#D1D5DB]",
 );
 
-/** Active row — peach wash + accent text + light ring (template primary cue) */
+/** Active row — soft green wash + accent text (FamilyHub clean) */
 export const SMARTHR_SIDEBAR_ACTIVE_ROW = cnClasses(
   SMARTHR_SIDEBAR_ACTIVE_BG,
   SMARTHR_SIDEBAR_ACTIVE_TEXT,
-  "shadow-[0_1px_2px_rgba(242,101,34,0.08)] ring-1 ring-inset ring-[#F26522]/12",
+  "shadow-[0_1px_2px_rgba(47,158,91,0.08)] ring-1 ring-inset ring-[#2F9E5B]/15",
 );
 
 export const SMARTHR_SIDEBAR_ASIDE = cnClasses(
@@ -701,7 +707,7 @@ export const SMARTHR_SIDEBAR_LOGO_TILE = cnClasses(
 export const SMARTHR_SIDEBAR_TOGGLE_BTN = cnClasses(
   "inline-flex h-[30px] w-[30px] shrink-0 items-center justify-center rounded-[5px] border",
   SMARTHR_BORDER_DEFAULT,
-  "bg-white text-[#6B7280] shadow-sm transition",
+  "bg-white text-[#475569] shadow-sm transition",
   "hover:bg-[#E8E9EA] hover:text-[#111827] hover:border-[#D1D5DB] focus-visible:outline-none focus-visible:ring-2",
   SMARTHR_FOCUS_RING_ACCENT_40,
   "focus-visible:ring-offset-2 focus-visible:ring-offset-white",
@@ -710,22 +716,22 @@ export const SMARTHR_SIDEBAR_TOGGLE_BTN = cnClasses(
 export const SMARTHR_SIDEBAR_DIVIDER = cnClasses("border-t", SMARTHR_BORDER_DEFAULT);
 
 export const SMARTHR_SIDEBAR_GROUP_LABEL =
-  "mb-2.5 px-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-[#9CA3AF]";
+  "mb-2.5 px-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-[#64748b]";
 
 export const SMARTHR_SIDEBAR_COLLAPSED_RULE = "mx-auto mb-2 h-px w-8 bg-[#E5E7EB]";
 
 export const SMARTHR_SIDEBAR_TEXT_PRIMARY =
-  "text-[16px] font-semibold tracking-tight text-[#1f1f1f]";
+  "text-[16px] font-semibold tracking-tight text-[#0f172a]";
 
-export const SMARTHR_SIDEBAR_TEXT_TAGLINE = "text-[12px] font-medium text-[#637381]";
+export const SMARTHR_SIDEBAR_TEXT_TAGLINE = "text-[12px] font-medium text-[#475569]";
 
-export const SMARTHR_SIDEBAR_TEXT_HOUSEHOLD = "truncate text-[13px] font-medium text-[#4B5563]";
+export const SMARTHR_SIDEBAR_TEXT_HOUSEHOLD = "truncate text-[13px] font-medium text-[#334155]";
 
-export const SMARTHR_SIDEBAR_ICON_MUTED = "text-[var(--fs-text-muted,#637381)]";
+export const SMARTHR_SIDEBAR_ICON_MUTED = "text-[var(--fs-text-muted,#475569)]";
 
-export const SMARTHR_SIDEBAR_ICON_NAV = "text-[#4B5563]";
+export const SMARTHR_SIDEBAR_ICON_NAV = "text-[#334155]";
 
 /** Inactive row label + icon hover (sidebar) */
 export const SMARTHR_SIDEBAR_ROW_LABEL_IDLE = SMARTHR_SIDEBAR_ICON_NAV;
 
-export const SMARTHR_SIDEBAR_ICON_GROUP_HOVER = "group-hover:text-[#4B5563]";
+export const SMARTHR_SIDEBAR_ICON_GROUP_HOVER = "group-hover:text-[#0f172a]";

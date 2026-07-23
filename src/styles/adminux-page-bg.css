@@ -1,0 +1,135 @@
+/**
+ * AdminUX page background presets — applied via html[data-fs-bg].
+ * FamilyHub-safe equivalents of None / White / Theme / Grad-1…10.
+ */
+
+html[data-fs-bg="none"] {
+  --fs-page-surface: transparent;
+}
+
+html[data-fs-bg="white"] {
+  --fs-page-surface: #ffffff;
+}
+
+html[data-fs-bg="theme"] {
+  --fs-page-surface: linear-gradient(160deg, #dbeafe 0%, #eff6ff 45%, #f8fafc 100%);
+}
+
+html[data-fs-bg="grad-1"] {
+  --fs-page-surface: radial-gradient(circle at 30% 20%, #cfe8ff, #ffffff 62%);
+}
+
+html[data-fs-bg="grad-2"] {
+  --fs-page-surface: radial-gradient(circle at 70% 10%, #ffd6e8, #ffffff 60%);
+}
+
+html[data-fs-bg="grad-3"] {
+  --fs-page-surface: radial-gradient(circle at 40% 30%, #d8f5e5, #ffffff 58%);
+}
+
+html[data-fs-bg="grad-4"] {
+  --fs-page-surface: radial-gradient(circle at 20% 80%, #e4ddff, #ffffff 55%);
+}
+
+html[data-fs-bg="grad-5"] {
+  --fs-page-surface: radial-gradient(circle at 80% 40%, #ffe7c2, #ffffff 58%);
+}
+
+html[data-fs-bg="grad-6"] {
+  --fs-page-surface: radial-gradient(circle at 50% 0%, #c9f0ff, #fff5fb 70%);
+}
+
+html[data-fs-bg="grad-7"] {
+  --fs-page-surface: radial-gradient(circle at 10% 50%, #ffd0d8, #f3fff8 65%);
+}
+
+html[data-fs-bg="grad-8"] {
+  --fs-page-surface: radial-gradient(circle at 90% 20%, #fff1b8, #e8f4ff 60%);
+}
+
+html[data-fs-bg="grad-9"] {
+  --fs-page-surface: radial-gradient(circle at 40% 10%, #d2ffe8, #ffe9f4 62%);
+}
+
+html[data-fs-bg="grad-10"] {
+  --fs-page-surface: radial-gradient(circle at 60% 80%, #cdd9ff, #fff8e8 58%);
+}
+
+/* Soft pastel canvas for the signed-in shell when a preset is active */
+html[data-fs-bg]:not([data-fs-bg="none"]) .adminux-app,
+html[data-fs-bg]:not([data-fs-bg="none"]) .adminux-skin {
+  background: var(--fs-page-surface) !important;
+  background-attachment: fixed;
+}
+
+html[data-fs-bg="none"] .adminux-app,
+html[data-fs-bg="none"] .adminux-skin {
+  background: var(--fs-page-bg, #f5f7f6);
+}
+
+/* Settings swatches */
+.fs-bg-swatch-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.85rem 1rem;
+}
+
+.fs-bg-swatch {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  min-width: 3.5rem;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  color: #475569;
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.fs-bg-swatch__circle {
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 999px;
+  border: 2px solid rgba(15, 23, 42, 0.12);
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.06);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+}
+
+.fs-bg-swatch:hover .fs-bg-swatch__circle,
+.fs-bg-swatch[aria-pressed="true"] .fs-bg-swatch__circle {
+  border-color: #1e3a8a;
+  box-shadow: 0 0 0 2px rgba(59, 110, 245, 0.35);
+  transform: translateY(-1px);
+}
+
+.fs-accent-swatch-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+}
+
+.fs-accent-swatch {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.35rem;
+  padding: 0.4rem 0.85rem;
+  border-radius: 0.55rem;
+  border: 1px solid transparent;
+  color: #fff;
+  font-size: 0.78rem;
+  font-weight: 750;
+  cursor: pointer;
+  transition: filter 0.15s ease, box-shadow 0.15s ease;
+}
+
+.fs-accent-swatch:hover {
+  filter: brightness(1.05);
+}
+
+.fs-accent-swatch[aria-pressed="true"] {
+  box-shadow: 0 0 0 2px #fff, 0 0 0 4px #1e3a8a;
+}

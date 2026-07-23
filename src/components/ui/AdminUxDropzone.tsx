@@ -3,6 +3,11 @@ import Dropzone from "dropzone";
 import "dropzone/dist/dropzone.css";
 import { FeatherIconTile } from "../icons/FeatherIcon";
 
+// Dropzone v5 had autoDiscover; v6 beta may not. Guard so we never double-bind.
+if ("autoDiscover" in Dropzone) {
+  (Dropzone as { autoDiscover?: boolean }).autoDiscover = false;
+}
+
 export type DroppedHouseholdFile = {
   id: string;
   name: string;

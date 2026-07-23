@@ -11,12 +11,14 @@ import type { AppearancePreferences } from "../lib/appearancePreferences";
 import {
   applyAppearanceCssVars,
   applyTextPreset,
+  applyThemeAccentPreset,
   mergeAppearanceDelta,
   readAppearanceFromStorage,
   SMARTHR_DEFAULT_APPEARANCE,
   writeAppearanceToStorage,
   type TextColorPreset,
 } from "../lib/appearancePreferences";
+import type { AdminuxAccentPreset, AdminuxPageBgPreset } from "../lib/adminuxTheme";
 import type {
   PageLayoutGlobal,
   PageLayoutPreferences,
@@ -35,6 +37,8 @@ type UiCustomizationContextValue = {
   setAppearance: (next: AppearancePreferences) => void;
   updateAppearance: (patch: Partial<AppearancePreferences>) => void;
   setTextPreset: (preset: TextColorPreset) => void;
+  setPageBgPreset: (preset: AdminuxPageBgPreset) => void;
+  setThemeAccent: (accent: AdminuxAccentPreset) => void;
   resetAppearance: () => void;
 
   pageLayout: PageLayoutPreferences;
@@ -112,6 +116,24 @@ export function UiCustomizationProvider({ children }: { children: ReactNode }) {
   const setTextPreset = useCallback((preset: TextColorPreset) => {
     setAppearanceState((prev) => {
       const next = applyTextPreset(prev, preset);
+      writeAppearanceToStorage(next);
+      applyAppearanceCssVars(next);
+      return next;
+    });
+  }, []);
+
+  const setPageBgPreset = useCallback((preset: AdminuxPageBgPreset) => {
+    setAppearanceState((prev) => {
+      const next = mergeAppearanceDelta(prev, { pageBgPreset: preset });
+      writeAppearanceToStorage(next);
+      applyAppearanceCssVars(next);
+      return next;
+    });
+  }, []);
+
+  const setThemeAccent = useCallback((accent: AdminuxAccentPreset) => {
+    setAppearanceState((prev) => {
+      const next = applyThemeAccentPreset(prev, accent);
       writeAppearanceToStorage(next);
       applyAppearanceCssVars(next);
       return next;
@@ -200,6 +222,8 @@ export function UiCustomizationProvider({ children }: { children: ReactNode }) {
       setAppearance,
       updateAppearance,
       setTextPreset,
+      setPageBgPreset,
+      setThemeAccent,
       resetAppearance,
       pageLayout,
       setPageLayout,
@@ -213,6 +237,8 @@ export function UiCustomizationProvider({ children }: { children: ReactNode }) {
     setAppearance,
     updateAppearance,
     setTextPreset,
+    setPageBgPreset,
+    setThemeAccent,
     resetAppearance,
     pageLayout,
     setPageLayout,

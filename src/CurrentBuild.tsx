@@ -1,7 +1,6 @@
-import { lazy, Suspense, useEffect, useLayoutEffect, useMemo, useState } from "react";
+import { lazy, Suspense, useEffect, useLayoutEffect, useState } from "react";
 import {
   AppShell,
-  type DashboardHeaderContext,
   type RouteKey,
   type ShellRoute,
 } from "./components/layout/AppShell";
@@ -9,7 +8,6 @@ import { AppLoading } from "./components/layout/AppLoading";
 import { ModuleGate } from "./components/layout/ModuleGate";
 import { useFamilyData } from "./hooks/useFamilyData";
 import { isRestrictedHouseholdMember } from "./lib/householdUx";
-import { dedupeNotificationsForDisplay } from "./lib/householdNotify";
 import {
   findMemberById,
   getMemberFullName,
@@ -19,19 +17,14 @@ import {
   getModuleCalendarLabel,
   getModuleDocsLabel,
   getModuleFamilyLabel,
-  getModuleHouseholdInventoryLabel,
   getModuleProjectsLabel,
   getModuleSettingsLabel,
   getModuleShoppingLabel,
-  getModuleTasksLabel,
 } from "./lib/customization";
 import { HouseholdProductProvider } from "./context/HouseholdProductContext";
 
 const CalendarPage = lazy(() =>
   import("./pages/CalendarPage").then((m) => ({ default: m.CalendarPage })),
-);
-const DashboardPage = lazy(() =>
-  import("./pages/DashboardPage").then((m) => ({ default: m.DashboardPage })),
 );
 const AdminUxHouseholdDashboard = lazy(() =>
   import("./pages/AdminUxHouseholdDashboard").then((m) => ({
@@ -76,6 +69,19 @@ const SubscriptionsPage = lazy(() =>
   import("./pages/SubscriptionsPage").then((m) => ({ default: m.SubscriptionsPage })),
 );
 const PetsPage = lazy(() => import("./pages/PetsPage").then((m) => ({ default: m.PetsPage })));
+const MessagesPage = lazy(() =>
+  import("./pages/MessagesPage").then((m) => ({ default: m.MessagesPage })),
+);
+const EmergencyPlanningPage = lazy(() =>
+  import("./pages/EmergencyPlanningPage").then((m) => ({
+    default: m.EmergencyPlanningPage,
+  })),
+);
+const HouseholdSidebarToolPage = lazy(() =>
+  import("./pages/HouseholdSidebarToolPage").then((m) => ({
+    default: m.HouseholdSidebarToolPage,
+  })),
+);
 
 export default function App() {
   const [routeHref, setRouteHref] = useState(
@@ -106,34 +112,15 @@ export default function App() {
     : undefined;
   const activeMemberLabel = activeMember ? getMemberFullName(activeMember) : undefined;
 
-  const dashboardHeader = useMemo((): DashboardHeaderContext | undefined => {
-    if (activeRoute !== "dashboard") {
-      return undefined;
-    }
-    const raw = data.notifications.filter((n) => {
-      if (n.dismissedAt) {
-        return false;
-      }
-      return true;
-    });
-    const notificationCount = dedupeNotificationsForDisplay(raw).length;
-    const groceryCount = data.shopping.filter((s) => !s.purchased).length;
-    const statusLine = `${groceryCount} on your shopping list · ${notificationCount} notification${notificationCount === 1 ? "" : "s"}`;
-    return { greeting: "Welcome home.", statusLine, notificationCount };
-  }, [
-    activeRoute,
-    data.notifications,
-    data.shopping,
-  ]);
-
-  /** Legacy landing aliases resolve to the Command Center (AdminUX) home. */
+  /** Legacy landing aliases resolve to Home (AdminUX command center). */
   useLayoutEffect(() => {
     const normalized = pathname.replace(/\/$/, "") || "/";
     if (
       normalized !== "/" &&
       normalized !== "/kiosk-login" &&
       normalized !== "/login" &&
-      normalized !== "/home"
+      normalized !== "/home" &&
+      normalized !== "/dashboard"
     ) {
       return;
     }
@@ -188,24 +175,27 @@ export default function App() {
       onNavigateHref={navigateTo}
       onOpenLogin={() => navigateTo("/cloud-login")}
       onRouteChange={navigateToRoute}
-      dashboardHeader={dashboardHeader}
       locationHref={routeHref}
       routeLabels={{
         dashboard: "Dashboard",
-        adminux: "Command Center",
+        adminux: "Home",
+        messages: "Messages",
         family: getModuleFamilyLabel(data.adminSettings),
-        tasks: getModuleTasksLabel(data.adminSettings),
+        tasks: "Cleaning / Kitchen",
         kitchen: "Kitchen Assignments",
         pets: "Pets",
-        projects: getModuleProjectsLabel(data.adminSettings),
-        pantry: getModuleHouseholdInventoryLabel(data.adminSettings),
+        emergency: "Emergency Planning",
+        subscriptions: "Subscriptions",
+        projects: getModuleProjectsLabel(data.adminSettings) || "Projects",
+        photos: "Photos",
+        planner: "Planner",
+        routines: "Routines",
+        pantry: "Pantry & Inventory",
         shopping: getModuleShoppingLabel(data.adminSettings),
         calendar: getModuleCalendarLabel(data.adminSettings),
-        planner: getModuleCalendarLabel(data.adminSettings),
         docs: getModuleDocsLabel(data.adminSettings),
         kitchenSchedule: "Kitchen Schedule",
         notifications: "Notifications",
-        subscriptions: "Subscriptions",
         settings: getModuleSettingsLabel(data.adminSettings),
       }}
     >
@@ -229,28 +219,6 @@ export default function App() {
           onOpenDashboard={() => navigateToRoute("dashboard")}
         />
       ) : null}
-      {activeRoute === "dashboard" ? (
-        <ModuleGate
-          moduleKey="dashboard"
-          moduleVisibility={data.adminSettings.moduleVisibility}
-          onOpenDashboard={() => navigateToRoute("dashboard")}
-          onOpenSettings={() => navigateToRoute("settings")}
-        >
-          <DashboardPage
-            data={data}
-            setData={setData}
-            navigateWithinApp={navigateTo}
-            restrictChildNavigation={isRestrictedHouseholdMember(activeMember)}
-            onOpenTasks={() => navigateToRoute("tasks")}
-            onOpenPantry={() => navigateToRoute("pantry")}
-            onOpenShopping={() => navigateToRoute("shopping")}
-            onOpenCalendar={() => navigateToRoute("calendar")}
-            onOpenPlanner={() => navigateToRoute("calendar")}
-            onOpenSettings={() => navigateToRoute("settings")}
-            onOpenMemberDashboard={navigateToMember}
-          />
-        </ModuleGate>
-      ) : null}
       {activeRoute === "adminux" ? (
         <ModuleGate
           moduleKey="dashboard"
@@ -267,7 +235,7 @@ export default function App() {
             onOpenTasks={() => navigateToRoute("tasks")}
             onOpenCalendar={() => navigateToRoute("calendar")}
             onOpenSettings={() => navigateToRoute("settings")}
-            onOpenDashboard={() => navigateToRoute("dashboard")}
+            onOpenMemberDashboard={navigateToMember}
           />
         </ModuleGate>
       ) : null}
@@ -344,11 +312,59 @@ export default function App() {
           onOpenDashboard={() => navigateToRoute("dashboard")}
         />
       ) : null}
+      {activeRoute === "messages" ? (
+        <MessagesPage
+          data={data}
+          setData={setData}
+          onOpenDashboard={() => navigateToRoute("adminux")}
+        />
+      ) : null}
+      {activeRoute === "emergency" ? (
+        <EmergencyPlanningPage
+          data={data}
+          onOpenDashboard={() => navigateToRoute("adminux")}
+        />
+      ) : null}
       {activeRoute === "projects" ? (
-        <HiddenModulePage
-          title="Unused shortcut"
-          onGoHome={() => navigateToRoute("dashboard")}
-          onGoSettings={() => navigateToRoute("settings")}
+        <HouseholdSidebarToolPage
+          title="Projects"
+          description="Longer household projects stay here in the sidebar — not on the wake page."
+          tips={[
+            "Use this space for multi-day household work.",
+            "Daily chores and kitchen duty stay on Home and Cleaning / Kitchen.",
+          ]}
+          relatedHref="/tasks"
+          relatedLabel="Open Cleaning / Kitchen"
+          onOpenHome={() => navigateToRoute("adminux")}
+          navigateWithinApp={navigateTo}
+        />
+      ) : null}
+      {activeRoute === "photos" ? (
+        <HouseholdSidebarToolPage
+          title="Photos"
+          description="Household photo references stay in the sidebar so Home stays uncluttered."
+          tips={[
+            "Cleaning task reference photos still live with Cleaning / Kitchen notes.",
+            "A fuller Photos library can grow later without changing today’s wake layout.",
+          ]}
+          relatedHref="/tasks"
+          relatedLabel="Open Cleaning / Kitchen"
+          onOpenHome={() => navigateToRoute("adminux")}
+          navigateWithinApp={navigateTo}
+        />
+      ) : null}
+      {activeRoute === "routines" ? (
+        <HouseholdSidebarToolPage
+          title="Routines"
+          description="Recurring household routines stay in the sidebar, off the main wake cards."
+          tips={[
+            "Daily chores and kitchen duty remain on Home.",
+            "Use Cleaning / Kitchen for today’s checklist and assignments.",
+          ]}
+          relatedHref="/tasks"
+          relatedLabel="Open Cleaning / Kitchen"
+          onOpenHome={() => navigateToRoute("adminux")}
+          navigateWithinApp={navigateTo}
         />
       ) : null}
       {activeRoute === "pantry" ? (
@@ -385,14 +401,14 @@ export default function App() {
           />
         </ModuleGate>
       ) : null}
-      {activeRoute === "calendar" ? (
+      {activeRoute === "calendar" || activeRoute === "planner" ? (
         <ModuleGate
           moduleKey="calendar"
           moduleVisibility={data.adminSettings.moduleVisibility}
           onOpenDashboard={() => navigateToRoute("dashboard")}
           onOpenSettings={() => navigateToRoute("settings")}
         >
-          <CalendarPage data={data} setData={setData} />
+          <CalendarPage data={data} setData={setData} navigateWithinApp={navigateTo} />
         </ModuleGate>
       ) : null}
       {activeRoute === "docs" ? (
@@ -460,8 +476,9 @@ export default function App() {
 }
 
 const routePathMap: Record<RouteKey, string> = {
-  dashboard: "/dashboard",
+  dashboard: "/adminux",
   adminux: "/adminux",
+  messages: "/messages",
   kiosk: "/kiosk",
   family: "/family",
   tasks: "/tasks",
@@ -476,6 +493,9 @@ const routePathMap: Record<RouteKey, string> = {
   calendar: "/calendar",
   planner: "/planner",
   docs: "/docs",
+  photos: "/photos",
+  routines: "/routines",
+  emergency: "/emergency",
   settings: "/settings",
 };
 
@@ -498,7 +518,7 @@ function parsePath(pathname: string): {
   }
 
   if (firstSegment === "dashboard") {
-    return { activeRoute: "dashboard" };
+    return { activeRoute: "adminux" };
   }
 
   if (firstSegment === "cloud-login") {
@@ -518,7 +538,7 @@ function parsePath(pathname: string): {
   }
 
   if (firstSegment === "planner") {
-    return { activeRoute: "calendar" };
+    return { activeRoute: "planner" };
   }
 
   if (firstSegment === "family") {

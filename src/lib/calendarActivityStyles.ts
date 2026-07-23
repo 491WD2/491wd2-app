@@ -70,6 +70,46 @@ const MAP: Record<string, ActivityCategoryVisual> = {
     dot: "bg-violet-500",
     chip: "border border-violet-200 bg-violet-50 text-violet-900",
   },
+  Household: {
+    block: "border border-slate-200 bg-slate-50 text-slate-900",
+    dot: "bg-slate-500",
+    chip: "border border-slate-200 bg-slate-50 text-slate-800",
+  },
+  Activity: {
+    block: "border border-teal-200 bg-teal-50 text-teal-950",
+    dot: "bg-teal-500",
+    chip: "border border-teal-200 bg-teal-50 text-teal-900",
+  },
+  Travel: {
+    block: "border border-indigo-200 bg-indigo-50 text-indigo-950",
+    dot: "bg-indigo-500",
+    chip: "border border-indigo-200 bg-indigo-50 text-indigo-900",
+  },
+  "No School": {
+    block: "border border-slate-700 bg-slate-900 text-slate-50",
+    dot: "bg-slate-800",
+    chip: "border border-slate-600 bg-slate-800 text-slate-100",
+  },
+  Chores: {
+    block: "border border-emerald-200 bg-emerald-50 text-emerald-950",
+    dot: "bg-emerald-500",
+    chip: "border border-emerald-200 bg-emerald-50 text-emerald-900",
+  },
+  Reminder: {
+    block: "border border-amber-200 bg-amber-50 text-amber-950",
+    dot: "bg-amber-500",
+    chip: "border border-amber-200 bg-amber-50 text-amber-900",
+  },
+  Meals: {
+    block: "border border-orange-200 bg-orange-50 text-orange-950",
+    dot: "bg-orange-500",
+    chip: "border border-orange-200 bg-orange-50 text-orange-900",
+  },
+  Home: {
+    block: "border border-slate-200 bg-slate-100 text-slate-800",
+    dot: "bg-slate-500",
+    chip: "border border-slate-200 bg-slate-50 text-slate-700",
+  },
 };
 
 export function getActivityCategoryVisual(category: string): ActivityCategoryVisual {

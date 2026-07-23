@@ -25,6 +25,8 @@ import {
   type RouteKey,
   type ShellRoute,
   isSidebarRoute,
+  SIDEBAR_HOUSEHOLD_TOOL_KEYS,
+  SIDEBAR_PRIMARY_KEYS,
 } from "./shellRoutes";
 
 type Props = {
@@ -42,15 +44,19 @@ type Props = {
 };
 
 const NAV_LABEL: Partial<Record<RouteKey, string>> = {
-  dashboard: "Home",
-  adminux: "Command Center",
+  adminux: "Home",
+  messages: "Messages",
   shopping: "Shopping",
-  pantry: "Inventory",
-  calendar: "Calendar",
-  notifications: "Notifications",
-  subscriptions: "Subscriptions",
-  tasks: "Cleaning",
+  pantry: "Pantry & Inventory",
+  calendar: "Calendar / Upcoming Events",
+  tasks: "Cleaning / Kitchen",
+  emergency: "Emergency Planning",
   pets: "Pets",
+  subscriptions: "Subscriptions",
+  projects: "Projects",
+  photos: "Photos",
+  planner: "Planner",
+  routines: "Routines",
   settings: "Settings",
 };
 
@@ -61,6 +67,9 @@ function routeVisible(
   if (key === "kitchen") {
     return false;
   }
+  if (key === "messages") {
+    return true;
+  }
   if (key === "notifications") {
     return moduleVisibility?.dashboard !== false;
   }
@@ -68,6 +77,17 @@ function routeVisible(
     return true;
   }
   if (key === "pets") {
+    return true;
+  }
+  if (key === "emergency") {
+    return true;
+  }
+  if (
+    key === "projects" ||
+    key === "photos" ||
+    key === "planner" ||
+    key === "routines"
+  ) {
     return true;
   }
   return (
@@ -198,10 +218,8 @@ export function SidebarNav({
         className="flex flex-1 flex-col gap-6 pb-4"
         aria-label="Primary sidebar"
       >
-        {renderGroup("Home", ["adminux", "dashboard"], { isFirst: true })}
-        {renderGroup("Household", ["shopping", "pantry", "calendar"])}
-        {renderGroup("Updates", ["notifications", "subscriptions"])}
-        {renderGroup("Cleaning", ["tasks", "pets"])}
+        {renderGroup("Main", [...SIDEBAR_PRIMARY_KEYS], { isFirst: true })}
+        {renderGroup("Household tools", [...SIDEBAR_HOUSEHOLD_TOOL_KEYS])}
         {renderGroup("System", ["settings"])}
 
         {kioskNavEnabled ? (

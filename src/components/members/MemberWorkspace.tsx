@@ -6,10 +6,12 @@ import type {
   PlannerEvent,
   Task,
 } from "../../data/familyData";
+import type { UpcomingEventRow } from "../../lib/upcomingEvents";
 import type { MemberChoreSuggestion, MemberTaskProgress } from "../../types/memberTasks";
 import { resolveMemberTheme } from "../../lib/memberTheme";
 import { computeMemberCompletionStreak } from "../../lib/memberStreak";
 import { cn, formatShortDate } from "../../lib/utils";
+import { UpcomingEventsList } from "../events/UpcomingEventsList";
 import { MemberSuggestions } from "./MemberSuggestions";
 import { MemberHeroCard } from "./MemberHeroCard";
 import { MemberProgressPanel } from "./MemberProgressPanel";
@@ -33,6 +35,7 @@ export type MemberWorkspaceProps = {
   recentlyCompletedItems: Task[];
   todayPlannerItems: PlannerEvent[];
   upcomingPlannerItems: PlannerEvent[];
+  upcomingEventRows?: UpcomingEventRow[];
   recentCleaningCompletions: CleaningCompletionRecord[];
   cleaningRoomName: (roomId: string) => string;
   cleaningStatusLabel: (status: CleaningCompletionRecord["status"]) => string;
@@ -128,6 +131,42 @@ export function MemberWorkspace(props: MemberWorkspaceProps) {
           onCompleteTask={props.onCompleteTask}
           getTaskDueDate={props.getTaskDueDate}
         />
+
+        <section
+          className="fh-member-upcoming mx-4 mb-5 space-y-3 sm:mx-5"
+          aria-labelledby="member-home-upcoming-events"
+        >
+          <div className="flex flex-wrap items-end justify-between gap-2">
+            <div>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-500">
+                Calendar
+              </p>
+              <h2
+                id="member-home-upcoming-events"
+                className="text-lg font-extrabold tracking-[-0.02em] text-slate-900"
+              >
+                Upcoming Events
+              </h2>
+              <p className="text-sm font-medium text-slate-600">
+                Today first, then next — yours and household-wide
+              </p>
+            </div>
+            {props.onOpenCalendar ? (
+              <button
+                type="button"
+                className="rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-bold text-slate-700 shadow-sm"
+                onClick={props.onOpenCalendar}
+              >
+                Open calendar
+              </button>
+            ) : null}
+          </div>
+          <UpcomingEventsList
+            events={props.upcomingEventRows ?? []}
+            emptyText="No upcoming events yet."
+            onOpenEvent={props.onOpenCalendar ? () => props.onOpenCalendar?.() : undefined}
+          />
+        </section>
 
         {props.pinPanel ? (
           <div className="fh-member-pin-panel">{props.pinPanel}</div>

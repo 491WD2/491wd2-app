@@ -12,7 +12,6 @@ import type {
   ActivityLogItem,
   CleaningCompletionRecord,
   FamilyMember,
-  PlannerEvent,
   Task,
 } from "../data/familyData";
 import { Button } from "../components/ui/Button";
@@ -32,6 +31,8 @@ import {
   trackMemberTaskReassign,
   trackMemberTaskSkip,
 } from "../lib/memberDashboardAnalytics";
+import { UpcomingEventsList } from "../components/events/UpcomingEventsList";
+import { selectUpcomingEventsForMemberHome } from "../lib/upcomingEvents";
 import type { PageProps } from "./pageTypes";
 import "../styles/guided-kiosk.css";
 
@@ -64,7 +65,7 @@ export function MemberDashboardPage({
             <div className="flex flex-wrap gap-2">
               <Button onClick={onOpenDashboard} variant="ghost">
                 <Home className="h-4 w-4" />
-                Dashboard
+                Home
               </Button>
               <Button onClick={onBackToFamily}>
                 <ArrowLeft className="h-4 w-4" />
@@ -106,15 +107,18 @@ export function MemberDashboardPage({
     .filter((task) => task.lastCompletedDate)
     .sort((a, b) => b.lastCompletedDate.localeCompare(a.lastCompletedDate))
     .slice(0, 5);
-  const assignedPlannerItems = data.planner
-    .filter((event) => isPlannerAssignedToMember(event, memberSafe))
-    .sort((a, b) => `${a.date}${a.time}`.localeCompare(`${b.date}${b.time}`));
-  const todayPlannerItems = assignedPlannerItems.filter(
-    (event) => event.date === today,
+  const upcomingEventRows = useMemo(
+    () => selectUpcomingEventsForMemberHome(data, memberSafe, today, 12),
+    [data, memberSafe, today],
   );
-  const upcomingPlannerItems = assignedPlannerItems
-    .filter((event) => event.date >= today)
-    .slice(0, 5);
+  const todayPlannerItems = useMemo(
+    () => upcomingEventRows.filter((row) => row.isToday).map((row) => row.event),
+    [upcomingEventRows],
+  );
+  const upcomingPlannerItems = useMemo(
+    () => upcomingEventRows.map((row) => row.event),
+    [upcomingEventRows],
+  );
   const recentActivity = getMemberActivity(data.activityLog ?? [], memberSafe);
 
   const recentCleaningCompletions = useMemo(
@@ -391,18 +395,12 @@ export function MemberDashboardPage({
           ) : null}
 
           {guidedFlow === "events" ? (
-            <div className="wd-guided-kiosk__chooser" role="list" aria-label="Member events">
-              {upcomingPlannerItems.length === 0 ? (
-                <p className="wd-guided-kiosk__empty">No upcoming events for this member.</p>
-              ) : (
-                upcomingPlannerItems.map((event) => (
-                  <article key={event.id} className="wd-guided-kiosk__summary-card">
-                    <strong>{event.title}</strong>
-                    <small>{event.date}{event.time ? ` · ${event.time}` : ""}</small>
-                  </article>
-                ))
-              )}
-            </div>
+            <UpcomingEventsList
+              events={upcomingEventRows}
+              emptyText="No upcoming events for this member."
+              compact
+              onOpenEvent={() => onOpenCalendar?.()}
+            />
           ) : null}
 
           {guidedFlow === "activity" ? (
@@ -436,7 +434,7 @@ export function MemberDashboardPage({
           <div className="wd-guided-kiosk__status">
             <span>{itemsDueToday.length} due today</span>
             <span>{overdueItems.length} overdue</span>
-            <span>{upcomingPlannerItems.length} events</span>
+            <span>{upcomingEventRows.length} events</span>
           </div>
         </section>
 
@@ -450,8 +448,43 @@ export function MemberDashboardPage({
           </section>
         ) : null}
 
+        <section
+          className="rounded-[18px] border border-white/15 bg-white/95 p-4 text-slate-950 shadow-[0_18px_45px_rgba(0,0,0,0.2)]"
+          aria-labelledby="member-upcoming-events-title"
+        >
+          <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-500">
+                Calendar
+              </p>
+              <h2 id="member-upcoming-events-title" className="text-lg font-extrabold text-slate-900">
+                Upcoming Events
+              </h2>
+            </div>
+            {onOpenCalendar ? (
+              <button
+                type="button"
+                className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-bold text-slate-700"
+                onClick={onOpenCalendar}
+              >
+                Calendar
+              </button>
+            ) : null}
+          </div>
+          <UpcomingEventsList
+            events={upcomingEventRows}
+            emptyText="No upcoming events yet."
+            compact
+            onOpenEvent={() => onOpenCalendar?.()}
+          />
+        </section>
+
         <section className="wd-guided-kiosk__actions-grid" aria-label="Member actions">
-          <button type="button" className="wd-guided-kiosk__action wd-guided-kiosk__action--primary" onClick={() => setGuidedFlow("tasks")}>
+          <button type="button" className="wd-guided-kiosk__action wd-guided-kiosk__action--primary" onClick={onOpenDashboard}>
+            <span className="wd-guided-kiosk__action-icon"><Home className="h-5 w-5" aria-hidden /></span>
+            <span><strong>Home</strong><small>Back to family wake page</small></span>
+          </button>
+          <button type="button" className="wd-guided-kiosk__action" onClick={() => setGuidedFlow("tasks")}>
             <span className="wd-guided-kiosk__action-icon"><ClipboardList className="h-5 w-5" aria-hidden /></span>
             <span><strong>Tasks</strong><small>Choose task, then mark done</small></span>
           </button>
@@ -493,7 +526,7 @@ export function MemberDashboardPage({
         <div className="flex flex-wrap gap-2">
           <Button onClick={onOpenDashboard} variant="ghost">
             <Home className="h-4 w-4" />
-            Dashboard
+            Home
           </Button>
           <Button onClick={() => setShowFullMember(false)} variant="secondary">
             Kiosk station
@@ -528,6 +561,7 @@ export function MemberDashboardPage({
         recentlyCompletedItems={recentlyCompletedItems}
         todayPlannerItems={todayPlannerItems}
         upcomingPlannerItems={upcomingPlannerItems}
+        upcomingEventRows={upcomingEventRows}
         recentCleaningCompletions={recentCleaningCompletions}
         cleaningRoomName={(roomId) =>
           data.cleaningRooms?.find((room) => room.id === roomId)?.name ?? "Room"
@@ -624,17 +658,6 @@ function EmptyState({ text }: { text: string }) {
 
 function isTaskAssignedToMember(task: Task, member: FamilyMember) {
   return task.assignedMemberId === member.id || samePerson(task.owner, member.name);
-}
-
-function isPlannerAssignedToMember(event: PlannerEvent, member: FamilyMember) {
-  if (event.assignedMemberIds?.includes(member.id)) {
-    return true;
-  }
-
-  return (
-    event.assignedMemberId === member.id ||
-    (!event.assignedMemberId && samePerson(event.assignedPerson, member.name))
-  );
 }
 
 function getMemberActivity(

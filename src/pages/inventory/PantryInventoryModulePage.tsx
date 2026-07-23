@@ -1,21 +1,28 @@
-import { ArrowLeft, Camera, Plus, ShoppingCart } from "lucide-react";
+import { Camera, Plus, ShoppingCart } from "lucide-react";
 import { lazy, Suspense, useCallback, useEffect, useMemo, useState } from "react";
 import {
   type RecipeIdea,
   type ShoppingItem,
   type PantryItem,
 } from "../../data/familyData";
+import type { DemoPantryZone } from "../../data/demoPantryInventory";
 import { Button } from "../../components/ui/Button";
 import { Select } from "../../components/ui/Field";
 import {
-  ModuleActionBar,
   WorkspacePageShell,
   WorkspacePanel,
   EmptyStatePanel,
 } from "../../components/workspace/ModuleWorkspace";
+import { PantryAdminUxChrome, type PantryInventorySort } from "../../components/inventory/PantryAdminUxChrome";
+import { PantryAdminUxInventoryList } from "../../components/inventory/PantryAdminUxInventoryList";
 import { createActivity } from "../../lib/activity";
 import { DS_MAIN_COLUMN } from "../../lib/designSystem";
 import { itemMatchesQrLocation, parseInventoryQrSearch } from "../../lib/inventoryDeepLink";
+import {
+  itemMatchesStorageZone,
+  summarizePantryByZone,
+  PANTRY_STORAGE_ZONES,
+} from "../../lib/pantryStorageZones";
 import {
   mapOpenFoodFactsToPantryItemRespectingImages,
   type NormalizedProductLookup,
@@ -82,6 +89,7 @@ import {
 import { siteNotificationEnabled } from "../../lib/notificationPreferences";
 import { ConsumeShoppingPrompt } from "../../components/inventory/ConsumeShoppingPrompt";
 import { ConsumeLowOutConfirmModal } from "../../components/inventory/ConsumeLowOutConfirmModal";
+
 const BarcodeScannerPanelLazy = lazy(() =>
   import("../../components/scanner/BarcodeScannerPanel").then((m) => ({
     default: m.BarcodeScannerPanel,
@@ -94,24 +102,18 @@ const ScanPutAwayWizardLazy = lazy(() =>
   })),
 );
 
-/** SmartHR — matches Shopping / Calendar */
-const PAGE_BG = "min-h-full bg-[#f7f7f7] text-[#1f1f1f] [-webkit-font-smoothing:antialiased]";
+const PAGE_BG = "aux-pantry__canvas min-h-full text-[#0f172a] [-webkit-font-smoothing:antialiased]";
 const CARD_SHELL =
-  "rounded-[8px] border border-[#ededed] bg-white shadow-[0_1px_1px_rgba(0,0,0,0.2)]";
-const SM_LABEL = "text-[11px] font-semibold uppercase tracking-[0.12em] text-[#637381]";
+  "rounded-[1.15rem] border border-[rgba(15,23,42,0.08)] bg-white shadow-[0_12px_32px_rgba(15,23,42,0.07)]";
+const SM_LABEL = "text-[11px] font-semibold uppercase tracking-[0.12em] text-[#64748b]";
 const SM_INPUT =
-  "min-h-10 w-full rounded-[8px] border border-[#ededed] bg-white px-3 py-2 text-[14px] text-[#1f1f1f] shadow-[0_1px_1px_rgba(0,0,0,0.06)] placeholder:text-[#8e8e8e] focus:border-[#FE9F43]/55 focus:outline-none focus:ring-2 focus:ring-[#FE9F43]/25";
+  "min-h-10 w-full rounded-[0.75rem] border border-[rgba(15,23,42,0.08)] bg-white px-3 py-2 text-[14px] text-[#0f172a] shadow-[0_1px_2px_rgba(15,23,42,0.04)] placeholder:text-[#94a3b8] focus:border-[#3b82f6]/55 focus:outline-none focus:ring-2 focus:ring-[#3b82f6]/25";
 const btnPrimaryOrange =
-  "bg-gradient-to-r from-[#FF6F28] to-[#FF5325] font-semibold text-white shadow-[0_6px_15px_rgba(242,101,34,0.22)] hover:brightness-[1.03] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FE9F43]/45 focus-visible:ring-offset-2 focus-visible:ring-offset-[#f7f7f7]";
+  "bg-gradient-to-r from-[#3b82f6] to-[#2563eb] font-semibold text-white shadow-[0_6px_15px_rgba(37,99,235,0.22)] hover:brightness-[1.03] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3b82f6]/45 focus-visible:ring-offset-2 focus-visible:ring-offset-[#eff6ff]";
 const btnSecondaryLight =
-  "border-[#ededed] bg-white font-semibold text-[#637381] shadow-sm hover:bg-[#f8f9fa] focus-visible:ring-2 focus-visible:ring-[#FE9F43]/25 focus-visible:ring-offset-2 focus-visible:ring-offset-[#f7f7f7]";
-const segmentInactiveLight = "text-[#637381] hover:bg-white hover:text-[#1f1f1f]";
-const segmentActiveLight =
-  "bg-gradient-to-r from-[#FF6F28] to-[#FF5325] text-white shadow-sm";
-const ACTION_BAR_SMARTHR =
-  "!rounded-[8px] !border-[#ededed] !shadow-[0_1px_1px_rgba(0,0,0,0.12)] ring-0";
+  "border-[rgba(15,23,42,0.08)] bg-white font-semibold text-[#64748b] shadow-sm hover:bg-[#f8fafc] focus-visible:ring-2 focus-visible:ring-[#3b82f6]/25 focus-visible:ring-offset-2 focus-visible:ring-offset-[#eff6ff]";
 const DETAILS_SMARTHR =
-  "rounded-[8px] border border-[#ededed] bg-[#f8f9fa] px-4 py-2 text-[#1f1f1f]";
+  "rounded-[1rem] border border-[rgba(15,23,42,0.08)] bg-white/80 px-4 py-2 text-[#0f172a]";
 
 function PantryHeavyFallback({ label }: { label: string }) {
   return (
@@ -123,7 +125,7 @@ function PantryHeavyFallback({ label }: { label: string }) {
 
 const inventoryPrimaryTabs = [
   { id: "dashboard", label: "Dashboard" },
-  { id: "add-item", label: "Add / update stock" },
+  { id: "add-item", label: "Add to Inventory" },
   { id: "inventory", label: "Inventory" },
   { id: "shopping-needs", label: "Low & restock" },
   { id: "storage-plan", label: "Storage Plan" },
@@ -176,7 +178,7 @@ export function PantryInventoryModulePage({
   navigateWithinApp,
 }: PageProps) {
   const workspaceTone = "light" as const;
-  const [activeTab, setActiveTab] = useState<InventoryTab>("dashboard");
+  const [activeTab, setActiveTab] = useState<InventoryTab>("inventory");
   const [shoppingNeedDismissedIds, setShoppingNeedDismissedIds] = useState<string[]>([]);
   const [scannerOpen, setScannerOpen] = useState(false);
   const [scanBarcodeSeed, setScanBarcodeSeed] = useState<string | undefined>(undefined);
@@ -186,6 +188,10 @@ export function PantryInventoryModulePage({
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [sourceFilter, setSourceFilter] = useState("all");
   const [searchText, setSearchText] = useState("");
+  const [storageZoneFilter, setStorageZoneFilter] = useState<DemoPantryZone | "all">("all");
+  const [inventorySort, setInventorySort] = useState<PantryInventorySort>("name");
+  const [stockStatusFilter, setStockStatusFilter] = useState("all");
+  const [showDetailedInventory, setShowDetailedInventory] = useState(false);
   const [pantryImageEditId, setPantryImageEditId] = useState<string | null>(null);
   const clearPantryImageEditRequest = useCallback(() => setPantryImageEditId(null), []);
   const parsedInventoryQr = useMemo(
@@ -199,6 +205,21 @@ export function PantryInventoryModulePage({
     const q = inventorySearch.startsWith("?") ? inventorySearch.slice(1) : inventorySearch;
     try {
       return new URLSearchParams(q).get("tab");
+    } catch {
+      return null;
+    }
+  }, [inventorySearch]);
+  const zoneFromQuery = useMemo((): DemoPantryZone | null => {
+    if (!inventorySearch?.trim()) {
+      return null;
+    }
+    const q = inventorySearch.startsWith("?") ? inventorySearch.slice(1) : inventorySearch;
+    try {
+      const raw = new URLSearchParams(q).get("zone")?.trim() ?? "";
+      if (PANTRY_STORAGE_ZONES.includes(raw as DemoPantryZone)) {
+        return raw as DemoPantryZone;
+      }
+      return null;
     } catch {
       return null;
     }
@@ -231,6 +252,23 @@ export function PantryInventoryModulePage({
       return Number.isFinite(t) && t >= cutoff;
     });
   }, [data.pantry]);
+  const recentlyUpdatedItems = useMemo(() => {
+    const cutoff = Date.now() - 14 * 24 * 60 * 60 * 1000;
+    return data.pantry.filter((p) => {
+      if (p.inactiveInInventory) {
+        return false;
+      }
+      const t = Date.parse(p.lastUpdated || p.createdAt);
+      return Number.isFinite(t) && t >= cutoff;
+    });
+  }, [data.pantry]);
+  const purchasedItemsToAdd = useMemo(
+    () =>
+      data.shopping.filter(
+        (item) => item.purchased === true || item.needsPutAway === true,
+      ),
+    [data.shopping],
+  );
   const overstockItems = useMemo(
     () => data.pantry.filter((p) => !p.inactiveInInventory && isInventoryOverstock(p)),
     [data.pantry],
@@ -284,6 +322,14 @@ export function PantryInventoryModulePage({
     }
   }, [tabFromQuery]);
 
+  useEffect(() => {
+    if (!zoneFromQuery) {
+      return;
+    }
+    setStorageZoneFilter(zoneFromQuery);
+    setActiveTab("inventory");
+  }, [zoneFromQuery]);
+
   const seedBarcodeFromUrl = useMemo(() => {
     if (!inventorySearch?.trim()) {
       return undefined;
@@ -309,6 +355,7 @@ export function PantryInventoryModulePage({
       return;
     }
     const id = parsedInventoryQr.itemId;
+    setShowDetailedInventory(true);
     const handle = window.setTimeout(() => {
       document
         .getElementById(`inventory-card-${id}`)
@@ -408,6 +455,10 @@ export function PantryInventoryModulePage({
       return false;
     }
 
+    if (storageZoneFilter !== "all" && !itemMatchesStorageZone(item, storageZoneFilter)) {
+      return false;
+    }
+
     if (categoryFilter !== "all" && item.category !== categoryFilter) {
       return false;
     }
@@ -420,12 +471,22 @@ export function PantryInventoryModulePage({
       return false;
     }
 
-    if (statusFilter === "low-stock" && !isInventoryLowStock(item)) {
-      return false;
+    if (stockStatusFilter === "Stocked" || stockStatusFilter === "Low" || stockStatusFilter === "Out") {
+      if (item.status !== stockStatusFilter) {
+        return false;
+      }
     }
 
-    if (statusFilter === "expiring" && !isInventoryExpiringSoon(item)) {
-      return false;
+    if (statusFilter === "low-stock" || stockStatusFilter === "low-stock") {
+      if (!isInventoryLowStock(item)) {
+        return false;
+      }
+    }
+
+    if (statusFilter === "expiring" || stockStatusFilter === "expiring") {
+      if (!isInventoryExpiringSoon(item)) {
+        return false;
+      }
     }
 
     if (statusFilter === "staples" && !item.isStaple) {
@@ -461,6 +522,101 @@ export function PantryInventoryModulePage({
 
     return true;
   });
+
+  const sortedFilteredItems = useMemo(() => {
+    const rows = [...filteredItems];
+    const statusRank = (status: string) => {
+      if (status === "Out") return 0;
+      if (status === "Low") return 1;
+      return 2;
+    };
+    rows.sort((a, b) => {
+      if (inventorySort === "status") {
+        const diff = statusRank(a.status) - statusRank(b.status);
+        if (diff !== 0) return diff;
+      }
+      if (inventorySort === "updated") {
+        const ta = Date.parse(a.lastUpdated || a.createdAt) || 0;
+        const tb = Date.parse(b.lastUpdated || b.createdAt) || 0;
+        if (tb !== ta) return tb - ta;
+      }
+      return a.name.localeCompare(b.name, undefined, { sensitivity: "base" });
+    });
+    return rows;
+  }, [filteredItems, inventorySort]);
+
+  const zoneSummaries = useMemo(() => summarizePantryByZone(data.pantry), [data.pantry]);
+  const activeInventoryCount = data.pantry.filter((p) => !p.inactiveInInventory).length;
+  const storageAreaCount = useMemo(() => {
+    const set = new Set(
+      data.pantry.filter((p) => !p.inactiveInInventory).map((p) => p.storageArea).filter(Boolean),
+    );
+    return Math.max(set.size, zoneSummaries.filter((z) => z.count > 0).length);
+  }, [data.pantry, zoneSummaries]);
+
+  function handleStatFilter(kind: "all" | "low" | "out" | "recent" | "purchased" | "storage") {
+    setActiveTab("inventory");
+    setStorageZoneFilter("all");
+    setCategoryFilter("all");
+    setLocationDetailFilter("all");
+    setStorageAreaFilter("all");
+    setSourceFilter("all");
+    setSearchText("");
+    if (kind === "all") {
+      setStatusFilter("all");
+      setStockStatusFilter("all");
+      return;
+    }
+    if (kind === "low") {
+      setStatusFilter("low-stock");
+      setStockStatusFilter("low-stock");
+      return;
+    }
+    if (kind === "out") {
+      setStatusFilter("all");
+      setStockStatusFilter("Out");
+      return;
+    }
+    if (kind === "recent") {
+      setStatusFilter("all");
+      setStockStatusFilter("all");
+      setInventorySort("updated");
+      return;
+    }
+    if (kind === "purchased") {
+      onOpenShopping?.();
+      navigateWithinApp?.("/shopping");
+      return;
+    }
+    if (kind === "storage") {
+      setActiveTab("storage-plan");
+    }
+  }
+
+  function handleSelectZone(zone: DemoPantryZone | "all") {
+    setStorageZoneFilter(zone);
+    setActiveTab("inventory");
+    if (zone === "all") {
+      setStorageAreaFilter("all");
+      setLocationDetailFilter("all");
+      return;
+    }
+    // Prefer friendly zone filter; clear conflicting storage selects.
+    setStorageAreaFilter("all");
+    setLocationDetailFilter("all");
+  }
+
+  function handleChromeStatusFilter(value: string) {
+    setStockStatusFilter(value);
+    if (value === "low-stock" || value === "expiring") {
+      setStatusFilter(value);
+    } else if (value === "all") {
+      setStatusFilter("all");
+    } else {
+      setStatusFilter("all");
+    }
+    setActiveTab("inventory");
+  }
   function addItem() {
     const now = new Date().toISOString();
     const item: PantryItem = {
@@ -854,131 +1010,118 @@ export function PantryInventoryModulePage({
     <div className={PAGE_BG}>
       <WorkspacePageShell
         className={cn(
-          "flex flex-col gap-4 px-[15px] pb-10 pt-0 sm:gap-5 sm:px-[30px] md:pb-10",
+          "aux-pantry flex flex-col gap-4 px-[15px] pb-10 pt-0 sm:gap-5 sm:px-[30px] md:pb-10",
           DS_MAIN_COLUMN,
         )}
         tone={workspaceTone}
       >
-        <header className={cn(CARD_SHELL, "p-5 sm:p-6")}>
-          <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
-            <div className="flex min-w-0 gap-3">
-              <div
-                className="h-14 w-1 shrink-0 rounded-full bg-gradient-to-b from-[#FF6F28] to-[#FF5325]"
-                aria-hidden
-              />
-              <div className="min-w-0">
-                <p className={SM_LABEL}>Kitchen</p>
-                <h1 className="mt-1 text-[22px] font-medium leading-snug tracking-tight text-[#1f1f1f]">
-                  Pantry &amp; Inventory
-                </h1>
-                <p className="mt-1 max-w-xl text-[14px] leading-relaxed text-[#575757]">
-                  Track what is on hand, low, or needs attention.
-                </p>
-              </div>
-            </div>
-            <div className="grid w-full grid-cols-2 gap-2 sm:grid-cols-4 sm:max-w-2xl lg:w-auto">
-              {(
-                [
-                  ["On hand", data.pantry.filter((p) => !p.inactiveInInventory).length],
-                  ["Low stock", lowStockItems.length],
-                  ["Use soon", useSoonNeedItems.length],
-                  ["Out", outItems.length],
-                ] as const
-              ).map(([label, value]) => (
-                <div
-                  key={label}
-                  className="rounded-[8px] border border-[#ededed] bg-[#f8f9fa] px-3 py-3 text-center shadow-[inset_0_1px_0_rgba(0,0,0,0.04)]"
-                >
-                  <p className="text-[10px] font-semibold uppercase tracking-wide text-[#637381]">{label}</p>
-                  <p className="text-xl font-semibold tabular-nums text-[#F26522]">{value}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </header>
+        <PantryAdminUxChrome
+          totalItems={activeInventoryCount}
+          lowStock={lowStockItems.length}
+          outOfStock={outItems.length}
+          recentlyUpdated={recentlyUpdatedItems.length}
+          purchasedToAdd={purchasedItemsToAdd.length}
+          storageAreaCount={storageAreaCount}
+          zoneSummaries={zoneSummaries}
+          activeZone={storageZoneFilter}
+          onSelectZone={handleSelectZone}
+          onAddItem={() => {
+            setActiveTab("add-item");
+          }}
+          onScanItem={() => {
+            setActiveTab("add-item");
+            setScannerOpen(true);
+          }}
+          onOpenSettings={
+            navigateWithinApp
+              ? () => navigateWithinApp("/settings")
+              : onOpenDashboard
+                ? () => onOpenDashboard()
+                : undefined
+          }
+          onStatFilter={handleStatFilter}
+          searchText={searchText}
+          setSearchText={(value) => {
+            setSearchText(value);
+            setActiveTab("inventory");
+          }}
+          categoryFilter={categoryFilter}
+          setCategoryFilter={(value) => {
+            setCategoryFilter(value);
+            setActiveTab("inventory");
+          }}
+          locationFilter={locationDetailFilter}
+          setLocationFilter={(value) => {
+            setLocationDetailFilter(value);
+            setActiveTab("inventory");
+          }}
+          statusFilter={stockStatusFilter}
+          setStatusFilter={handleChromeStatusFilter}
+          sortBy={inventorySort}
+          setSortBy={setInventorySort}
+          categories={categories}
+          locations={locationDetails}
+        />
 
-        <ModuleActionBar className={ACTION_BAR_SMARTHR} tone={workspaceTone}>
-          <div className="flex flex-col gap-4">
+        <details className={cn(CARD_SHELL, "px-4 py-2")}>
+          <summary className="cursor-pointer select-none py-3 text-sm font-semibold text-[#0f172a]">
+            More — shopping link &amp; grocery library
+          </summary>
+          <div className="space-y-4 border-t border-[rgba(15,23,42,0.08)] pb-3 pt-3">
             <div className="flex flex-wrap gap-2">
-              <Button className={btnPrimaryOrange} onClick={addItem} variant="primary">
-                <Plus className="h-4 w-4" />
-                Add Stock
+              <Button className={btnSecondaryLight} onClick={onOpenShopping} variant="secondary">
+                <ShoppingCart className="h-4 w-4" />
+                Shopping list
               </Button>
-              <Button
-                onClick={() => {
-                  setActiveTab("add-item");
-                  setScannerOpen(true);
-                }}
-                variant="secondary"
-                className={cn(btnSecondaryLight, "min-h-12 text-base")}
-              >
-                <Camera className="h-5 w-5" />
-                Scan item
-              </Button>
-              <Button
-                type="button"
-                variant="secondary"
-                className={cn(btnSecondaryLight, "min-h-12 text-base")}
-                onClick={() => setActiveTab("inventory")}
-              >
-                Use item
-              </Button>
+              {purchasedItemsToAdd.length > 0 ? (
+                <Button
+                  className={btnSecondaryLight}
+                  variant="secondary"
+                  onClick={() => {
+                    onOpenShopping?.();
+                    navigateWithinApp?.("/shopping");
+                  }}
+                >
+                  Purchased Items to Add ({purchasedItemsToAdd.length})
+                </Button>
+              ) : null}
             </div>
-            <details className="rounded-[8px] border border-[#ededed] bg-[#f8f9fa] px-3 py-1">
-              <summary className="cursor-pointer select-none py-3 text-sm font-semibold text-[#1f1f1f]">
-                More — navigation and library
-              </summary>
-              <div className="space-y-4 border-t border-[#ededed] pb-3 pt-3">
-                <div className="flex flex-wrap gap-2">
-                  <Button className="text-[#637381] hover:bg-white" onClick={onOpenDashboard} variant="ghost">
-                    <ArrowLeft className="h-4 w-4" />
-                    Home
-                  </Button>
-                  <Button className={btnSecondaryLight} onClick={onOpenShopping} variant="secondary">
-                    <ShoppingCart className="h-4 w-4" />
-                    Shopping list
-                  </Button>
-                </div>
-                <div className="grid gap-2 md:grid-cols-[minmax(220px,360px)_auto]">
-                  <label className="space-y-1.5">
-                    <span className={SM_LABEL}>Saved grocery items</span>
-                    <Select className={SM_INPUT} value={selectedLibraryItemId} onChange={(event) => setSelectedLibraryItemId(event.target.value)}>
-                      <option value="">Choose a frequent item</option>
-                      {data.groceryItems.map((item) => (
-                        <option key={item.id} value={item.id}>
-                          {item.name} · {item.defaultLocation}
-                        </option>
-                      ))}
-                    </Select>
-                  </label>
-                  <div className="flex items-end">
-                    <Button
-                      className={cn("w-full", btnSecondaryLight)}
-                      disabled={!selectedLibraryItemId}
-                      onClick={addLibraryItem}
-                      variant="secondary"
-                    >
-                      Add from library
-                    </Button>
-                  </div>
-                </div>
+            <div className="grid gap-2 md:grid-cols-[minmax(220px,360px)_auto]">
+              <label className="space-y-1.5">
+                <span className={SM_LABEL}>Saved grocery items</span>
+                <Select
+                  className={SM_INPUT}
+                  value={selectedLibraryItemId}
+                  onChange={(event) => setSelectedLibraryItemId(event.target.value)}
+                >
+                  <option value="">Choose a frequent item</option>
+                  {data.groceryItems.map((item) => (
+                    <option key={item.id} value={item.id}>
+                      {item.name} · {item.defaultLocation}
+                    </option>
+                  ))}
+                </Select>
+              </label>
+              <div className="flex items-end">
+                <Button
+                  className={cn("w-full", btnSecondaryLight)}
+                  disabled={!selectedLibraryItemId}
+                  onClick={addLibraryItem}
+                  variant="secondary"
+                >
+                  Add from library
+                </Button>
               </div>
-            </details>
+            </div>
           </div>
-        </ModuleActionBar>
+        </details>
 
-        <nav
-          className="flex gap-0.5 overflow-x-auto rounded-[8px] border border-[#ededed] bg-[#f8f9fa] p-1 shadow-[inset_0_1px_0_rgba(0,0,0,0.04)]"
-          aria-label="Pantry sections"
-        >
+        <nav className="aux-pantry__tabs" aria-label="Pantry sections">
           {inventoryPrimaryTabs.map((tab) => (
             <button
               key={tab.id}
               type="button"
-              className={cn(
-                "motion-tab min-h-10 whitespace-nowrap rounded-[6px] border border-transparent px-3.5 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FE9F43]/45 focus-visible:ring-offset-2 focus-visible:ring-offset-[#f7f7f7]",
-                activeTab === tab.id ? segmentActiveLight : segmentInactiveLight,
-              )}
+              className={cn("aux-pantry__tab", activeTab === tab.id && "is-active")}
               onClick={() => setActiveTab(tab.id)}
             >
               {tab.label}
@@ -986,17 +1129,18 @@ export function PantryInventoryModulePage({
           ))}
         </nav>
 
-        <p className="text-xs leading-relaxed text-[#637381]">
-          QR labels open the matching item or shelf on this device.
+        <p className="text-xs leading-relaxed text-[#64748b]">
+          QR labels open the matching item or shelf on this device. Scan and Open Food Facts lookup stay available
+          under Add to Inventory.
         </p>
 
       {inventorySearch ? (
         <div
           className={cn(
-            "flex flex-col gap-3 rounded-[8px] border px-4 py-3 sm:flex-row sm:items-center sm:justify-between",
+            "flex flex-col gap-3 rounded-[1rem] border px-4 py-3 sm:flex-row sm:items-center sm:justify-between",
             missingDeepLinkItem
               ? "border-amber-200 bg-amber-50/90 text-amber-950"
-              : "border-[#ededed] bg-[#f8f9fa] text-[#1f1f1f]",
+              : "border-[rgba(15,23,42,0.08)] bg-white text-[#0f172a]",
           )}
         >
           <p className="text-sm leading-relaxed">
@@ -1032,10 +1176,15 @@ export function PantryInventoryModulePage({
 
       {activeTab === "add-item" ? (
         <div className="flex flex-col gap-6">
-          <WorkspacePanel className={CARD_SHELL} eyebrow="Three steps" title="Add item" tone={workspaceTone}>
+          <WorkspacePanel
+            className={CARD_SHELL}
+            eyebrow="Add to Inventory"
+            title="Scan or enter stock"
+            tone={workspaceTone}
+          >
             <ol className="list-decimal space-y-2 pl-5 text-sm text-[#575757]">
               <li>Scan a barcode with the camera.</li>
-              <li>Pick a saved grocery item from the bar above, or search in the form.</li>
+              <li>Pick a saved grocery item from the library, or search in the form.</li>
               <li>Add manually in the form — fields stay optional until you need them.</li>
             </ol>
           </WorkspacePanel>
@@ -1060,6 +1209,10 @@ export function PantryInventoryModulePage({
               onClick={() => navigateWithinApp?.("/pantry?tab=storage-plan")}
             >
               Storage plan tools
+            </Button>
+            <Button type="button" variant="secondary" className={btnSecondaryLight} onClick={addItem}>
+              <Plus className="h-4 w-4" />
+              Add Item
             </Button>
           </div>
           {scannerOpen ? (
@@ -1385,44 +1538,88 @@ export function PantryInventoryModulePage({
       ) : null}
 
       {activeTab === "inventory" ? (
-        <InventoryGridView
-          addInventoryItemToShopping={addInventoryItemToShopping}
-          applyProductLookupToInventory={applyProductLookupToInventory}
-          adjustItemQuantity={adjustItemQuantity}
-          allPantryItems={data.pantry}
-          categories={categories}
-          categoryFilter={categoryFilter}
-          deepLinkOrigin={deepLinkOrigin}
-          filteredItems={filteredItems}
-          highlightItemId={parsedInventoryQr.itemId}
-          inventoryPanelEyebrow="What you have now"
-          inventoryPanelTitle="Inventory"
-          locationDetailFilter={locationDetailFilter}
-          locationDetails={locationDetails}
-          onAddItem={addItem}
-          onAddMissingIngredientsToShopping={addMissingIngredientsToShopping}
-          onAddRecipeIdea={addRecipeIdeaFromInventory}
-          onClearPantryImageEditRequest={clearPantryImageEditRequest}
-          onConsumeInventory={consumeInventoryAmount}
-          onRequestPantryImageEdit={setPantryImageEditId}
-          pantryImageEditRequestId={pantryImageEditId}
-          pantryNamesForRecipes={data.pantry.map((p) => p.name)}
-          searchText={searchText}
-          setCategoryFilter={setCategoryFilter}
-          setLocationDetailFilter={setLocationDetailFilter}
-          setSearchText={setSearchText}
-          setSourceFilter={setSourceFilter}
-          setStatusFilter={setStatusFilter}
-          setStorageAreaFilter={setStorageAreaFilter}
-          sourceFilter={sourceFilter}
-          sourceOptions={sourceOptions}
-          statusFilter={statusFilter}
-          storageAreaFilter={storageAreaFilter}
-          selectLists={pantrySelectLists}
-          tone={workspaceTone}
-          updateItem={updateItem}
-          familyMembers={data.familyMembers}
-        />
+        <div className="space-y-4">
+          <PantryAdminUxInventoryList
+            items={sortedFilteredItems}
+            adjustItemQuantity={adjustItemQuantity}
+            addInventoryItemToShopping={addInventoryItemToShopping}
+            onEditItem={(itemId) => {
+              setPantryImageEditId(itemId);
+              setActiveTab("inventory");
+              window.requestAnimationFrame(() => {
+                document
+                  .getElementById(`inventory-card-${itemId}`)
+                  ?.scrollIntoView({ behavior: "smooth", block: "center" });
+              });
+              // Fall through to detailed card editor below when user wants full edit.
+              setShowDetailedInventory(true);
+            }}
+            onUpdateStock={(itemId) => {
+              setShowDetailedInventory(true);
+              setPantryImageEditId(itemId);
+              window.requestAnimationFrame(() => {
+                document
+                  .getElementById(`inventory-card-${itemId}`)
+                  ?.scrollIntoView({ behavior: "smooth", block: "center" });
+              });
+            }}
+          />
+          {showDetailedInventory ? (
+            <details className={DETAILS_SMARTHR} open>
+              <summary className="cursor-pointer py-2 text-sm font-semibold text-[#0f172a]">
+                Detailed inventory editor
+              </summary>
+              <div className="pb-4 pt-2">
+                <InventoryGridView
+                  addInventoryItemToShopping={addInventoryItemToShopping}
+                  applyProductLookupToInventory={applyProductLookupToInventory}
+                  adjustItemQuantity={adjustItemQuantity}
+                  allPantryItems={data.pantry}
+                  categories={categories}
+                  categoryFilter={categoryFilter}
+                  deepLinkOrigin={deepLinkOrigin}
+                  filteredItems={sortedFilteredItems}
+                  highlightItemId={parsedInventoryQr.itemId ?? pantryImageEditId ?? undefined}
+                  inventoryPanelEyebrow="Full edit cards"
+                  inventoryPanelTitle="Edit inventory"
+                  locationDetailFilter={locationDetailFilter}
+                  locationDetails={locationDetails}
+                  onAddItem={addItem}
+                  onAddMissingIngredientsToShopping={addMissingIngredientsToShopping}
+                  onAddRecipeIdea={addRecipeIdeaFromInventory}
+                  onClearPantryImageEditRequest={clearPantryImageEditRequest}
+                  onConsumeInventory={consumeInventoryAmount}
+                  onRequestPantryImageEdit={setPantryImageEditId}
+                  pantryImageEditRequestId={pantryImageEditId}
+                  pantryNamesForRecipes={data.pantry.map((p) => p.name)}
+                  searchText={searchText}
+                  setCategoryFilter={setCategoryFilter}
+                  setLocationDetailFilter={setLocationDetailFilter}
+                  setSearchText={setSearchText}
+                  setSourceFilter={setSourceFilter}
+                  setStatusFilter={setStatusFilter}
+                  setStorageAreaFilter={setStorageAreaFilter}
+                  sourceFilter={sourceFilter}
+                  sourceOptions={sourceOptions}
+                  statusFilter={statusFilter}
+                  storageAreaFilter={storageAreaFilter}
+                  selectLists={pantrySelectLists}
+                  tone={workspaceTone}
+                  updateItem={updateItem}
+                  familyMembers={data.familyMembers}
+                />
+              </div>
+            </details>
+          ) : (
+            <button
+              type="button"
+              className="aux-pantry__btn aux-pantry__btn--ghost"
+              onClick={() => setShowDetailedInventory(true)}
+            >
+              Open detailed inventory editor
+            </button>
+          )}
+        </div>
       ) : null}
 
       <ConsumeLowOutConfirmModal

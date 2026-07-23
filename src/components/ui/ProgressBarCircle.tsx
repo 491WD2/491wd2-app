@@ -33,6 +33,7 @@ export function ProgressBarCircle({
     if (!host) return;
 
     host.innerHTML = "";
+    // Avoid from/to color tween — rgba trail colors break progressbar.js interpolator (toFixed on undefined).
     const bar = new ProgressBar.Circle(host, {
       color,
       trailColor,
@@ -43,8 +44,6 @@ export function ProgressBarCircle({
       text: {
         autoStyleContainer: false,
       },
-      from: { color: trailColor },
-      to: { color },
       step(_state: unknown, circle: { path: SVGPathElement; setText: (t: string) => void; value: () => number }) {
         const pct = Math.round(circle.value() * 100);
         circle.setText(`${pct}%`);

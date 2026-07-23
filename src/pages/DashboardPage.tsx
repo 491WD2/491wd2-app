@@ -595,11 +595,11 @@ export function DashboardPage({
       <FamilyHubDashboard
         data={data}
         setData={setData}
-        greeting={greeting}
         navigateWithinApp={navigateWithinApp}
         onOpenPantry={onOpenPantry}
         onOpenTasks={onOpenTasks}
         onOpenCalendar={onOpenCalendar}
+        onOpenShopping={onOpenShopping}
         onOpenMemberDashboard={onOpenMemberDashboard}
       />
     );

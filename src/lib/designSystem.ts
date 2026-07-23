@@ -107,9 +107,9 @@ export const DS_CARD_RAISED =
 export const HOME_PANEL =
   "rounded-lg border border-[#ededed] bg-white shadow-[0_1px_1px_rgba(0,0,0,0.2)] transition-[border-color,background-color,box-shadow] duration-150 ease-out";
 
-export const HOME_PANEL_HEADER = "text-[20px] font-medium leading-snug text-[#1f1f1f]";
+export const HOME_PANEL_HEADER = "text-[20px] font-medium leading-snug text-[#0f172a]";
 
-export const HOME_BODY = "text-[15px] leading-snug text-[#575757]";
+export const HOME_BODY = "text-[15px] leading-snug text-[#334155]";
 
 export const HOME_KITCHEN_DAY_TILE =
   "rounded-lg border border-[#ededed] bg-white shadow-[0_1px_1px_rgba(0,0,0,0.12)] transition-[border-color,background-color] duration-150 ease-out";

@@ -78,6 +78,7 @@ import {
   isInventoryOverstock,
   isUseSoonCandidate,
   getPantryItemDisplayImageSrc,
+  getPantryItemPlaceholderEmoji,
   groupPantryItemsByShelfForTable,
 } from "./inventoryUtils";
 import { effectiveBestByDate } from "../../lib/inventoryDates";
@@ -131,6 +132,7 @@ function PantryItemThumb({
 }) {
   const src = getPantryItemDisplayImageSrc(item);
   const [broken, setBroken] = useState(false);
+  const placeholderEmoji = getPantryItemPlaceholderEmoji(item);
   const box =
     size === "lg"
       ? "h-14 w-14 rounded-[8px]"
@@ -147,11 +149,15 @@ function PantryItemThumb({
         className={cn(
           "flex shrink-0 items-center justify-center border border-dashed object-cover",
           box,
-          dark ? "border-white/20 bg-white/5" : "border-[#ededed] bg-[#f8f9fa]",
+          dark ? "border-white/20 bg-white/5" : "border-[#ededed] bg-[#f0f9ff]",
         )}
         aria-hidden
       >
-        <Image className={cn("opacity-45", iconClass)} aria-hidden />
+        {placeholderEmoji ? (
+          <span className={size === "lg" ? "text-xl" : "text-base"}>{placeholderEmoji}</span>
+        ) : (
+          <Image className={cn("opacity-45", iconClass)} aria-hidden />
+        )}
       </div>
     ) : (
       <img
@@ -342,7 +348,7 @@ export function InventoryOverviewView({
             tone={tone}
             value={useSoonItems.length}
           />
-          <InvMetric label="Recently Added" tone={tone} value={recentlyAddedItems.length} />
+          <InvMetric label="Recently Updated" tone={tone} value={recentlyAddedItems.length} />
         </div>
         <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           <QuickAction
@@ -396,9 +402,9 @@ export function InventoryOverviewView({
         />
       </WorkspacePanel>
 
-      <WorkspacePanel className={panelChrome} title="Recently added" eyebrow="Last 14 days" tone={tone}>
+      <WorkspacePanel className={panelChrome} title="Recently updated" eyebrow="Last 14 days" tone={tone}>
         <AlertList
-          emptyText="No new items in the last two weeks."
+          emptyText="No inventory updates in the last two weeks."
           items={recentlyAddedItems}
           tone={tone}
         />

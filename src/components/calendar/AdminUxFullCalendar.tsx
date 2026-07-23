@@ -16,7 +16,14 @@ type Props = {
 
 const CATEGORY_CLASS: Record<PlannerEventCategory, string> = {
   Family: "bg-theme-subtle",
+  Household: "bg-theme-subtle",
   School: "bg-info-subtle",
+  "No School": "bg-dark-subtle",
+  Activity: "bg-success-subtle",
+  Travel: "bg-purple-subtle",
+  Chores: "bg-green-subtle",
+  Reminder: "bg-yellow-subtle",
+  Tentative: "bg-orange-subtle",
   Sports: "bg-success-subtle",
   Medical: "bg-danger-subtle",
   Work: "bg-orange-subtle",

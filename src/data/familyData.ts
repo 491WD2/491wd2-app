@@ -2,6 +2,7 @@ import {
   CLEANING_PLAYBOOK_CANONICAL_IDS,
   cloneCleaningRoomStarter,
 } from "./cleaningPlaybookTemplates";
+import { createDemoPantryInventoryItems } from "./demoPantryInventory";
 
 export type TaskStatus =
   | "Not Started"
@@ -789,6 +790,8 @@ export type ProductLookupMetadata = {
   rawCode?: string;
 };
 
+export type PlannerStickyColor = "dark" | "blue" | "yellow" | "green";
+
 export type PlannerEvent = {
   id: string;
   title: string;
@@ -801,11 +804,21 @@ export type PlannerEvent = {
   responsibleAdultId?: string;
   startTime?: string;
   endTime?: string;
+  /** Inclusive end date for multi-day travel / camp spans (YYYY-MM-DD). */
+  endDate?: string;
   isAllDay?: boolean;
   repeatEnabled?: boolean;
   repeatRule?: PlannerRepeatRule;
   location?: string;
   notes?: string;
+  /** Freeform household tags (school, travel, tentative, band, camp, …). */
+  tags?: string[];
+  /** Tentative / not confirmed — prefer this over category "Tentative". */
+  isTentative?: boolean;
+  /** Shown at bottom of No School sticky notes. */
+  noSchoolReason?: string;
+  /** Sticky note color for school markers. */
+  stickyColor?: PlannerStickyColor;
   prepChecklist?: PlannerPrepChecklistItem[];
   reminderSettings?: PlannerReminderSetting[];
   createdAt?: string;
@@ -815,6 +828,13 @@ export type PlannerEvent = {
 export type PlannerEventCategory =
   | "Family"
   | "School"
+  | "No School"
+  | "Activity"
+  | "Travel"
+  | "Household"
+  | "Chores"
+  | "Reminder"
+  | "Tentative"
   | "Sports"
   | "Medical"
   | "Work"
@@ -1242,7 +1262,14 @@ export const moduleKeys: ModuleKey[] = [
 
 export const plannerCategories: PlannerEvent["category"][] = [
   "Family",
+  "Household",
   "School",
+  "No School",
+  "Activity",
+  "Travel",
+  "Chores",
+  "Reminder",
+  "Tentative",
   "Sports",
   "Medical",
   "Work",
@@ -1295,13 +1322,28 @@ export const memberColorThemes = [
 /**
  * Canonical household roster — used for defaults, empty roster normalization,
  * and the Settings repair tool.
+ *
+ * Seed IDs stay `member-1`… in this array order so existing seed chores/kitchen
+ * schedule keep stable references. Wake-page button order is
+ * {@link WAKE_PAGE_MEMBER_DISPLAY_ORDER}.
  */
 export const CANONICAL_HOUSEHOLD_ROSTER_NAMES = [
   "Lorraine",
-  "Herschel",
+  "Hershel",
   "Stella",
   "Nox",
   "Jeremiah",
+  "Selena",
+] as const;
+
+/** Portrait kiosk wake-page member button order (display only). */
+export const WAKE_PAGE_MEMBER_DISPLAY_ORDER = [
+  "Hershel",
+  "Lorraine",
+  "Stella",
+  "Nox",
+  "Jeremiah",
+  "Selena",
 ] as const;
 
 const CANONICAL_MEMBER_COLOR_THEMES: (typeof memberColorThemes)[number][] = [
@@ -1310,9 +1352,10 @@ const CANONICAL_MEMBER_COLOR_THEMES: (typeof memberColorThemes)[number][] = [
   "purple",
   "green",
   "orange",
+  "emerald",
 ];
 
-/** Stable IDs `member-1`…`member-5` match bundled seed tasks and projects. */
+/** Stable IDs `member-1`… match bundled seed tasks and projects; Selena is `member-6`. */
 export function createCanonicalHouseholdFamilyMembers(): FamilyMember[] {
   return CANONICAL_HOUSEHOLD_ROSTER_NAMES.map((name, index) => ({
     id: `member-${index + 1}`,
@@ -1703,88 +1746,7 @@ export const initialFamilyData: FamilyData = {
       nextStep: "Pick target dates",
     },
   ],
-  pantry: [
-    {
-      id: "pantry-1",
-      name: "Pasta",
-      quantity: "4 boxes",
-      unit: "boxes",
-      category: "Dry goods",
-      storageArea: "Pantry",
-      location: "Pantry",
-      pantryWall: "Wall 1",
-      pantryShelf: "Shelf 2",
-      wall: "Wall 1",
-      shelf: "Shelf 2",
-      status: "Stocked",
-      expiryDate: "",
-      notes: "",
-      isStaple: true,
-      minQuantity: "2",
-      tags: ["dinner"],
-      source: "seed",
-      lastUpdated: "2026-05-04",
-      createdAt: "2026-05-04",
-    },
-    {
-      id: "pantry-2",
-      name: "Greek yogurt",
-      quantity: "2 tubs",
-      unit: "tubs",
-      category: "Dairy",
-      storageArea: "Kitchen Fridge",
-      location: "Kitchen Fridge",
-      status: "Low",
-      expiryDate: "",
-      notes: "",
-      isStaple: true,
-      minQuantity: "2",
-      tags: ["breakfast"],
-      source: "seed",
-      lastUpdated: "2026-05-04",
-      createdAt: "2026-05-04",
-    },
-    {
-      id: "pantry-3",
-      name: "Frozen berries",
-      quantity: "1 bag",
-      unit: "bag",
-      category: "Frozen",
-      storageArea: "Laundry Room Freezer",
-      location: "Laundry Room Freezer",
-      status: "Stocked",
-      expiryDate: "",
-      notes: "",
-      isStaple: false,
-      minQuantity: "",
-      tags: ["smoothies"],
-      source: "seed",
-      lastUpdated: "2026-05-04",
-      createdAt: "2026-05-04",
-    },
-    {
-      id: "pantry-4",
-      name: "Lunch snacks",
-      quantity: "1 bin",
-      unit: "bin",
-      category: "Kids",
-      storageArea: "Pantry",
-      location: "Pantry",
-      pantryWall: "Wall 2",
-      pantryShelf: "Shelf 1",
-      wall: "Wall 2",
-      shelf: "Shelf 1",
-      status: "Low",
-      expiryDate: "",
-      notes: "",
-      isStaple: true,
-      minQuantity: "2",
-      tags: ["school"],
-      source: "seed",
-      lastUpdated: "2026-05-04",
-      createdAt: "2026-05-04",
-    },
-  ],
+  pantry: createDemoPantryInventoryItems(),
   shopping: [
     {
       id: "shop-1",

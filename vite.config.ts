@@ -4,6 +4,10 @@ import tailwindcss from "@tailwindcss/vite";
 import { VitePWA } from "vite-plugin-pwa";
 
 export default defineConfig({
+  // dragula (AdminUX shopping board) references Node's `global`; map it for browser ESM.
+  define: {
+    global: "globalThis",
+  },
   plugins: [
     react(),
     tailwindcss(),
@@ -108,6 +112,11 @@ export default defineConfig({
   },
   optimizeDeps: {
     entries: ["index.html"],
+    esbuildOptions: {
+      define: {
+        global: "globalThis",
+      },
+    },
   },
   server: {
     port: 5173,

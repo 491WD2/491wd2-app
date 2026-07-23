@@ -89,6 +89,10 @@ import { FeatureRoadmapPanel } from "../components/settings/FeatureRoadmapPanel"
 import { DeviceNotificationsCard } from "../components/settings/DeviceNotificationsCard";
 import { SubscriptionSettingsSection } from "../components/settings/SubscriptionSettingsSection";
 import { AppearanceLayoutEditor } from "../components/settings/AppearanceLayoutEditor";
+import {
+  applyDemoPantryInventory,
+  DEMO_PANTRY_ITEM_COUNT,
+} from "../data/demoPantryInventory";
 import { siteNotificationEnabled } from "../lib/notificationPreferences";
 import { testAiConnection } from "../services/aiClient";
 import { pingInstacartConnection } from "../services/instacartClient";
@@ -817,6 +821,39 @@ export function SettingsPage({ data, setData, onOpenLogin, navigateWithinApp }: 
     );
     setHasExportedThisSession(false);
     setMessage("Reset complete. This device is back to the default template.");
+  }
+
+  function loadDemoPantryInventory() {
+    const activeCount = (data.pantry ?? []).filter((p) => p && !p.inactiveInInventory).length;
+    let forceReplace = false;
+    if (activeCount > 0) {
+      const ok = window.confirm(
+        `Pantry already has ${activeCount} item${activeCount === 1 ? "" : "s"}.\n\nReplace pantry inventory with the ${DEMO_PANTRY_ITEM_COUNT}-item demo (Fridge 1–2, Freezer 1–3, Kitchen Pantry)?\n\nOther household data is not changed. Export a backup first if you are unsure.`,
+      );
+      if (!ok) {
+        setMessage("Demo pantry load cancelled — existing pantry kept.");
+        return;
+      }
+      forceReplace = true;
+    }
+    const result = applyDemoPantryInventory(data.pantry, { forceReplace });
+    if (!result.applied) {
+      setMessage(result.message);
+      return;
+    }
+    setData((current) =>
+      createActivity(
+        { ...current, pantry: result.pantry },
+        {
+          type: "imported",
+          entityType: "pantryItem",
+          entityId: "demo-pantry",
+          entityTitle: "Demo pantry inventory",
+          message: result.message,
+        },
+      ),
+    );
+    setMessage(result.message);
   }
 
   function importStagedChores() {
@@ -2336,6 +2373,27 @@ export function SettingsPage({ data, setData, onOpenLogin, navigateWithinApp }: 
           <Button type="button" onClick={exportData} variant="primary" className="min-h-11 px-5 font-semibold">
             <Download className="h-4 w-4" aria-hidden />
             Export Backup
+          </Button>
+        </Card>
+
+        <Card tone="light">
+          <CardHeader tone="light" title="Demo pantry inventory" eyebrow="Sample stock" />
+          <p className="mb-3 text-[14px] leading-relaxed text-[#575757]">
+            Load {DEMO_PANTRY_ITEM_COUNT} household food examples across Fridge 1–2, Freezer 1–3, and
+            Kitchen Pantry. Uses emoji placeholders — no scraped product photos. Does not change the
+            storage key or other modules.
+          </p>
+          <p className="mb-4 rounded-[8px] border border-[#ededed] bg-[#f8fafc] px-3 py-2.5 text-[13px] text-[#64748b]">
+            If pantry is empty, loads immediately. If pantry already has items, you will be asked to
+            confirm replace (pantry only).
+          </p>
+          <Button
+            type="button"
+            variant="secondary"
+            className="min-h-11 font-semibold"
+            onClick={loadDemoPantryInventory}
+          >
+            Load demo pantry inventory
           </Button>
         </Card>
 

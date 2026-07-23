@@ -58,16 +58,16 @@ import { navigateKioskNav } from "../../lib/kioskShellNavigation";
 export type { RouteKey, ShellRoute };
 export { routes };
 
-/** Home · Calendar · Shopping · Pantry — Cleaning & Settings in “More”. */
+/** Home · Messages · Calendar · Shopping — rest in “More”. */
 const bottomNavRoutes: RouteKey[] = [
-  "dashboard",
+  "adminux",
+  "messages",
   "calendar",
   "shopping",
-  "pantry",
 ];
 
-/** Cleaning (`tasks`) includes kitchen workflow — no separate Kitchen tab. */
-const moreMenuRouteKeys: RouteKey[] = ["tasks", "pets", "settings"];
+/** Cleaning, pantry, pets, settings — compact More sheet. */
+const moreMenuRouteKeys: RouteKey[] = ["pantry", "tasks", "pets", "settings"];
 
 function routeVisible(
   key: RouteKey,
@@ -76,6 +76,9 @@ function routeVisible(
   if (key === "kitchen") {
     return moduleVisibility?.tasks !== false;
   }
+  if (key === "messages") {
+    return true;
+  }
   if (key === "notifications") {
     return moduleVisibility?.dashboard !== false;
   }
@@ -83,6 +86,17 @@ function routeVisible(
     return true;
   }
   if (key === "pets") {
+    return true;
+  }
+  if (key === "emergency") {
+    return true;
+  }
+  if (
+    key === "projects" ||
+    key === "photos" ||
+    key === "planner" ||
+    key === "routines"
+  ) {
     return true;
   }
   return (
@@ -1078,15 +1092,17 @@ export function AppShell({
               const Icon = route.icon;
               const label = routeLabels?.[key] ?? route.label;
               const short =
-                key === "dashboard"
+                key === "adminux" || key === "dashboard"
                   ? "Home"
-                  : key === "shopping"
-                    ? "Shop"
-                    : key === "pantry"
-                      ? "Pantry"
-                      : key === "calendar"
-                        ? "Calendar"
-                        : "App";
+                  : key === "messages"
+                    ? "Messages"
+                    : key === "shopping"
+                      ? "Shop"
+                      : key === "pantry"
+                        ? "Pantry"
+                        : key === "calendar"
+                          ? "Calendar"
+                          : "App";
               const isActive = activeRoute === key;
               return (
                 <button

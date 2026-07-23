@@ -1774,6 +1774,7 @@ function normalizePlannerEvent(value: unknown, admin: AdminSettings): PlannerEve
   const assignedMemberId = readString(item.assignedMemberId, "");
   const assignedMemberIds = normalizeStringArray(item.assignedMemberIds);
   const startTime = readOptionalString(item.startTime) ?? readString(item.time, "16:00");
+  const stickyColor = pickOptional(item.stickyColor, ["dark", "blue", "yellow", "green"]);
 
   return {
     ...item,
@@ -1797,6 +1798,7 @@ function normalizePlannerEvent(value: unknown, admin: AdminSettings): PlannerEve
     responsibleAdultId: readOptionalString(item.responsibleAdultId),
     startTime,
     endTime: readOptionalString(item.endTime),
+    endDate: readOptionalString(item.endDate),
     isAllDay: typeof item.isAllDay === "boolean" ? item.isAllDay : false,
     repeatEnabled:
       typeof item.repeatEnabled === "boolean" ? item.repeatEnabled : false,
@@ -1809,6 +1811,10 @@ function normalizePlannerEvent(value: unknown, admin: AdminSettings): PlannerEve
     ]),
     location: readOptionalString(item.location),
     notes: readOptionalString(item.notes),
+    tags: normalizeStringArray(item.tags),
+    isTentative: typeof item.isTentative === "boolean" ? item.isTentative : false,
+    noSchoolReason: readOptionalString(item.noSchoolReason),
+    stickyColor,
     prepChecklist: normalizePlannerChecklist(item.prepChecklist),
     reminderSettings: normalizePlannerReminders(item.reminderSettings),
     createdAt: readString(item.createdAt, now),

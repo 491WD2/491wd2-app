@@ -1,7 +1,5 @@
 import {
-  ArrowLeft,
   CheckCircle2,
-  ChevronRight,
   ListChecks,
   Minus,
   Package,
@@ -13,7 +11,6 @@ import {
   ShoppingCart,
   Sparkles,
   Store,
-  Users,
   X,
 } from "lucide-react";
 import {
@@ -26,7 +23,10 @@ import {
 import type { ShoppingItem } from "../data/familyData";
 import { ProductDetailPanel } from "../components/ProductDetailPanel";
 import { ProductScanPanel } from "../components/ProductScanPanel";
-import { ShoppingListCard } from "../components/shopping/ShoppingListCard";
+import {
+  findLinkedPantryItem,
+  ShoppingAdminUxRow,
+} from "../components/shopping/ShoppingAdminUxRow";
 import { ShoppingQuickActions } from "../components/shopping/ShoppingQuickActions";
 import { useHouseholdProducts } from "../context/HouseholdProductContext";
 import { createActivity } from "../lib/activity";
@@ -55,9 +55,11 @@ import {
   mergeShoppingQuantityStrings,
 } from "./shopping/shoppingUtils";
 import type { PageProps } from "./pageTypes";
+import { getMemberFullName } from "../lib/utils";
 import { useDrawerEscape } from "../hooks/useDrawerEscape";
 import "../styles/pantry-shopping-grofast.css";
 import "../styles/guided-kiosk.css";
+import "../styles/shopping-adminux.css";
 
 function createShoppingRowFromCartLine(line: GroceryCartLine): ShoppingItem {
   const base = createShoppingItemFromName(line.productName);
@@ -121,6 +123,7 @@ export function ShoppingPage({ data, setData, navigateWithinApp, shoppingSearch 
   const [selectedStore, setSelectedStore] = useState("All Stores");
   const [newListTitle, setNewListTitle] = useState("");
   const [sharedListTitle, setSharedListTitle] = useState("Shared Household List");
+  const [quickAddName, setQuickAddName] = useState("");
 
   const addDrawerTitleId = useId();
 
@@ -278,6 +281,22 @@ export function ShoppingPage({ data, setData, navigateWithinApp, shoppingSearch 
       .slice(0, 8);
   }, [cartLines, catalog, data.shopping]);
 
+  const purchasedItemsToAdd = useMemo(() => {
+    const fromCart = purchasedCartLines.length;
+    const fromSaved = data.shopping.filter(
+      (item) => item.purchased === true || item.needsPutAway === true,
+    ).length;
+    return Math.max(fromCart, fromSaved);
+  }, [data.shopping, purchasedCartLines.length]);
+
+  const memberNameById = useMemo(() => {
+    const map = new Map<string, string>();
+    for (const member of data.familyMembers) {
+      map.set(member.id, getMemberFullName(member));
+    }
+    return map;
+  }, [data.familyMembers]);
+
   function syncShoppingRoute(next: {
     action?: ShoppingPageAction | null;
     category?: ShoppingKioskCategoryId;
@@ -299,11 +318,53 @@ export function ShoppingPage({ data, setData, navigateWithinApp, shoppingSearch 
   }
 
   function openPantryInventory() {
-    navigateWithinApp?.("/pantry?view=pantry");
+    navigateWithinApp?.("/pantry");
   }
 
   function openPantrySettings() {
-    navigateWithinApp?.("/pantry?view=settings");
+    navigateWithinApp?.("/settings");
+  }
+
+  function submitQuickAdd() {
+    const name = quickAddName.trim();
+    if (!name) {
+      return;
+    }
+    addItem({
+      productId: `manual-${crypto.randomUUID()}`,
+      productName: name,
+      imageUrl: null,
+      category: MANUAL_SHOPPING_CATEGORY,
+      quantity: 1,
+      unit: "each",
+      store: selectedStore === "All Stores" ? storeOptions[0] ?? "" : selectedStore,
+      notes: "",
+      purchased: false,
+    });
+    setQuickAddName("");
+    setSaveMessage(`${name} was added to shopping.`);
+    setScreen("hub");
+  }
+
+  function addPurchasedLineToInventory(line: GroceryCartLine) {
+    const product = products.find((entry) => entry.id === line.productId);
+    if (product) {
+      addProductToPantry(product);
+      setSaveMessage(`${line.productName} was sent to inventory (Add to Inventory).`);
+      return;
+    }
+    openProductAddDrawer({
+      catalogId: line.productId,
+      name: line.productName,
+      category: line.category,
+      quantity: String(line.quantity),
+      unit: line.unit,
+      store: line.store,
+      notes: line.notes,
+      imageUrl: line.imageUrl,
+    });
+    setSaveMessage(`Review details, then use Add to Inventory from the product panel.`);
+    navigateWithinApp?.("/pantry?tab=add-item");
   }
 
   function openShoppingScreen(nextScreen: ShoppingFlowScreen) {
@@ -859,175 +920,33 @@ export function ShoppingPage({ data, setData, navigateWithinApp, shoppingSearch 
 
   function renderTopBar() {
     return (
-      <header className="wd-shopping-ref__topbar" aria-label="Shopping navigation">
-        <button type="button" className="wd-shopping-ref__back" onClick={openPantryInventory}>
-          <ArrowLeft className="h-4 w-4" aria-hidden />
-          Back
+      <header className="aux-shopping__topbar" aria-label="Shopping navigation">
+        <button type="button" className="aux-shopping__btn aux-shopping__btn--ghost" onClick={openPantryInventory}>
+          <Package className="h-4 w-4" aria-hidden />
+          Inventory
         </button>
         <strong>Shopping</strong>
-        <span aria-hidden />
+        <button type="button" className="aux-shopping__btn aux-shopping__btn--ghost" onClick={openPantrySettings}>
+          <Settings className="h-4 w-4" aria-hidden />
+          Settings
+        </button>
       </header>
     );
   }
 
-  function renderHubScreen() {
+  function renderNeedToBuySection() {
     return (
-      <main className="wd-shopping-ref__content wd-shopping-flow" aria-label="Shopping main">
-        <section className="wd-shopping-flow__hero">
-          <div>
-            <h1>Household Shopping</h1>
-            <span>{openLineCount} active items from your real shopping cart and product library.</span>
-          </div>
-        </section>
-
-        {saveMessage ? <p className="wd-shopping-ref__status" role="status">{saveMessage}</p> : null}
-
-        <section className="wd-shopping-flow__quick-grid" aria-label="Shopping shortcuts">
-          <button type="button" onClick={() => openShoppingScreen("lists")}>
-            <ListChecks className="h-6 w-6" aria-hidden />
-            <strong>Lists</strong>
-            <span>{listCards.length} list views</span>
-          </button>
-          <button type="button" onClick={() => openAddItemModal()}>
-            <Plus className="h-6 w-6" aria-hidden />
-            <strong>Add Product</strong>
-            <span>Search real products</span>
-          </button>
-          <button type="button" onClick={openScanModal}>
-            <ScanLine className="h-6 w-6" aria-hidden />
-            <strong>Scan Item</strong>
-            <span>Barcode + OpenFoodFacts</span>
-          </button>
-          <button type="button" onClick={() => openShoppingScreen("shared-list")}>
-            <Share2 className="h-6 w-6" aria-hidden />
-            <strong>Shared List</strong>
-            <span>Household planning</span>
-          </button>
-          <button type="button" onClick={openPantrySettings}>
-            <Settings className="h-6 w-6" aria-hidden />
-            <strong>Settings</strong>
-            <span>Pantry and shopping setup</span>
-          </button>
-        </section>
-
-        <section className="wd-shopping-flow__cards" aria-label="Shopping list groups">
-          {listCards.map((list) => (
-            <button
-              key={list.id}
-              type="button"
-              className="wd-shopping-flow__list-card"
-              onClick={() => openShoppingScreen(list.screen)}
-            >
-              <span className="wd-shopping-flow__list-icon" aria-hidden>
-                {list.id === "shared" ? <Users className="h-5 w-5" /> : <ShoppingCart className="h-5 w-5" />}
-              </span>
-              <span className="wd-shopping-flow__list-copy">
-                <strong>{list.title}</strong>
-                <small>{list.subtitle}</small>
-              </span>
-              <em>{list.count}</em>
-            </button>
-          ))}
-        </section>
-        <button type="button" className="wd-shopping-flow__pantry-link" onClick={openPantryInventory}>
-          <Package className="h-5 w-5" aria-hidden />
+      <section className="aux-shopping__card" aria-label="Need to Buy">
+        <div className="aux-shopping__card-head">
+          <h2>Need to Buy</h2>
           <span>
-            <strong>Inventory</strong>
-            <small>Open inventory locations</small>
+            {visibleCurrentLines.length} item{visibleCurrentLines.length === 1 ? "" : "s"}
           </span>
-          <ChevronRight className="h-5 w-5" aria-hidden />
-        </button>
-      </main>
-    );
-  }
-
-  function renderListsScreen() {
-    return (
-      <main className="wd-shopping-ref__content wd-shopping-flow" aria-label="Available shopping lists">
-        <section className="wd-shopping-flow__section-head">
-          <div>
-            <p className="wd-shopping-flow__eyebrow">Lists</p>
-            <h1>Shopping Lists</h1>
-            <span>Built from your current cart and saved household shopping data.</span>
-          </div>
-          <button type="button" onClick={() => openShoppingScreen("new-list")}>
-            <Plus className="h-4 w-4" aria-hidden />
-            New List
-          </button>
-        </section>
-
-        <section className="wd-shopping-flow__cards">
-          {listCards.map((list) => (
-            <button
-              key={list.id}
-              type="button"
-              className="wd-shopping-flow__list-card wd-shopping-flow__list-card--wide"
-              onClick={() => openShoppingScreen(list.screen)}
-            >
-              <span className="wd-shopping-flow__list-icon" aria-hidden>
-                <ListChecks className="h-5 w-5" />
-              </span>
-              <span>
-                <strong>{list.title}</strong>
-                <small>{list.subtitle} · {list.meta}</small>
-              </span>
-              <em>{list.count}</em>
-            </button>
-          ))}
-        </section>
-
-        {savedOpenItems.length > 0 ? (
-          <section className="wd-shopping-flow__saved" aria-label="Saved household shopping items">
-            <h2>Saved Household Items</h2>
-            {savedOpenItems.slice(0, 8).map((item) => (
-              <article key={item.id} className="wd-shopping-flow__saved-row">
-                <strong>{item.name}</strong>
-                <span>{item.quantity || "1"} {item.unit || ""}</span>
-              </article>
-            ))}
-          </section>
-        ) : null}
-      </main>
-    );
-  }
-
-  function renderCurrentListScreen() {
-    return (
-      <main className="wd-shopping-ref__content wd-shopping-flow" aria-label="Current shopping list">
-        <section className="wd-shopping-flow__section-head wd-shopping-flow__section-head--current">
-          <div>
-            <p className="wd-shopping-flow__eyebrow">Current List</p>
-            <h1>{currentListTitle}</h1>
-            <span>{visibleCurrentLines.length} visible active item{visibleCurrentLines.length === 1 ? "" : "s"}.</span>
-          </div>
-          <button type="button" onClick={startShopping}>
-            <Sparkles className="h-4 w-4" aria-hidden />
-            Start Shopping
-          </button>
-        </section>
-
-        <section className="wd-shopping-flow__list-stats" aria-label="Shopping list summary">
-          <article>
-            <span>Active</span>
-            <strong>{activeCartLines.length}</strong>
-            <small>Still needed</small>
-          </article>
-          <article>
-            <span>Visible</span>
-            <strong>{visibleCurrentLines.length}</strong>
-            <small>{selectedStore}</small>
-          </article>
-          <article>
-            <span>Purchased</span>
-            <strong>{purchasedCartLines.length}</strong>
-            <small>Checked off</small>
-          </article>
-        </section>
-
-        <section className="wd-shopping-flow__store-strip" aria-label="Store selector">
-          <Store className="h-5 w-5" aria-hidden />
-          <div>
-            <strong>Store selector</strong>
+        </div>
+        <div className="aux-shopping__store-row">
+          <Store className="h-4 w-4 text-slate-500" aria-hidden />
+          <label className="aux-shopping__field" style={{ flex: "1 1 12rem", margin: 0 }}>
+            <span>Store filter</span>
             <select value={selectedStore} onChange={(event) => setSelectedStore(event.target.value)}>
               <option value="All Stores">All Stores</option>
               {storeOptions.map((store) => (
@@ -1036,87 +955,320 @@ export function ShoppingPage({ data, setData, navigateWithinApp, shoppingSearch 
                 </option>
               ))}
             </select>
+          </label>
+        </div>
+        {visibleCurrentLines.length === 0 ? (
+          <div className="aux-shopping__empty" role="status">
+            <p>Your Need to Buy list is empty.</p>
+            <span>Use Quick Add, Add Product, or Scan Item to start.</span>
+          </div>
+        ) : (
+          <>
+            <div className="aux-shopping__table-head" aria-hidden>
+              <span>Item</span>
+              <span>Qty</span>
+              <span>Category</span>
+              <span>Linked pantry</span>
+              <span>Actions</span>
+            </div>
+            {visibleCurrentLines.map((line) => {
+              const linked = findLinkedPantryItem(line, data.pantry);
+              return (
+                <ShoppingAdminUxRow
+                  key={line.id}
+                  line={line}
+                  mode="need"
+                  linkedPantryName={linked?.name}
+                  onMarkPurchased={() => toggleCartPurchased(line.id, true)}
+                  onDelete={() => removeItem(line.id)}
+                  onEdit={() => openShoppingLineDetails(line)}
+                  onQuantityChange={(quantity) => setCartQuantity(line.id, quantity)}
+                />
+              );
+            })}
+          </>
+        )}
+      </section>
+    );
+  }
+
+  function renderPurchasedSection() {
+    return (
+      <section className="aux-shopping__card" aria-label="Purchased items">
+        <div className="aux-shopping__card-head">
+          <h2>
+            <CheckCircle2 className="mr-1 inline h-4 w-4" aria-hidden />
+            Purchased
+          </h2>
+          <span>
+            {purchasedCartLines.length} item{purchasedCartLines.length === 1 ? "" : "s"}
+          </span>
+        </div>
+        {purchasedCartLines.length === 0 ? (
+          <div className="aux-shopping__empty" role="status">
+            <p>No purchased items yet.</p>
+            <span>Mark items purchased while you shop, then Add to Inventory.</span>
+          </div>
+        ) : (
+          <>
+            <div className="aux-shopping__table-head" aria-hidden>
+              <span>Item</span>
+              <span>Qty</span>
+              <span>Category</span>
+              <span>Linked pantry</span>
+              <span>Actions</span>
+            </div>
+            {purchasedCartLines.map((line) => {
+              const linked = findLinkedPantryItem(line, data.pantry);
+              return (
+                <ShoppingAdminUxRow
+                  key={line.id}
+                  line={line}
+                  mode="purchased"
+                  linkedPantryName={linked?.name}
+                  onMarkPurchased={() => toggleCartPurchased(line.id, true)}
+                  onMoveBack={() => toggleCartPurchased(line.id, false)}
+                  onDelete={() => removeItem(line.id)}
+                  onEdit={() => openShoppingLineDetails(line)}
+                  onAddToInventory={() => addPurchasedLineToInventory(line)}
+                  onQuantityChange={(quantity) => setCartQuantity(line.id, quantity)}
+                />
+              );
+            })}
+          </>
+        )}
+      </section>
+    );
+  }
+
+  function renderHubScreen() {
+    return (
+      <main className="aux-shopping" aria-label="Shopping main">
+        <header className="aux-shopping__hero" aria-label="Shopping">
+          <div>
+            <p className="aux-shopping__eyebrow">Household shopping</p>
+            <h1>Shopping</h1>
+            <p>Keep household shopping organized and connected to inventory.</p>
+          </div>
+          <div className="aux-shopping__hero-actions">
+            <button type="button" className="aux-shopping__btn aux-shopping__btn--primary" onClick={() => openAddItemModal()}>
+              <Plus className="h-4 w-4" aria-hidden />
+              Add Product
+            </button>
+            <button type="button" className="aux-shopping__btn aux-shopping__btn--scan" onClick={openScanModal}>
+              <ScanLine className="h-4 w-4" aria-hidden />
+              Scan Item
+            </button>
+            <button
+              type="button"
+              className="aux-shopping__btn aux-shopping__btn--violet"
+              onClick={() => openShoppingScreen("shared-list")}
+            >
+              <Share2 className="h-4 w-4" aria-hidden />
+              Shared List
+            </button>
+            <button type="button" className="aux-shopping__btn aux-shopping__btn--teal" onClick={openPantryInventory}>
+              <Package className="h-4 w-4" aria-hidden />
+              Inventory
+            </button>
+          </div>
+        </header>
+
+        {saveMessage ? (
+          <p className="aux-shopping__status" role="status">
+            {saveMessage}
+          </p>
+        ) : null}
+
+        <section className="aux-shopping__stats" aria-label="Shopping summary">
+          <button type="button" className="aux-shopping__stat aux-shopping__stat--need" onClick={() => openShoppingScreen("current")}>
+            <strong>{activeCartLines.length}</strong>
+            <span>Need to Buy</span>
+          </button>
+          <button type="button" className="aux-shopping__stat aux-shopping__stat--purchased" onClick={() => openShoppingScreen("current")}>
+            <strong>{purchasedCartLines.length}</strong>
+            <span>Purchased</span>
+          </button>
+          <button type="button" className="aux-shopping__stat aux-shopping__stat--saved" onClick={() => openShoppingScreen("lists")}>
+            <strong>{savedOpenItems.length}</strong>
+            <span>Saved Lists</span>
+          </button>
+          <button
+            type="button"
+            className="aux-shopping__stat aux-shopping__stat--shared"
+            onClick={() => openShoppingScreen("shared-list")}
+          >
+            <strong>{cartLines.length}</strong>
+            <span>Shared Household List</span>
+          </button>
+          <button type="button" className="aux-shopping__stat aux-shopping__stat--library" onClick={() => openAddItemModal()}>
+            <strong>{catalog.length}</strong>
+            <span>Product Library</span>
+          </button>
+          <button
+            type="button"
+            className="aux-shopping__stat aux-shopping__stat--to-add"
+            onClick={() => openShoppingScreen("current")}
+          >
+            <strong>{purchasedItemsToAdd}</strong>
+            <span>Purchased Items to Add</span>
+          </button>
+        </section>
+
+        <section className="aux-shopping__card" aria-label="Quick Add">
+          <div className="aux-shopping__card-head">
+            <h2>Quick Add</h2>
+            <p>Type an item and add it to the current shopping list</p>
+          </div>
+          <form
+            className="aux-shopping__quick-add"
+            onSubmit={(event) => {
+              event.preventDefault();
+              submitQuickAdd();
+            }}
+          >
+            <label className="aux-shopping__field">
+              <span>Add shopping item</span>
+              <input
+                value={quickAddName}
+                onChange={(event) => setQuickAddName(event.target.value)}
+                placeholder="Milk, bananas, paper towels…"
+                aria-label="Add shopping item"
+              />
+            </label>
+            <button type="submit" className="aux-shopping__btn aux-shopping__btn--primary">
+              <Plus className="h-4 w-4" aria-hidden />
+              Add to Shopping
+            </button>
+          </form>
+        </section>
+
+        <section className="aux-shopping__card" aria-label="Shopping lists">
+          <div className="aux-shopping__card-head">
+            <h2>Current, Saved &amp; Shared lists</h2>
+            <button type="button" className="aux-shopping__btn aux-shopping__btn--ghost" onClick={() => openShoppingScreen("new-list")}>
+              <Plus className="h-4 w-4" aria-hidden />
+              New List
+            </button>
+          </div>
+          <div className="aux-shopping__lists">
+            {listCards.map((list) => (
+              <button
+                key={list.id}
+                type="button"
+                className="aux-shopping__list-card"
+                onClick={() => openShoppingScreen(list.screen)}
+              >
+                <strong>{list.title}</strong>
+                <small>
+                  {list.subtitle} · {list.meta}
+                </small>
+                <em>{list.count}</em>
+              </button>
+            ))}
           </div>
         </section>
 
-        <section className="wd-shopping-ref__list wd-shopping-flow__list-panel" aria-label="Current active shopping items">
-          <header className="wd-shopping-flow__list-panel-head">
-            <div>
-              <p>To buy</p>
-              <h2>Active grocery items</h2>
-            </div>
-            <span>{visibleCurrentLines.length} item{visibleCurrentLines.length === 1 ? "" : "s"}</span>
-          </header>
-          {visibleCurrentLines.length === 0 ? (
-            <div className="wd-shopping-ref__empty" role="status">
-              <p>Your current list is empty.</p>
-              <span>Add a product, scan an item, or send something from Pantry.</span>
-            </div>
-          ) : (
-            <div className="wd-shopping-flow__table-wrap">
-              <div className="wd-shopping-flow__table-head" aria-hidden>
-                <span>Need</span>
-                <span>Name</span>
-                <span>Store</span>
-                <span>Amount</span>
-                <span />
-              </div>
-              <ul className="gf-shopping-list wd-shopping-flow__line-list">
-                {visibleCurrentLines.map((line) => (
-                  <ShoppingListCard
-                    key={line.id}
-                    line={line}
-                    variant="table"
-                    onOpenDetails={openShoppingLineDetails}
-                    onTogglePurchased={toggleCartPurchased}
-                    onQuantityChange={setCartQuantity}
-                    onRemove={removeItem}
-                  />
-                ))}
-              </ul>
-            </div>
-          )}
-        </section>
+        {renderNeedToBuySection()}
+        {renderPurchasedSection()}
 
-        {purchasedCartLines.length > 0 ? (
-          <section className="wd-shopping-ref__purchased wd-shopping-flow__list-panel wd-shopping-flow__list-panel--purchased" aria-label="Purchased items">
-            <header className="wd-shopping-flow__list-panel-head">
-              <div>
-                <p>Checked off</p>
-                <h2><CheckCircle2 className="h-4 w-4" aria-hidden /> Purchased items</h2>
-              </div>
-              <span>{purchasedCartLines.length} done</span>
-            </header>
-            <div className="wd-shopping-flow__table-wrap">
-              <div className="wd-shopping-flow__table-head" aria-hidden>
-                <span>Done</span>
-                <span>Name</span>
-                <span>Store</span>
-                <span>Amount</span>
-                <span />
-              </div>
-              <ul className="gf-shopping-list wd-shopping-flow__line-list">
-                {purchasedCartLines.map((line) => (
-                  <ShoppingListCard
-                    key={line.id}
-                    line={line}
-                    variant="table"
-                    onOpenDetails={openShoppingLineDetails}
-                    onTogglePurchased={toggleCartPurchased}
-                    onQuantityChange={setCartQuantity}
-                    onRemove={removeItem}
-                  />
-                ))}
-              </ul>
+        {savedOpenItems.length > 0 ? (
+          <section className="aux-shopping__card" aria-label="Saved household shopping items">
+            <div className="aux-shopping__card-head">
+              <h2>Saved Shopping List</h2>
+              <span>{savedOpenItems.length} open saved items</span>
             </div>
+            {savedOpenItems.slice(0, 10).map((item) => (
+              <article key={item.id} className="aux-shopping-row">
+                <div>
+                  <p className="aux-shopping-row__name">{item.name}</p>
+                  <p className="aux-shopping-row__meta">
+                    {item.preferredStore || "No store"}
+                    {item.requestedByMemberId
+                      ? ` · Requested by ${memberNameById.get(item.requestedByMemberId) || "member"}`
+                      : ""}
+                  </p>
+                </div>
+                <div>
+                  <p className="aux-shopping-row__name">
+                    {item.quantity || "1"}
+                    {item.unit ? ` ${item.unit}` : ""}
+                  </p>
+                </div>
+                <div>
+                  <p className="aux-shopping-row__meta">{item.category || "—"}</p>
+                </div>
+                <div>
+                  <p className="aux-shopping-row__meta">
+                    {item.sourcePantryItemId ? "Linked pantry item" : "Saved household row"}
+                  </p>
+                </div>
+                <div className="aux-shopping-row__actions">
+                  <button
+                    type="button"
+                    className="is-primary"
+                    onClick={() => {
+                      addItem({
+                        productId: item.groceryItemId || `saved-${item.id}`,
+                        productName: item.name,
+                        imageUrl: item.productImageUrl || null,
+                        category: item.category,
+                        quantity: Math.max(1, Number.parseFloat(item.quantity || "1") || 1),
+                        unit: normalizeShoppingUnit(item.unit, "each"),
+                        store: item.preferredStore || storeOptions[0] || "",
+                        notes: item.notes || "",
+                        purchased: false,
+                      });
+                      setSaveMessage(`${item.name} added to the current cart.`);
+                    }}
+                  >
+                    Add to cart
+                  </button>
+                </div>
+              </article>
+            ))}
           </section>
         ) : null}
+
+        <section className="aux-shopping__card" aria-label="Shopping integrations">
+          <div className="aux-shopping__card-head">
+            <h2>Integrations</h2>
+            <p>Scan, library, inventory, and save — all kept</p>
+          </div>
+          <div className="aux-shopping__integrations">
+            <button type="button" className="aux-shopping__integration" onClick={openScanModal}>
+              <ScanLine className="h-5 w-5 text-orange-500" aria-hidden />
+              <strong>Scan Item</strong>
+              <small>Barcode camera</small>
+            </button>
+            <button type="button" className="aux-shopping__integration" onClick={() => openAddItemModal()}>
+              <Search className="h-5 w-5 text-sky-500" aria-hidden />
+              <strong>Product Library</strong>
+              <small>{catalog.length} products · Open Food Facts on scan</small>
+            </button>
+            <button type="button" className="aux-shopping__integration" onClick={openPantryInventory}>
+              <Package className="h-5 w-5 text-teal-600" aria-hidden />
+              <strong>Inventory link</strong>
+              <small>Add purchased stock to pantry</small>
+            </button>
+            <button
+              type="button"
+              className="aux-shopping__integration"
+              onClick={saveShoppingList}
+              disabled={cartLines.length === 0}
+            >
+              <ListChecks className="h-5 w-5 text-violet-600" aria-hidden />
+              <strong>Save / Export list</strong>
+              <small>Write current cart into household shopping data</small>
+            </button>
+          </div>
+        </section>
 
         <ShoppingQuickActions
           itemCount={openLineCount}
           onSaveList={saveShoppingList}
           onReorderNote={() => openShoppingScreen("lists")}
-          saveMessage={saveMessage}
+          saveMessage=""
           saveDisabled={cartLines.length === 0}
           primaryLabel="Save current list"
           secondaryLabel="Review lists"
@@ -1125,35 +1277,160 @@ export function ShoppingPage({ data, setData, navigateWithinApp, shoppingSearch 
     );
   }
 
+  function renderListsScreen() {
+    return (
+      <main className="aux-shopping" aria-label="Available shopping lists">
+        <section className="aux-shopping__screen-head">
+          <div>
+            <p className="aux-shopping__eyebrow">Lists</p>
+            <h1>Shopping Lists</h1>
+            <span>Built from your current cart and saved household shopping data.</span>
+          </div>
+          <button type="button" className="aux-shopping__btn aux-shopping__btn--primary" onClick={() => openShoppingScreen("new-list")}>
+            <Plus className="h-4 w-4" aria-hidden />
+            New List
+          </button>
+        </section>
+
+        <section className="aux-shopping__card">
+          <div className="aux-shopping__lists">
+            {listCards.map((list) => (
+              <button
+                key={list.id}
+                type="button"
+                className="aux-shopping__list-card"
+                onClick={() => openShoppingScreen(list.screen)}
+              >
+                <strong>{list.title}</strong>
+                <small>
+                  {list.subtitle} · {list.meta}
+                </small>
+                <em>{list.count}</em>
+              </button>
+            ))}
+          </div>
+        </section>
+
+        {savedOpenItems.length > 0 ? (
+          <section className="aux-shopping__card" aria-label="Saved household shopping items">
+            <div className="aux-shopping__card-head">
+              <h2>Saved Household Items</h2>
+            </div>
+            {savedOpenItems.slice(0, 12).map((item) => (
+              <article key={item.id} className="aux-shopping-row">
+                <div>
+                  <p className="aux-shopping-row__name">{item.name}</p>
+                </div>
+                <div>
+                  <p className="aux-shopping-row__meta">
+                    {item.quantity || "1"} {item.unit || ""}
+                  </p>
+                </div>
+                <div>
+                  <p className="aux-shopping-row__meta">{item.category}</p>
+                </div>
+                <div>
+                  <p className="aux-shopping-row__meta">
+                    {item.requestedByMemberId
+                      ? memberNameById.get(item.requestedByMemberId) || "Requested"
+                      : "—"}
+                  </p>
+                </div>
+                <div />
+              </article>
+            ))}
+          </section>
+        ) : null}
+
+        <button type="button" className="aux-shopping__btn aux-shopping__btn--ghost" onClick={() => openShoppingScreen("hub")}>
+          Back to Shopping dashboard
+        </button>
+      </main>
+    );
+  }
+
+  function renderCurrentListScreen() {
+    return (
+      <main className="aux-shopping" aria-label="Current shopping list">
+        <section className="aux-shopping__screen-head">
+          <div>
+            <p className="aux-shopping__eyebrow">Current List</p>
+            <h1>{currentListTitle}</h1>
+            <span>
+              {visibleCurrentLines.length} visible Need to Buy item
+              {visibleCurrentLines.length === 1 ? "" : "s"}.
+            </span>
+          </div>
+          <button type="button" className="aux-shopping__btn aux-shopping__btn--primary" onClick={startShopping}>
+            <Sparkles className="h-4 w-4" aria-hidden />
+            Start Shopping
+          </button>
+        </section>
+
+        {saveMessage ? (
+          <p className="aux-shopping__status" role="status">
+            {saveMessage}
+          </p>
+        ) : null}
+
+        {renderNeedToBuySection()}
+        {renderPurchasedSection()}
+
+        <ShoppingQuickActions
+          itemCount={openLineCount}
+          onSaveList={saveShoppingList}
+          onReorderNote={() => openShoppingScreen("lists")}
+          saveMessage=""
+          saveDisabled={cartLines.length === 0}
+          primaryLabel="Save current list"
+          secondaryLabel="Review lists"
+        />
+
+        <button type="button" className="aux-shopping__btn aux-shopping__btn--ghost" onClick={() => openShoppingScreen("hub")}>
+          Back to Shopping dashboard
+        </button>
+      </main>
+    );
+  }
+
   function renderAddProductScreen() {
     return (
-      <main className="wd-shopping-ref__content wd-shopping-flow" aria-label="Add product">
-        <section className="wd-shopping-flow__section-head">
+      <main className="aux-shopping" aria-label="Add product">
+        <section className="aux-shopping__screen-head">
           <div>
-            <p className="wd-shopping-flow__eyebrow">Add Product</p>
+            <p className="aux-shopping__eyebrow">Add Product</p>
             <h1>Find or Add Product</h1>
-            <span>Search your real product library, type a manual item, or scan a barcode.</span>
+            <span>Search your product library, type a manual item, or scan a barcode (Open Food Facts).</span>
           </div>
-          <button type="button" onClick={openScanModal}>
+          <button type="button" className="aux-shopping__btn aux-shopping__btn--scan" onClick={openScanModal}>
             <ScanLine className="h-4 w-4" aria-hidden />
             Scan
           </button>
         </section>
 
-        {addDrawerState ? renderAddDrawer() : (
-          <button type="button" className="wd-shopping-ref__add" onClick={() => openAddItemModal()}>
+        {addDrawerState ? (
+          renderAddDrawer()
+        ) : (
+          <button type="button" className="aux-shopping__btn aux-shopping__btn--primary" onClick={() => openAddItemModal()}>
             <Search className="h-5 w-5" aria-hidden />
             Start Product Search
           </button>
         )}
 
         {frequentProducts.length > 0 ? (
-          <section className="wd-shopping-flow__recommendations" aria-label="Recommended products">
-            <h2>Recommended from your products</h2>
-            <div>
+          <section className="aux-shopping__card" aria-label="Recommended products">
+            <div className="aux-shopping__card-head">
+              <h2>Product library picks</h2>
+            </div>
+            <div className="aux-shopping__product-grid">
               {frequentProducts.map((item) => (
-                <button key={item.id} type="button" onClick={() => addCatalogProductToShopping(item)}>
-                  <span className="wd-shopping-ref__thumb" aria-hidden>
+                <button
+                  key={item.id}
+                  type="button"
+                  className="aux-shopping__product-chip"
+                  onClick={() => addCatalogProductToShopping(item)}
+                >
+                  <span className="aux-shopping__thumb" aria-hidden>
                     {item.imageUrl ? <img src={item.imageUrl} alt="" loading="lazy" /> : item.name.charAt(0)}
                   </span>
                   <strong>{item.name}</strong>
@@ -1163,48 +1440,63 @@ export function ShoppingPage({ data, setData, navigateWithinApp, shoppingSearch 
             </div>
           </section>
         ) : null}
+
+        <button type="button" className="aux-shopping__btn aux-shopping__btn--ghost" onClick={() => openShoppingScreen("hub")}>
+          Back to Shopping dashboard
+        </button>
       </main>
     );
   }
 
   function renderListBuilderScreen(shared: boolean) {
     return (
-      <main className="wd-shopping-ref__content wd-shopping-flow" aria-label={shared ? "Shared list" : "New list"}>
-        <section className="wd-shopping-flow__section-head">
+      <main className="aux-shopping" aria-label={shared ? "Shared list" : "New list"}>
+        <section className="aux-shopping__screen-head">
           <div>
-            <p className="wd-shopping-flow__eyebrow">{shared ? "Shared List" : "New List"}</p>
+            <p className="aux-shopping__eyebrow">{shared ? "Shared List" : "New List"}</p>
             <h1>{shared ? "Shared Household List" : "Create Shopping List"}</h1>
             <span>Uses the existing household cart and saved shopping data. No data model reset.</span>
           </div>
         </section>
 
-        <section className="wd-shopping-flow__builder">
-          <label>
+        <section className="aux-shopping__card">
+          <label className="aux-shopping__field">
             <span>List title</span>
             <input
               value={shared ? sharedListTitle : newListTitle}
-              onChange={(event) => shared ? setSharedListTitle(event.target.value) : setNewListTitle(event.target.value)}
+              onChange={(event) =>
+                shared ? setSharedListTitle(event.target.value) : setNewListTitle(event.target.value)
+              }
               placeholder={shared ? "Shared Household List" : "Weekend Costco Run"}
             />
           </label>
-          <div className="wd-shopping-flow__builder-summary">
-            <article>
+          <div className="aux-shopping__stats" style={{ marginTop: "1rem", marginBottom: 0 }}>
+            <div className="aux-shopping__stat aux-shopping__stat--need">
               <strong>{activeCartLines.length}</strong>
               <span>Active items</span>
-            </article>
-            <article>
+            </div>
+            <div className="aux-shopping__stat aux-shopping__stat--saved">
               <strong>{storeOptions.length}</strong>
               <span>Known stores</span>
-            </article>
-            <article>
+            </div>
+            <div className="aux-shopping__stat aux-shopping__stat--library">
               <strong>{products.length}</strong>
               <span>Products</span>
-            </article>
+            </div>
           </div>
-          <button type="button" className="wd-shopping-flow__hero-action" onClick={() => createNewList(shared)}>
+          <button
+            type="button"
+            className="aux-shopping__btn aux-shopping__btn--primary"
+            style={{ marginTop: "1rem" }}
+            onClick={() => createNewList(shared)}
+          >
             {shared ? "Use Shared List" : "Create List"}
           </button>
         </section>
+
+        <button type="button" className="aux-shopping__btn aux-shopping__btn--ghost" onClick={() => openShoppingScreen("hub")}>
+          Back to Shopping dashboard
+        </button>
       </main>
     );
   }
@@ -1276,7 +1568,7 @@ export function ShoppingPage({ data, setData, navigateWithinApp, shoppingSearch 
   );
 
   return (
-    <div className="wd-shopping-ref">
+    <div className="aux-shopping__canvas wd-shopping-ref">
       {renderTopBar()}
       {screen === "hub" ? renderHubScreen() : null}
       {screen === "lists" ? renderListsScreen() : null}

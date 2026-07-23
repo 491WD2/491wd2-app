@@ -389,7 +389,7 @@ export function ScanPutAwayWizard({
     <div className="space-y-6">
       <div className={SCAN_CARD}>
         <p className="text-xs font-semibold uppercase tracking-wide text-[#F26522]">
-          Scan drives the household food loop
+          Add to Inventory
         </p>
         <p className="mt-2 text-sm leading-relaxed text-[#575757]">
           Identify → cross-check → add to inventory → then use → low/out → alerts → shopping list.

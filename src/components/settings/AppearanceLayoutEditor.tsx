@@ -1,3 +1,4 @@
+import { RotateCcw } from "lucide-react";
 import { useUiCustomization } from "../../context/UiCustomizationContext";
 import { Button } from "../ui/Button";
 import { Card, CardHeader } from "../ui/Card";
@@ -10,6 +11,14 @@ import {
 import type { PageLayoutRouteKey } from "../../lib/pageLayoutPreferences";
 import { SMARTHR_DEFAULT_APPEARANCE } from "../../lib/appearancePreferences";
 import type { TextColorPreset } from "../../lib/appearancePreferences";
+import {
+  ADMINUX_ACCENT_HEX,
+  ADMINUX_ACCENT_LABELS,
+  ADMINUX_ACCENT_PRESETS,
+  ADMINUX_PAGE_BG_LABELS,
+  ADMINUX_PAGE_BG_PRESETS,
+  ADMINUX_PAGE_BG_SWATCH,
+} from "../../lib/adminuxTheme";
 
 const PAGE_LABEL: Record<PageLayoutRouteKey, string> = {
   home: "Home",
@@ -68,7 +77,7 @@ function normalizeHexColor(raw: string): string {
   if (/^#[0-9a-fA-F]{6}$/.test(s)) {
     return s;
   }
-  return "#f26522";
+  return "#3b6ef5";
 }
 
 export function AppearanceLayoutEditor() {
@@ -77,6 +86,8 @@ export function AppearanceLayoutEditor() {
     updateAppearance,
     resetAppearance,
     setTextPreset,
+    setPageBgPreset,
+    setThemeAccent,
     pageLayout,
     updateGlobalLayout,
     resetPageLayouts,
@@ -87,10 +98,72 @@ export function AppearanceLayoutEditor() {
   return (
     <div className="space-y-5">
       <Card tone="light">
+        <CardHeader tone="light" title="Background Color" eyebrow="AdminUX theme" />
+        <p className="mb-2 text-sm font-medium text-[#475569]">
+          Choose your desired theme color
+        </p>
+        <p className="mb-4 text-sm text-[#64748b]">
+          Soft pastel page backgrounds inspired by AdminUX (None, White, Theme, Grad-1…10). Keep
+          enough contrast between background and text. Saved on this device in{" "}
+          <span className="font-mono text-xs">familysite-491:appearance</span> — household data is
+          not modified.
+        </p>
+        <div className="fs-bg-swatch-grid" role="group" aria-label="Page background presets">
+          {ADMINUX_PAGE_BG_PRESETS.map((preset) => (
+            <button
+              key={preset}
+              type="button"
+              className="fs-bg-swatch"
+              aria-pressed={appearance.pageBgPreset === preset}
+              aria-label={ADMINUX_PAGE_BG_LABELS[preset]}
+              onClick={() => setPageBgPreset(preset)}
+            >
+              <span
+                className="fs-bg-swatch__circle"
+                style={{
+                  background: ADMINUX_PAGE_BG_SWATCH[preset],
+                  display: "inline-flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                {preset === "none" ? (
+                  <RotateCcw className="h-4 w-4 text-slate-500" aria-hidden />
+                ) : null}
+              </span>
+              <span>{ADMINUX_PAGE_BG_LABELS[preset]}</span>
+            </button>
+          ))}
+        </div>
+      </Card>
+
+      <Card tone="light">
+        <CardHeader tone="light" title="Theme accent colors" eyebrow="Buttons &amp; highlights" />
+        <p className="mb-4 text-sm text-[#64748b]">
+          AdminUX-style accent presets (Theme, Accent, Success, Warning, Orange, Purple, Teal…).
+          Updates primary buttons, gradients, and sidebar active color.
+        </p>
+        <div className="fs-accent-swatch-grid" role="group" aria-label="Theme accent presets">
+          {ADMINUX_ACCENT_PRESETS.map((accent) => (
+            <button
+              key={accent}
+              type="button"
+              className="fs-accent-swatch"
+              style={{ background: ADMINUX_ACCENT_HEX[accent] }}
+              aria-pressed={appearance.themeAccent === accent}
+              onClick={() => setThemeAccent(accent)}
+            >
+              {ADMINUX_ACCENT_LABELS[accent]}
+            </button>
+          ))}
+        </div>
+      </Card>
+
+      <Card tone="light">
         <CardHeader tone="light" title="Color &amp; type" eyebrow="Appearance" />
         <p className="mb-4 text-sm text-[#575757]">
-          Saved only on this device in <span className="font-mono text-xs">familysite-491:appearance</span>
-          . Household data is not modified.
+          Fine-tune individual colors. Presets above set these automatically. Saved in{" "}
+          <span className="font-mono text-xs">familysite-491:appearance</span>.
         </p>
         <div className="space-y-4">
           <ColorField
@@ -161,12 +234,12 @@ export function AppearanceLayoutEditor() {
               className="font-semibold"
               onClick={() => resetAppearance()}
             >
-              Reset to SmartHR default
+              Reset to AdminUX default
             </Button>
           </div>
           <p className="text-xs text-[#637381]">
-            Defaults match SmartHR template accents ({SMARTHR_DEFAULT_APPEARANCE.primary}, gradient{" "}
-            {SMARTHR_DEFAULT_APPEARANCE.gradientStart} → {SMARTHR_DEFAULT_APPEARANCE.gradientEnd}).
+            Defaults use AdminUX theme blue ({SMARTHR_DEFAULT_APPEARANCE.primary}) with Grad-1 page
+            background.
           </p>
         </div>
       </Card>

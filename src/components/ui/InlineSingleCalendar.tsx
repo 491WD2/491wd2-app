@@ -1,8 +1,5 @@
 import { useEffect, useId, useRef } from "react";
-import $ from "jquery";
-import moment from "moment";
-import "daterangepicker";
-import "daterangepicker/daterangepicker.css";
+import { $, moment } from "../../lib/daterangepickerReady";
 import { cn } from "../../lib/utils";
 
 type Props = {
