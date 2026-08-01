@@ -1,0 +1,672 @@
+/**
+ * FamilyHub Start Page — configurable widget system (visual shell).
+ * Tokens: familyhub-theme.css
+ * Layout positions stay in familyhub-smart-dash.css / NotionHomeWorkspace.
+ *
+ * Goal: premium configurable start-page widgets — not plain white cards.
+ */
+
+:root {
+  --widget-radius: var(--radius-widget, 28px);
+  --widget-border: var(--border-widget);
+  --widget-shadow: var(--shadow-widget);
+  --widget-shadow-hover: var(--shadow-widget-hover);
+  --widget-surface: var(--surface-widget);
+  --widget-highlight: var(--surface-widget-highlight);
+  --widget-inset: var(--surface-widget-inset);
+}
+
+/* —— Customize tray (affordance for future edit mode) —— */
+.fh-start-page__customize {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.28rem;
+  margin-top: 0.75rem;
+  padding: 0.28rem;
+  border-radius: var(--radius-pill);
+  border: 1px solid rgba(31, 111, 191, 0.12);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.78), rgba(244, 249, 255, 0.7)),
+    var(--surface-customize);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: var(--shadow-soft), inset 0 1px 0 rgba(255, 255, 255, 0.85);
+}
+
+.fh-start-page__customize-btn,
+.fh-start-page__customize-hint {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.32rem;
+  min-height: 1.95rem;
+  padding: 0.22rem 0.72rem;
+  border-radius: var(--radius-pill);
+  border: 1px solid transparent;
+  font-family: var(--font-ui);
+  font-size: 0.74rem;
+  font-weight: 740;
+  letter-spacing: 0.015em;
+  transition: background 140ms ease, border-color 140ms ease, color 140ms ease, opacity 140ms ease;
+}
+
+.fh-start-page__customize-btn {
+  background: rgba(255, 255, 255, 0.92);
+  border-color: rgba(18, 28, 46, 0.08);
+  color: var(--text-soft);
+  cursor: not-allowed;
+  box-shadow: 0 1px 2px rgba(18, 28, 46, 0.04);
+}
+
+.fh-start-page__customize-btn:disabled {
+  opacity: 0.88;
+}
+
+.fh-start-page__customize-btn:hover:disabled {
+  border-color: rgba(31, 111, 191, 0.16);
+  color: var(--brand-primary-strong);
+  background: #fff;
+}
+
+.fh-start-page__customize-hint {
+  background: linear-gradient(135deg, var(--soft-blue), rgba(227, 246, 247, 0.9));
+  color: var(--brand-primary-strong);
+  border-color: rgba(31, 111, 191, 0.16);
+}
+
+/* —— Start Page widget anatomy —— */
+.fh-start-widget {
+  --widget-accent: var(--brand-primary);
+  --widget-accent-soft: var(--soft-blue);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  padding: 0;
+  border-radius: var(--widget-radius);
+  border: 1px solid var(--widget-border);
+  background: var(--widget-surface);
+  box-shadow: var(--widget-shadow);
+  overflow: hidden;
+  isolation: isolate;
+  transition:
+    box-shadow 200ms ease,
+    border-color 200ms ease,
+    transform 200ms ease;
+}
+
+/* Accent rail — widget identity */
+.fh-start-widget::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(
+    90deg,
+    var(--widget-accent) 0%,
+    color-mix(in srgb, var(--widget-accent) 55%, transparent) 42%,
+    transparent 88%
+  );
+  z-index: 2;
+  pointer-events: none;
+}
+
+/* Soft corner glow for depth */
+.fh-start-widget::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background:
+    radial-gradient(120% 70% at 0% 0%, var(--widget-accent-soft), transparent 48%),
+    radial-gradient(80% 50% at 100% 100%, rgba(255, 255, 255, 0.35), transparent 55%);
+  opacity: 0.55;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.fh-start-widget > * {
+  position: relative;
+  z-index: 1;
+}
+
+.fh-start-widget:hover {
+  border-color: color-mix(in srgb, var(--widget-accent) 28%, var(--widget-border));
+  box-shadow: var(--widget-shadow-hover);
+  transform: translateY(-1px);
+}
+
+/* Per-widget accent identity */
+.fh-start-widget.fh-fridge-home__kitchen {
+  --widget-accent: var(--brand-amber);
+  --widget-accent-soft: var(--soft-amber);
+}
+
+.fh-start-widget.fh-fridge-home__calendar {
+  --widget-accent: var(--brand-primary);
+  --widget-accent-soft: var(--soft-blue);
+}
+
+.fh-start-widget.fh-fridge-home__shopping {
+  --widget-accent: var(--brand-mint);
+  --widget-accent-soft: var(--soft-mint);
+}
+
+.fh-start-widget.fh-fridge-home__storage {
+  --widget-accent: var(--brand-aqua);
+  --widget-accent-soft: var(--soft-aqua);
+}
+
+.fh-start-widget__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.7rem;
+  padding: 1.05rem 1.15rem 0.85rem;
+  border-bottom: 1px solid var(--border-divider);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.55)),
+    linear-gradient(90deg, var(--widget-accent-soft), transparent 70%);
+}
+
+.fh-start-widget__header-lead {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.7rem;
+  min-width: 0;
+}
+
+.fh-start-widget__header-copy {
+  min-width: 0;
+  padding-top: 0.05rem;
+}
+
+.fh-start-widget__title {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: 1.08rem;
+  font-weight: 780;
+  letter-spacing: -0.03em;
+  color: var(--text-main);
+  line-height: 1.15;
+}
+
+.fh-start-widget__subtitle {
+  margin: 0.22rem 0 0;
+  font-family: var(--font-ui);
+  font-size: 0.76rem;
+  font-weight: 650;
+  color: var(--text-muted);
+  line-height: 1.35;
+}
+
+.fh-start-widget__icon {
+  width: 2.4rem;
+  height: 2.4rem;
+  flex-shrink: 0;
+  border-radius: var(--radius-tile);
+  box-shadow:
+    inset 0 0 0 1px rgba(18, 28, 46, 0.04),
+    0 4px 12px color-mix(in srgb, var(--widget-accent) 18%, transparent);
+}
+
+.fh-start-widget__header-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  flex-shrink: 0;
+  padding: 0.15rem;
+  border-radius: var(--radius-pill);
+  background: rgba(255, 255, 255, 0.45);
+  border: 1px solid rgba(18, 28, 46, 0.04);
+}
+
+.fh-start-widget__action {
+  min-height: 2.05rem;
+  padding: 0.22rem 0.78rem;
+  font-size: 0.76rem;
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: var(--shadow-soft);
+}
+
+.fh-start-widget__menu {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.05rem;
+  height: 2.05rem;
+  border-radius: 50%;
+  border: 1px solid rgba(18, 28, 46, 0.06);
+  background: rgba(255, 255, 255, 0.88);
+  color: var(--text-muted);
+  cursor: not-allowed;
+  opacity: 0.85;
+  transition: background 140ms ease, color 140ms ease, border-color 140ms ease, opacity 140ms ease;
+}
+
+.fh-start-widget__menu:hover:not(:disabled),
+.fh-start-widget__menu:focus-visible {
+  background: var(--soft-blue);
+  border-color: rgba(31, 111, 191, 0.16);
+  color: var(--brand-primary-strong);
+  outline: none;
+}
+
+.fh-start-widget__body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  padding: 0.95rem 1.15rem 0.9rem;
+}
+
+.fh-start-widget__empty {
+  margin: 0;
+  padding: 1rem 1.05rem;
+  border-radius: calc(var(--radius-control) + 2px);
+  border: 1px dashed color-mix(in srgb, var(--widget-accent) 22%, var(--border-soft));
+  background: var(--widget-inset);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.8),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.35);
+  color: var(--text-muted);
+  font-family: var(--font-ui);
+  font-size: 0.9rem;
+  font-weight: 620;
+  line-height: 1.45;
+}
+
+.fh-start-widget__footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.7rem 1.15rem 0.95rem;
+  border-top: 1px solid var(--border-divider);
+  background:
+    linear-gradient(180deg, transparent, color-mix(in srgb, var(--widget-accent-soft) 55%, transparent));
+}
+
+.fh-start-widget__meta-chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 1.6rem;
+  padding: 0.16rem 0.62rem;
+  border-radius: var(--radius-pill);
+  border: 1px solid color-mix(in srgb, var(--widget-accent) 14%, var(--border-soft));
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--text-soft);
+  font-family: var(--font-ui);
+  font-size: 0.68rem;
+  font-weight: 740;
+  letter-spacing: 0.03em;
+  box-shadow: 0 1px 2px rgba(18, 28, 46, 0.03);
+}
+
+/* Home board uses Start widgets inside fridge-home grid */
+.fh-fridge-home.fh-start-page .fh-start-widget {
+  height: 100%;
+}
+
+.fh-fridge-home.fh-start-page .fh-fridge-home__board > .fh-start-widget,
+.fh-fridge-home.fh-start-page .fh-fridge-home__dock > .fh-start-widget {
+  min-height: 0;
+}
+
+.fh-start-page .fh-fridge-home__empty-panel {
+  background: var(--widget-inset);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+/* Calendar mini-month — designed inset tool surface */
+.fh-start-page .fh-fridge-home__mini-cal {
+  background: var(--widget-inset);
+  border: 1px solid color-mix(in srgb, var(--brand-primary) 12%, var(--border-soft));
+  border-radius: calc(var(--radius-panel) - 2px);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    0 8px 18px rgba(21, 40, 72, 0.05);
+}
+
+.fh-start-page .fh-fridge-home__activity--event {
+  border-color: color-mix(in srgb, var(--brand-primary) 14%, var(--border-soft));
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.98), var(--soft-blue));
+  box-shadow: var(--shadow-soft);
+}
+
+.fh-start-page .fh-fridge-home__kitchen-hero {
+  padding: 0.45rem 0.65rem 0.95rem;
+  margin-bottom: 0.75rem;
+  border-bottom: none;
+  background:
+    radial-gradient(95% 140% at 0% 0%, var(--soft-amber), transparent 62%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.5), transparent);
+  border-radius: calc(var(--radius-control) + 4px);
+  border: 1px solid color-mix(in srgb, var(--brand-amber) 14%, var(--border-soft));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+.fh-start-page .fh-fridge-home__kitchen .fh-start-widget__empty {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  min-height: 4.5rem;
+}
+
+/* —— Shopping widget (Pass 3 focus) —— */
+.fh-shop-widget__summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-bottom: 0.75rem;
+}
+
+.fh-shop-widget__summary-chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 1.7rem;
+  padding: 0.18rem 0.65rem;
+  border-radius: var(--radius-pill);
+  border: 1px solid color-mix(in srgb, var(--brand-mint) 18%, var(--border-soft));
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--text-soft);
+  font-family: var(--font-ui);
+  font-size: 0.72rem;
+  font-weight: 740;
+  box-shadow: var(--shadow-soft);
+}
+
+.fh-shop-widget__summary-chip--ready {
+  background: var(--soft-mint);
+  color: #1f6f56;
+  border-color: rgba(47, 157, 122, 0.22);
+}
+
+.fh-shop-widget__list {
+  gap: 0.45rem !important;
+  margin-bottom: 0.15rem;
+}
+
+.fh-shop-widget__row {
+  min-height: 3.25rem !important;
+  padding: 0.65rem 0.8rem !important;
+  border-radius: calc(var(--radius-control) + 2px) !important;
+  border: 1px solid color-mix(in srgb, var(--brand-mint) 16%, var(--border-soft)) !important;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(240, 250, 245, 0.94)) !important;
+  box-shadow: 0 2px 8px rgba(21, 40, 72, 0.04) !important;
+  grid-template-columns: 1fr auto !important;
+  align-items: center !important;
+}
+
+.fh-shop-widget__row:hover,
+.fh-shop-widget__row:focus-visible {
+  background:
+    linear-gradient(135deg, #fff, var(--soft-mint)) !important;
+  border-color: rgba(47, 157, 122, 0.28) !important;
+  box-shadow: 0 6px 16px rgba(47, 157, 122, 0.1) !important;
+}
+
+.fh-shop-widget__row-main {
+  display: flex;
+  flex-direction: column;
+  gap: 0.18rem;
+  min-width: 0;
+  text-align: left;
+}
+
+.fh-shop-widget__row-cat {
+  font-family: var(--font-ui);
+  font-size: 0.68rem;
+  font-weight: 720;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.fh-start-page .fh-fridge-home__qty-badge {
+  min-width: 2.1rem;
+  min-height: 1.85rem;
+  padding: 0.2rem 0.65rem;
+  background: linear-gradient(180deg, #e8f8f0, var(--soft-mint));
+  border-color: rgba(47, 157, 122, 0.24);
+  color: #176349;
+  font-size: 0.8rem;
+  font-weight: 780;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
+}
+
+.fh-shop-widget__composer {
+  margin-top: auto;
+  padding: 0.75rem 0.8rem 0.8rem;
+  border-radius: calc(var(--radius-control) + 4px);
+  border: 1px solid color-mix(in srgb, var(--brand-mint) 14%, var(--border-soft));
+  background:
+    linear-gradient(180deg, rgba(240, 250, 245, 0.95), rgba(236, 247, 242, 0.88));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.85),
+    0 4px 12px rgba(21, 40, 72, 0.03);
+}
+
+.fh-shop-widget__composer-label {
+  margin: 0 0 0.45rem;
+  font-family: var(--font-ui);
+  font-size: 0.68rem;
+  font-weight: 780;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.fh-start-page .fh-fridge-home__shop-form {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: none;
+  gap: 0.45rem;
+}
+
+.fh-start-page .fh-fridge-home__shop-form input {
+  min-height: 2.55rem;
+  border-radius: var(--radius-pill);
+  border-color: rgba(47, 157, 122, 0.18);
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: inset 0 1px 2px rgba(18, 28, 46, 0.04);
+  font-weight: 600;
+}
+
+.fh-start-page .fh-fridge-home__shop-form input:focus {
+  border-color: rgba(47, 157, 122, 0.4);
+  box-shadow: 0 0 0 3px rgba(47, 157, 122, 0.14);
+}
+
+.fh-start-page .fh-fridge-home__shop-form button,
+.fh-start-page .fh-fridge-home__shop-form .fh-btn-primary {
+  min-height: 2.55rem;
+  min-width: 4.4rem;
+  border-radius: var(--radius-pill);
+  font-size: 0.86rem;
+}
+
+/* —— Pantry & Storage widget (Pass 3 focus) —— */
+.fh-start-page .fh-fridge-home__storage-note {
+  margin: 0 0 0.85rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  line-height: 1.45;
+  color: var(--text-soft);
+}
+
+.fh-storage-widget__areas {
+  margin-bottom: 0.75rem;
+}
+
+.fh-storage-widget__areas .fh-fridge-home__agenda-title {
+  margin-bottom: 0.55rem;
+}
+
+.fh-start-page .fh-fridge-home__zone-stats {
+  gap: 0.5rem;
+}
+
+.fh-mini-stat {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-height: 4.4rem;
+  padding: 0.7rem 0.65rem 0.7rem 0.85rem;
+  border-radius: calc(var(--radius-control) + 4px);
+  border: 1px solid var(--border-soft);
+  background: linear-gradient(165deg, #fff, var(--surface-panel));
+  box-shadow: var(--shadow-soft), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  transition: border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+  overflow: hidden;
+}
+
+.fh-mini-stat::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.55rem;
+  bottom: 0.55rem;
+  width: 3px;
+  border-radius: var(--radius-pill);
+  background: var(--widget-accent, var(--brand-aqua));
+}
+
+.fh-mini-stat:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-card);
+}
+
+.fh-mini-stat__dot {
+  position: absolute;
+  top: 0.65rem;
+  right: 0.65rem;
+  width: 0.4rem;
+  height: 0.4rem;
+  border-radius: 50%;
+  background: var(--widget-accent, var(--brand-aqua));
+  opacity: 0.75;
+}
+
+.fh-mini-stat__value {
+  font-family: var(--font-heading);
+  font-size: 1.55rem;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  color: var(--text-main);
+}
+
+.fh-mini-stat__label {
+  font-family: var(--font-ui);
+  font-size: 0.66rem;
+  font-weight: 780;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.fh-mini-stat--mint {
+  --widget-accent: var(--brand-mint);
+  background: linear-gradient(165deg, #fff, var(--soft-mint));
+  border-color: rgba(47, 157, 122, 0.18);
+}
+
+.fh-mini-stat--aqua {
+  --widget-accent: var(--brand-aqua);
+  background: linear-gradient(165deg, #fff, var(--soft-aqua));
+  border-color: rgba(42, 168, 184, 0.2);
+}
+
+.fh-mini-stat--blue {
+  --widget-accent: var(--brand-primary);
+  background: linear-gradient(165deg, #fff, var(--soft-blue));
+  border-color: rgba(31, 111, 191, 0.18);
+}
+
+.fh-mini-stat--amber {
+  --widget-accent: var(--brand-amber);
+  background: linear-gradient(165deg, #fff, var(--soft-amber));
+  border-color: rgba(201, 138, 26, 0.2);
+}
+
+.fh-storage-widget__hint {
+  margin: auto 0 0;
+  padding-top: 0.55rem;
+  font-family: var(--font-ui);
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+.fh-start-page .fh-fridge-home__jump--inline button {
+  min-height: 2.15rem;
+  padding: 0.28rem 0.72rem;
+  background: rgba(255, 255, 255, 0.94);
+  border-color: color-mix(in srgb, var(--brand-aqua) 16%, var(--border-soft));
+  box-shadow: var(--shadow-soft);
+}
+
+.fh-start-page .fh-fridge-home__jump--inline button:hover,
+.fh-start-page .fh-fridge-home__jump--inline button:focus-visible {
+  background: var(--soft-aqua);
+  border-color: rgba(42, 168, 184, 0.3);
+}
+
+/* Calendar agenda item denser polish */
+.fh-start-page .fh-fridge-home__activity--event {
+  border-left: 3px solid var(--brand-primary);
+  padding-left: 0.75rem;
+}
+
+.fh-start-page .fh-fridge-home__mini-cal-day.is-today {
+  box-shadow: var(--shadow-button), 0 0 0 2px rgba(31, 111, 191, 0.18);
+}
+
+/* Customize tray sits as integrated hero module */
+.fh-fridge-home__top .fh-start-page__customize {
+  margin-top: 0.65rem;
+}
+
+/* Sidebar account / member footer */
+.fh-smart-dash .notion-sidebar__footer {
+  margin-top: auto;
+  padding: 0.7rem 0.4rem 0.25rem;
+  border-top: 1px solid var(--border-divider);
+}
+
+.fh-smart-dash .notion-sidebar__member {
+  margin: 0;
+  padding: 0.55rem 0.75rem;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--border-soft);
+  background: rgba(255, 255, 255, 0.86);
+  color: var(--text-soft);
+  font-family: var(--font-ui);
+  font-size: 0.78rem;
+  font-weight: 740;
+  box-shadow: var(--shadow-soft);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.fh-smart-dash .fh-notion-toolbar__badge {
+  background: var(--soft-amber);
+  color: #8a5d0f;
+  border-color: rgba(201, 138, 26, 0.28);
+  box-shadow: 0 1px 2px rgba(201, 138, 26, 0.14);
+  font-weight: 780;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fh-start-widget:hover {
+    transform: none;
+  }
+}

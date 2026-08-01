@@ -1,0 +1,111 @@
+/**
+ * FamilyHub ← Bitrix24 Air Design token bridge (Step 1: design reference).
+ *
+ * Curated subset adapted from references/b24ui-main/src/runtime/air-design-tokens
+ * for the React shell. Does NOT import Vue/Nuxt b24ui runtime.
+ *
+ * Source map (approx):
+ * - tw-style/colors.css — palette hex
+ * - tw-style/radius.css — radius scale
+ * - 003_b24_context_light.css — light context accents / surfaces
+ * - theme/dashboard-sidebar.ts — frosted sidebar pattern
+ */
+
+.fh-smart-dash {
+  /* —— Bitrix Air palette (subset) —— */
+  --b24-white: #ffffff;
+  --b24-black: #333333;
+  --b24-gray-30: #f5f7f8;
+  --b24-gray-40: #f1f4f6;
+  --b24-gray-100: #edeef0;
+  --b24-gray-200: #dfe0e3;
+  --b24-gray-500: #a8adb4;
+  --b24-gray-700: #838c95;
+  --b24-gray-900: #525c69;
+  --b24-gray-950: #333333;
+
+  --b24-orange-150: #fff5e3;
+  --b24-orange-250: #ffe9be;
+  --b24-orange-300: #ffe1a6;
+  --b24-orange-400: #ffc34d;
+  --b24-orange: #ffa900;
+  --b24-orange-600: #e89b06;
+
+  --b24-blue-150: #ecfafe;
+  --b24-blue-250: #d3f4ff;
+  --b24-blue-300: #c3f0ff;
+  --b24-blue: #2fc6f6;
+  --b24-blue-primary: #0075ff;
+  --b24-blue-850: #2066b0;
+
+  --b24-green-200: #f1fbd0;
+  --b24-green-300: #e2f1b3;
+  --b24-green-400: #bbde4d;
+  --b24-green: #9dcf00;
+  --b24-collab-600: #19cc45;
+
+  --b24-cyan-150: #d1eef9;
+  --b24-cyan: #05b5ab;
+
+  --b24-red-200: #ffe8e8;
+  --b24-red: #ff5752;
+
+  /* —— Radius (tw-style/radius.css) —— */
+  --b24-radius-sm: 8px;
+  --b24-radius-md: 10px;
+  --b24-radius-lg: 12px;
+  --b24-radius-xl: 14px;
+  --b24-radius-2xl: 16px;
+  --b24-radius-3xl: 20px;
+  --b24-radius-pill: 99rem;
+
+  /* —— Surfaces / type (context light) —— */
+  --b24-ink: var(--b24-gray-950);
+  --b24-ink-secondary: var(--b24-gray-900);
+  --b24-ink-muted: var(--b24-gray-700);
+  --b24-surface: var(--b24-white);
+  --b24-surface-secondary: #fbfbfb;
+  --b24-surface-tertiary: var(--b24-gray-40);
+  --b24-divider: #f0f0f0;
+  --b24-accent-primary: var(--b24-blue-primary);
+  --b24-accent-warm: var(--b24-orange);
+  --b24-accent-success: var(--b24-collab-600);
+
+  /* —— Glass (dashboard-sidebar pattern) —— */
+  --b24-glass: color-mix(in srgb, var(--b24-white) 78%, transparent);
+  --b24-glass-strong: color-mix(in srgb, var(--b24-white) 92%, transparent);
+  --b24-blur: 18px;
+
+  /* —— Map into smart-dash / theme variables —— */
+  --fh-dash-radius: var(--radius-card, var(--b24-radius-3xl));
+  --fh-dash-radius-sm: var(--radius-button, var(--b24-radius-2xl));
+  --fh-dash-radius-pill: var(--radius-pill, var(--b24-radius-pill));
+  --fh-dash-glass: var(--surface-glass, var(--b24-glass));
+  --fh-dash-glass-strong: var(--surface-glass-strong, var(--b24-glass-strong));
+  --fh-dash-ink: var(--text-main, var(--b24-ink));
+  --fh-dash-muted: var(--text-soft, var(--b24-ink-secondary));
+  --fh-dash-faint: var(--text-muted, var(--b24-ink-muted));
+  --fh-dash-accent: var(--brand-amber, var(--b24-accent-warm));
+  --fh-dash-accent-primary: var(--brand-primary, var(--b24-accent-primary));
+  --fh-dash-shadow: var(--shadow-card);
+  --fh-dash-shadow-hover: var(--shadow-panel);
+  --fh-dash-canvas: var(--app-bg);
+}
+
+[data-fh-theme="dark"] .fh-smart-dash {
+  --b24-glass: rgba(38, 38, 38, 0.78);
+  --b24-glass-strong: rgba(38, 38, 38, 0.92);
+  --b24-ink: #eef2f7;
+  --b24-ink-secondary: #a8adb4;
+  --b24-ink-muted: #838c95;
+  --b24-accent-primary: #1587fa;
+  --fh-dash-glass: var(--b24-glass);
+  --fh-dash-glass-strong: var(--b24-glass-strong);
+  --fh-dash-ink: var(--b24-ink);
+  --fh-dash-muted: var(--b24-ink-secondary);
+  --fh-dash-faint: var(--b24-ink-muted);
+  --fh-dash-accent-primary: var(--b24-accent-primary);
+  --fh-dash-shadow: 0 12px 32px rgba(0, 0, 0, 0.35), 0 1px 0 rgba(255, 255, 255, 0.04) inset;
+  --fh-dash-shadow-hover: 0 18px 40px rgba(0, 0, 0, 0.45);
+  --fh-dash-canvas: linear-gradient(160deg, #1a1a1a 0%, #262626 45%, #1e2430 100%);
+}

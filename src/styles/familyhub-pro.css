@@ -1,0 +1,830 @@
+/**
+ * FamilyHub Professional Shell — Wall Display / Kiosk standard
+ * -------------------------------------------------------------
+ * Visual source: /kiosk full board + Office Inventory light cards
+ * (fh-kiosk-*). Clean white cards, pale page, uppercase sections.
+ *
+ * Tokens: familyhub-theme.css + familyhub-kiosk-tokens.css
+ */
+
+@import "./familyhub-kiosk-tokens.css";
+
+:root {
+  /* Align app atmosphere with Wall Display calm pale page */
+  --pro-page: var(--fh-kiosk-page, #f7f9fc);
+  --pro-surface: var(--fh-kiosk-surface, #ffffff);
+  --pro-surface-soft: var(--fh-kiosk-surface-soft, #f3f4f6);
+  --pro-border: var(--fh-kiosk-border, #e4e8ef);
+  --pro-border-strong: var(--fh-kiosk-border-strong, #d6dce6);
+  --pro-ink: var(--fh-kiosk-text, #172033);
+  --pro-muted: var(--fh-kiosk-text-soft, #64748b);
+  --pro-faint: var(--fh-kiosk-text-muted, #94a3b8);
+  --pro-primary: var(--brand-primary, #1f6fbf);
+  --pro-primary-soft: var(--soft-blue, #e5f0ff);
+  --pro-radius: var(--fh-kiosk-radius-lg, 18px);
+  --pro-radius-sm: var(--fh-kiosk-radius-md, 14px);
+  --pro-shadow: var(--fh-kiosk-shadow-sm, 0 4px 12px rgb(15 23 42 / 0.07));
+  --pro-shadow-md: var(--fh-kiosk-shadow-md, 0 10px 24px rgb(15 23 42 / 0.09));
+}
+
+/* —— Shared primitives (reuse across pages) —— */
+.fh-pro-page {
+  background: var(--pro-page);
+  color: var(--pro-ink);
+  font-family: var(--font-body);
+  min-height: 100%;
+}
+
+.fh-pro-section-title {
+  margin: 0 0 0.65rem;
+  font-family: var(--font-ui);
+  font-size: 0.78rem;
+  font-weight: 750;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--pro-muted);
+}
+
+.fh-pro-card {
+  border-radius: var(--pro-radius);
+  border: 1px solid var(--pro-border);
+  background: var(--pro-surface);
+  box-shadow: var(--pro-shadow);
+}
+
+.fh-pro-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 1rem 1.05rem;
+  border-radius: var(--pro-radius-sm);
+  border: 1px solid var(--pro-border);
+  background: var(--pro-surface);
+  box-shadow: var(--pro-shadow);
+  text-align: center;
+}
+
+.fh-pro-stat strong {
+  font-family: var(--font-heading);
+  font-size: 1.85rem;
+  font-weight: 750;
+  letter-spacing: -0.03em;
+  color: var(--pro-ink);
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.fh-pro-stat span {
+  font-family: var(--font-ui);
+  font-size: 0.68rem;
+  font-weight: 750;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--pro-muted);
+}
+
+.fh-pro-action {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-height: 3.25rem;
+  padding: 0.7rem 0.95rem;
+  border-radius: var(--pro-radius-sm);
+  border: 1px solid var(--pro-border);
+  background: var(--pro-surface);
+  box-shadow: var(--pro-shadow);
+  color: var(--pro-ink);
+  font-family: var(--font-ui);
+  font-size: 0.95rem;
+  font-weight: 700;
+  text-align: left;
+  cursor: pointer;
+  transition: background 140ms ease, border-color 140ms ease, box-shadow 140ms ease;
+}
+
+.fh-pro-action:hover,
+.fh-pro-action:focus-visible {
+  background: var(--pro-surface-soft);
+  border-color: var(--pro-border-strong);
+  outline: none;
+}
+
+.fh-pro-action__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.65rem;
+  height: 2.65rem;
+  border-radius: 10px;
+  background: var(--pro-primary-soft);
+  color: var(--pro-primary);
+  flex-shrink: 0;
+}
+
+.fh-pro-list-row {
+  display: block;
+  width: 100%;
+  padding: 0.95rem 1.05rem;
+  border-radius: var(--pro-radius-sm);
+  border: 1px solid var(--pro-border);
+  background: var(--pro-surface);
+  box-shadow: var(--pro-shadow);
+  text-align: left;
+  color: var(--pro-ink);
+}
+
+.fh-pro-list-row strong,
+.fh-pro-list-row .fh-pro-list-row__title {
+  display: block;
+  font-size: 1.02rem;
+  font-weight: 720;
+  color: var(--pro-ink);
+}
+
+.fh-pro-list-row small,
+.fh-pro-list-row .fh-pro-list-row__meta {
+  display: block;
+  margin-top: 0.2rem;
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: var(--pro-muted);
+}
+
+.fh-pro-empty {
+  margin: 0;
+  padding: 1rem 1.05rem;
+  border-radius: var(--pro-radius-sm);
+  border: 1px solid var(--pro-border);
+  background: var(--pro-surface-soft);
+  color: var(--pro-muted);
+  font-size: 0.92rem;
+  font-weight: 600;
+}
+
+.fh-pro-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  min-height: 2.45rem;
+  padding: 0.4rem 1rem;
+  border-radius: var(--pro-radius-sm);
+  border: 1px solid var(--pro-border);
+  background: var(--pro-surface);
+  color: var(--pro-ink);
+  font-family: var(--font-ui);
+  font-size: 0.86rem;
+  font-weight: 720;
+  cursor: pointer;
+  box-shadow: var(--pro-shadow);
+}
+
+.fh-pro-btn--primary {
+  border-color: var(--pro-primary);
+  background: var(--pro-primary);
+  color: #fff;
+  box-shadow: var(--shadow-button);
+}
+
+.fh-pro-btn--ghost {
+  background: var(--pro-surface);
+  color: var(--pro-primary);
+  border-color: var(--pro-border);
+}
+
+/* —— App shell: Wall Display pale canvas —— */
+.fh-smart-dash.notion-shell,
+.fh-smart-dash .notion-shell__main,
+.fh-smart-dash .notion-shell__content,
+.fh-smart-dash.fh-notion-app {
+  background:
+    radial-gradient(900px 520px at 8% -6%, rgba(125, 184, 255, 0.14), transparent 55%),
+    radial-gradient(760px 480px at 96% 4%, rgba(45, 190, 175, 0.1), transparent 52%),
+    linear-gradient(180deg, #eef4fb 0%, var(--pro-page) 42%, #f8fafc 100%) !important;
+  background-attachment: fixed;
+}
+
+.fh-smart-dash .notion-sidebar {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.88), rgba(247, 250, 253, 0.92)),
+    var(--pro-surface) !important;
+  border-color: var(--pro-border) !important;
+  box-shadow: var(--pro-shadow) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+.fh-smart-dash .notion-sidebar__row[aria-current="page"] {
+  background: var(--pro-surface) !important;
+  border: 1px solid var(--pro-border) !important;
+  box-shadow: var(--pro-shadow) !important;
+}
+
+.fh-smart-dash .notion-sidebar__row[aria-current="page"] .notion-sidebar__row-icon {
+  background: var(--pro-primary-soft) !important;
+  color: var(--pro-primary) !important;
+}
+
+.fh-smart-dash .notion-workspace-toolbar,
+.fh-smart-dash .fh-notion-toolbar {
+  background: var(--pro-surface) !important;
+  border-color: var(--pro-border) !important;
+  box-shadow: var(--fh-kiosk-shadow-xs) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+.fh-smart-dash .notion-toolbar__icon-btn {
+  background: var(--pro-surface-soft);
+  border-color: var(--pro-border);
+}
+
+/* —— Home Start widgets → Wall Display clean cards —— */
+.fh-start-page.fh-fridge-home {
+  gap: 1rem;
+}
+
+.fh-start-page .fh-fridge-home__top {
+  border: 1px solid var(--pro-border) !important;
+  background: var(--pro-surface) !important;
+  box-shadow: var(--pro-shadow-md) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border-radius: var(--pro-radius) !important;
+}
+
+.fh-start-page .fh-fridge-home__top::before {
+  width: 0 !important;
+}
+
+.fh-start-page .fh-fridge-home__kicker {
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-size: 0.72rem;
+  color: var(--pro-muted) !important;
+  font-weight: 750;
+}
+
+.fh-start-page .fh-fridge-home__title {
+  font-weight: 750;
+  color: var(--pro-ink);
+}
+
+.fh-start-page .fh-fridge-home__status button {
+  background: var(--pro-surface-soft) !important;
+  border-color: var(--pro-border) !important;
+  box-shadow: none !important;
+  color: var(--pro-ink) !important;
+  font-weight: 700;
+}
+
+.fh-start-page .fh-fridge-home__clock {
+  background: var(--pro-surface-soft) !important;
+  border: 1px solid var(--pro-border);
+  box-shadow: none !important;
+}
+
+.fh-start-page .fh-start-page__customize {
+  background: var(--pro-surface-soft) !important;
+  border-color: var(--pro-border) !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+}
+
+.fh-start-page .fh-start-page__customize-btn {
+  background: var(--pro-surface) !important;
+  border-color: var(--pro-border) !important;
+  box-shadow: none !important;
+  opacity: 0.9;
+}
+
+.fh-start-page .fh-start-page__customize-hint {
+  background: var(--pro-primary-soft) !important;
+  border-color: transparent !important;
+}
+
+/* Strip decorative widget chrome → clean professional cards */
+.fh-start-page .fh-start-widget {
+  border: 1px solid var(--pro-border) !important;
+  background: var(--pro-surface) !important;
+  box-shadow: var(--pro-shadow-md) !important;
+  border-radius: var(--pro-radius) !important;
+  transform: none !important;
+}
+
+.fh-start-page .fh-start-widget::before,
+.fh-start-page .fh-start-widget::after {
+  display: none !important;
+}
+
+.fh-start-page .fh-start-widget:hover {
+  transform: none !important;
+  box-shadow: var(--pro-shadow-md) !important;
+  border-color: var(--pro-border-strong) !important;
+}
+
+.fh-start-page .fh-start-widget__header {
+  background: var(--pro-surface) !important;
+  border-bottom: 1px solid var(--pro-border) !important;
+}
+
+.fh-start-page .fh-start-widget__header-actions {
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+}
+
+.fh-start-page .fh-start-widget__title {
+  font-weight: 750;
+  color: var(--pro-ink);
+}
+
+.fh-start-page .fh-start-widget__subtitle {
+  color: var(--pro-muted);
+  font-weight: 600;
+}
+
+.fh-start-page .fh-start-widget__icon {
+  box-shadow: none !important;
+  width: 2.55rem;
+  height: 2.55rem;
+}
+
+.fh-start-page .fh-start-widget__action,
+.fh-start-page .fh-ghost-pill {
+  border-radius: var(--pro-radius-sm) !important;
+  border-color: var(--pro-border) !important;
+  background: var(--pro-surface) !important;
+  box-shadow: none !important;
+  color: var(--pro-primary) !important;
+}
+
+.fh-start-page .fh-start-widget__menu {
+  border-color: var(--pro-border) !important;
+  background: var(--pro-surface-soft) !important;
+}
+
+.fh-start-page .fh-start-widget__footer {
+  background: var(--pro-surface-soft) !important;
+  border-top-color: var(--pro-border) !important;
+}
+
+.fh-start-page .fh-start-widget__meta-chip {
+  background: var(--pro-surface) !important;
+  border-color: var(--pro-border) !important;
+  color: var(--pro-muted) !important;
+  box-shadow: none !important;
+}
+
+.fh-start-page .fh-start-widget__empty,
+.fh-start-page .fh-fridge-home__empty-panel {
+  background: var(--pro-surface-soft) !important;
+  border: 1px solid var(--pro-border) !important;
+  border-style: solid !important;
+  box-shadow: none !important;
+  color: var(--pro-muted) !important;
+}
+
+.fh-start-page .fh-fridge-home__kitchen-hero {
+  background: var(--pro-surface-soft) !important;
+  border: 1px solid var(--pro-border) !important;
+  box-shadow: none !important;
+}
+
+.fh-start-page .fh-fridge-home__activity--event,
+.fh-start-page .fh-shop-widget__row,
+.fh-start-page .fh-fridge-home__shop-row,
+.fh-start-page .fh-fridge-home__activity {
+  background: var(--pro-surface) !important;
+  border: 1px solid var(--pro-border) !important;
+  box-shadow: var(--fh-kiosk-shadow-xs) !important;
+}
+
+.fh-start-page .fh-fridge-home__activity--event {
+  border-left: 3px solid var(--pro-primary) !important;
+  background: var(--pro-surface) !important;
+}
+
+.fh-start-page .fh-fridge-home__mini-cal {
+  background: var(--pro-surface-soft) !important;
+  border-color: var(--pro-border) !important;
+  box-shadow: none !important;
+}
+
+.fh-start-page .fh-shop-widget__summary-chip {
+  background: var(--pro-surface-soft) !important;
+  border-color: var(--pro-border) !important;
+  box-shadow: none !important;
+  color: var(--pro-ink) !important;
+}
+
+.fh-start-page .fh-shop-widget__summary-chip--ready {
+  background: var(--soft-mint) !important;
+  color: #1f6f56 !important;
+}
+
+.fh-start-page .fh-shop-widget__composer {
+  background: var(--pro-surface-soft) !important;
+  border-color: var(--pro-border) !important;
+  box-shadow: none !important;
+}
+
+.fh-start-page .fh-mini-stat {
+  background: var(--pro-surface) !important;
+  border-color: var(--pro-border) !important;
+  box-shadow: var(--pro-shadow) !important;
+}
+
+.fh-start-page .fh-mini-stat::before {
+  display: none;
+}
+
+.fh-start-page .fh-mini-stat__dot {
+  display: none;
+}
+
+.fh-start-page .fh-mini-stat:hover {
+  transform: none;
+}
+
+.fh-start-page .fh-fridge-home__jump--inline button {
+  background: var(--pro-surface) !important;
+  border-color: var(--pro-border) !important;
+  box-shadow: none !important;
+  border-radius: var(--pro-radius-sm) !important;
+}
+
+.fh-start-page .fh-fridge-home__agenda-title {
+  letter-spacing: 0.14em;
+  color: var(--pro-muted);
+}
+
+/* Home section labels (Wall Display style) */
+.fh-fridge-home__board-wrap,
+.fh-fridge-home__dock-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  min-height: 0;
+}
+
+.fh-start-page__board-label,
+.fh-start-page__dock-label {
+  margin: 0;
+  font-family: var(--font-ui);
+  font-size: 0.72rem;
+  font-weight: 750;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--pro-muted);
+}
+
+.fh-fridge-home__board-wrap .fh-fridge-home__board,
+.fh-fridge-home__dock-wrap .fh-fridge-home__dock {
+  flex: 1;
+  min-height: 0;
+}
+
+/* —— Calendar schedule dashboard —— */
+.fh-sched {
+  background: transparent !important;
+}
+
+.fh-sched::before,
+.fh-sched::after {
+  display: none !important;
+}
+
+.fh-sched-workspace,
+.fh-sched .fh-sched-card,
+.fh-sched-upcoming,
+.fh-sched-toolbar {
+  border-color: var(--pro-border) !important;
+  background: var(--pro-surface) !important;
+  box-shadow: var(--pro-shadow) !important;
+  backdrop-filter: none !important;
+}
+
+.fh-sched-btn {
+  border-radius: var(--pro-radius-sm) !important;
+}
+
+.fh-sched-btn--primary {
+  background: var(--pro-primary) !important;
+  border-color: var(--pro-primary) !important;
+}
+
+/* —— Shopping / Pantry canvases —— */
+.aux-shopping__canvas,
+.aux-pantry__canvas,
+.wd-pantry-route {
+  background:
+    radial-gradient(800px 480px at 10% 0%, rgba(125, 184, 255, 0.12), transparent 55%),
+    var(--pro-page) !important;
+}
+
+.aux-shopping__card,
+.aux-pantry__card,
+.fh-kiosk-home__panel,
+.fh-kiosk-page__card {
+  border: 1px solid var(--pro-border) !important;
+  background: var(--pro-surface) !important;
+  box-shadow: var(--pro-shadow-md) !important;
+  border-radius: var(--pro-radius) !important;
+}
+
+.aux-shopping__stat,
+.aux-pantry__stat,
+.fh-kiosk-home__stat-card {
+  border: 1px solid var(--pro-border) !important;
+  background: var(--pro-surface) !important;
+  box-shadow: var(--pro-shadow) !important;
+  border-radius: var(--pro-radius-sm) !important;
+}
+
+.fh-kiosk-home__action-card {
+  border: 1px solid var(--pro-border) !important;
+  background: var(--pro-surface) !important;
+  box-shadow: var(--pro-shadow) !important;
+}
+
+.fh-kiosk-page,
+.fh-kiosk-home {
+  background: transparent;
+}
+
+/* —— Cleaning / Chores —— */
+.wd-chore-hh {
+  background: transparent !important;
+  color: var(--pro-ink);
+}
+
+.wd-chore-hh__hero {
+  border: 1px solid var(--pro-border) !important;
+  background: var(--pro-surface) !important;
+  box-shadow: var(--pro-shadow-md) !important;
+  border-radius: var(--pro-radius) !important;
+  overflow: hidden;
+}
+
+.wd-chore-hh__hero-glow {
+  display: none !important;
+}
+
+.wd-chore-hh__eyebrow {
+  letter-spacing: 0.14em !important;
+  color: var(--pro-muted) !important;
+}
+
+.wd-chore-hh__content .wd-chore-hh__card,
+.wd-chore-hh__panel,
+.wd-chore-hh [class*="card"] {
+  border-color: var(--pro-border);
+}
+
+/* Soften dark filter bars toward Wall Display */
+.wd-chore-hh__filter-bar,
+.wd-chore-hh__filters,
+.wd-chore-hh__toolbar {
+  background: var(--pro-surface) !important;
+  border: 1px solid var(--pro-border) !important;
+  color: var(--pro-ink) !important;
+  box-shadow: var(--pro-shadow) !important;
+}
+
+/* —— Settings —— */
+.wd-settings-ref {
+  background: transparent !important;
+  color: var(--pro-ink);
+}
+
+.wd-settings-ref__card,
+.wd-settings-ref__hero {
+  border: 1px solid var(--pro-border) !important;
+  background: var(--pro-surface) !important;
+  box-shadow: var(--pro-shadow-md) !important;
+  border-radius: var(--pro-radius) !important;
+}
+
+.wd-settings-ref__topbar,
+.wd-settings-ref__switcher {
+  background: var(--pro-surface) !important;
+  border-color: var(--pro-border) !important;
+}
+
+/* —— Messages (uses kiosk home) —— */
+.fh-kiosk-page .fh-kiosk-home__list-row {
+  border: 1px solid var(--pro-border);
+  background: var(--pro-surface);
+  box-shadow: var(--fh-kiosk-shadow-xs);
+}
+
+/* —— Kiosk full board (Tailwind) sits on same pale canvas —— */
+.kiosk-prose,
+.workstation-shell {
+  color: var(--pro-ink);
+}
+
+/* —— Home final pass: command-center alignment with /kiosk —— */
+.fh-home-pro.fh-fridge-home {
+  gap: 1.1rem;
+  max-width: min(1280px, 100%);
+}
+
+.fh-home-pro__hero {
+  padding: 1.15rem 1.35rem !important;
+}
+
+.fh-home-pro .fh-fridge-home__kicker.fh-pro-section-title {
+  margin-bottom: 0.35rem;
+}
+
+.fh-home-pro .fh-fridge-home__title {
+  font-size: clamp(1.55rem, 2vw, 1.95rem);
+  font-weight: 750;
+  letter-spacing: -0.03em;
+  color: var(--pro-ink);
+}
+
+.fh-home-customize {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  margin-top: 0.65rem;
+  padding: 0;
+  border: none;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.fh-home-customize__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  min-height: 1.85rem;
+  padding: 0.2rem 0.65rem;
+  border-radius: var(--pro-radius-sm);
+  border: 1px solid var(--pro-border);
+  background: var(--pro-surface-soft);
+  color: var(--pro-muted);
+  font-family: var(--font-ui);
+  font-size: 0.72rem;
+  font-weight: 700;
+  cursor: not-allowed;
+  opacity: 0.85;
+}
+
+.fh-home-pro__chips {
+  gap: 0.4rem;
+}
+
+.fh-home-pro__chips button {
+  min-height: 2.15rem !important;
+  padding: 0.3rem 0.8rem !important;
+  border-radius: var(--pro-radius-sm) !important;
+  background: var(--pro-surface-soft) !important;
+  border: 1px solid var(--pro-border) !important;
+  box-shadow: none !important;
+  font-size: 0.8rem !important;
+  font-weight: 700 !important;
+  color: var(--pro-ink) !important;
+}
+
+.fh-home-pro__clock {
+  background: var(--pro-surface-soft) !important;
+  border: 1px solid var(--pro-border) !important;
+  border-radius: var(--pro-radius-sm) !important;
+  padding: 0.55rem 0.85rem !important;
+  box-shadow: none !important;
+}
+
+.fh-home-pro__priority {
+  background: var(--pro-surface-soft) !important;
+  border: 1px solid var(--pro-border) !important;
+  border-radius: var(--pro-radius-sm) !important;
+  padding: 0.85rem 0.95rem !important;
+  margin-bottom: 0.85rem;
+}
+
+.fh-home-pro__priority .fh-fridge-home__kitchen-name {
+  font-size: clamp(1.65rem, 2.4vw, 2.1rem);
+  font-weight: 750;
+}
+
+.fh-home-pro__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.fh-home-pro__list .fh-pro-list-row {
+  cursor: pointer;
+  transition: background 140ms ease, border-color 140ms ease;
+}
+
+.fh-home-pro__list .fh-pro-list-row:hover,
+.fh-home-pro__list .fh-pro-list-row:focus-visible {
+  background: var(--pro-surface-soft);
+  border-color: var(--pro-border-strong);
+  outline: none;
+}
+
+.fh-home-pro__shop-row {
+  display: flex !important;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.fh-home-pro__shop-main {
+  min-width: 0;
+  flex: 1;
+}
+
+.fh-home-pro__qty {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2rem;
+  min-height: 1.75rem;
+  padding: 0.15rem 0.55rem;
+  border-radius: 999px;
+  background: var(--soft-mint, #e5f6ef);
+  border: 1px solid rgba(47, 157, 122, 0.2);
+  color: #1f6f56;
+  font-size: 0.78rem;
+  font-weight: 750;
+  font-variant-numeric: tabular-nums;
+}
+
+.fh-home-pro__composer {
+  display: flex;
+  gap: 0.45rem;
+  margin-top: auto;
+  padding-top: 0.85rem;
+}
+
+.fh-home-pro__composer input {
+  flex: 1;
+  min-height: 2.45rem;
+  padding: 0.4rem 0.9rem;
+  border: 1px solid var(--pro-border);
+  border-radius: var(--pro-radius-sm);
+  background: var(--pro-surface-soft);
+  color: var(--pro-ink);
+  font-family: var(--font-ui);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.fh-home-pro__composer input:focus {
+  outline: none;
+  border-color: var(--pro-primary);
+  background: var(--pro-surface);
+  box-shadow: 0 0 0 3px rgba(31, 111, 191, 0.12);
+}
+
+.fh-home-pro__mini-cal {
+  background: var(--pro-surface-soft) !important;
+  border: 1px solid var(--pro-border) !important;
+  border-radius: var(--pro-radius-sm) !important;
+  box-shadow: none !important;
+}
+
+.fh-home-pro__links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.fh-home-pro__links .fh-pro-btn {
+  min-height: 2.15rem;
+  font-size: 0.8rem;
+}
+
+.fh-home-pro .fh-start-widget__header {
+  background: var(--pro-surface) !important;
+}
+
+.fh-home-pro .fh-start-widget__footer {
+  background: var(--pro-surface-soft) !important;
+}
+
+.fh-home-pro .fh-fridge-home__storage {
+  background: var(--pro-surface) !important;
+}
+
+.fh-home-pro .fh-mini-stat {
+  text-align: center;
+  background: var(--pro-surface) !important;
+  border: 1px solid var(--pro-border) !important;
+  box-shadow: var(--pro-shadow) !important;
+}
+
+.fh-home-pro .fh-mini-stat::before,
+.fh-home-pro .fh-mini-stat__dot {
+  display: none !important;
+}

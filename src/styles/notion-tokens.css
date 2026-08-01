@@ -1,0 +1,100 @@
+/**
+ * FamilyHub Notion layout & typography tokens — Stage N1A
+ * Theme surfaces/text live in familyhub-notion-theme.css (data-fh-theme).
+ */
+
+@import "./familyhub-notion-theme.css";
+
+.notion-app {
+  --notion-font:
+    ui-sans-serif,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    "Inter",
+    sans-serif;
+
+  /* Legacy aliases → semantic theme tokens */
+  --notion-text: var(--fh-notion-text-primary);
+  --notion-text-secondary: var(--fh-notion-text-secondary);
+  --notion-text-muted: var(--fh-notion-text-tertiary);
+  --notion-text-faint: var(--fh-notion-text-disabled);
+  --notion-bg: var(--fh-notion-page);
+  --notion-bg-elevated: var(--fh-notion-surface);
+  --notion-sidebar-bg: var(--fh-notion-sidebar);
+  --notion-sidebar-hover: var(--fh-notion-surface-hover);
+  --notion-sidebar-active: var(--fh-notion-surface-active);
+  --notion-border: var(--fh-notion-border);
+  --notion-border-strong: var(--fh-notion-border-strong);
+  --notion-divider: var(--fh-notion-border);
+  --notion-accent: var(--fh-notion-accent);
+  --notion-accent-soft: var(--fh-notion-focus);
+  --notion-shadow-subtle: var(--fh-notion-shadow);
+
+  /* Legacy chip aliases → Phase 5 property palette */
+  --notion-prop-gray-bg: var(--fh-property-gray-bg);
+  --notion-prop-gray-text: var(--fh-property-gray-text);
+  --notion-prop-brown-bg: var(--fh-property-orange-bg);
+  --notion-prop-brown-text: var(--fh-property-orange-text);
+  --notion-prop-orange-bg: var(--fh-property-orange-bg);
+  --notion-prop-orange-text: var(--fh-property-orange-text);
+  --notion-prop-yellow-bg: var(--fh-property-yellow-bg);
+  --notion-prop-yellow-text: var(--fh-property-yellow-text);
+  --notion-prop-green-bg: var(--fh-property-green-bg);
+  --notion-prop-green-text: var(--fh-property-green-text);
+  --notion-prop-blue-bg: var(--fh-property-blue-bg);
+  --notion-prop-blue-text: var(--fh-property-blue-text);
+  --notion-prop-purple-bg: var(--fh-property-purple-bg);
+  --notion-prop-purple-text: var(--fh-property-purple-text);
+  --notion-prop-pink-bg: var(--fh-property-pink-bg);
+  --notion-prop-pink-text: var(--fh-property-pink-text);
+  --notion-prop-red-bg: var(--fh-property-red-bg);
+  --notion-prop-red-text: var(--fh-property-red-text);
+  --notion-prop-teal-bg: var(--fh-property-teal-bg);
+  --notion-prop-teal-text: var(--fh-property-teal-text);
+
+  /* Type scale */
+  --fh-notion-type-page-title-size: clamp(2rem, 3vw, 2.75rem);
+  --fh-notion-type-page-title-weight: 700;
+  --fh-notion-type-page-title-tracking: -0.035em;
+  --fh-notion-type-page-title-leading: 1.12;
+
+  --fh-notion-type-page-desc-size: 0.95rem;
+  --fh-notion-type-page-desc-leading: 1.6;
+
+  --fh-notion-type-section-size: 1rem;
+  --fh-notion-type-section-weight: 600;
+  --fh-notion-type-section-leading: 1.35;
+
+  --fh-notion-type-db-title-size: 1rem;
+  --fh-notion-type-db-title-weight: 600;
+
+  --fh-notion-type-property-size: 0.75rem;
+  --fh-notion-type-property-weight: 500;
+
+  --fh-notion-type-body-size: 0.875rem;
+  --fh-notion-type-body-leading: 1.5;
+
+  --fh-notion-type-meta-size: 0.6875rem;
+  --fh-notion-type-meta-weight: 600;
+  --fh-notion-type-meta-tracking: 0.04em;
+
+  --notion-radius-sm: 6px;
+  --notion-radius-md: 8px;
+  --notion-radius-lg: 10px;
+
+  --notion-shadow-none: none;
+
+  --notion-sidebar-width: 240px;
+  --notion-sidebar-collapsed: 0;
+  --notion-content-max: 1024px;
+  --notion-page-padding: 2rem;
+
+  font-family: var(--notion-font);
+  font-size: var(--fh-notion-type-body-size);
+  line-height: var(--fh-notion-type-body-leading);
+  color: var(--fh-notion-text-primary);
+  background: var(--fh-notion-page);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}

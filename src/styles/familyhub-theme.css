@@ -1,0 +1,292 @@
+/**
+ * FamilyHub — editable premium dashboard theme
+ * ------------------------------------------------
+ * Change colors, fonts, radii, and shadows here.
+ * Consumed by shell, Home, Calendar, Pantry, and AdminUX skins.
+ *
+ * Style direction: light AdminUX / Gogo dashboard + FridgeWise aqua accents.
+ * Dark kiosk theme is intentionally deferred.
+ */
+
+:root {
+  /* —— Typography —— */
+  --font-heading: "Urbanist", "Inter", "SF Pro Display", system-ui, sans-serif;
+  --font-body: "Mulish", "Inter", "SF Pro Text", system-ui, sans-serif;
+  --font-ui: "Mulish", "Inter", system-ui, sans-serif;
+  --font-sans: var(--font-body);
+
+  /* —— Atmospheric page background (Wall Display calm pale) —— */
+  --app-bg-start: #eef4fb;
+  --app-bg-middle: #f3f8f7;
+  --app-bg-end: #f7f9fc;
+  --app-bg-glow-blue: rgba(125, 184, 255, 0.16);
+  --app-bg-glow-aqua: rgba(45, 190, 175, 0.1);
+  --app-bg-glow-sky: rgba(147, 197, 253, 0.12);
+  --app-bg:
+    radial-gradient(900px 520px at 8% -6%, var(--app-bg-glow-blue), transparent 55%),
+    radial-gradient(760px 480px at 96% 4%, var(--app-bg-glow-aqua), transparent 52%),
+    linear-gradient(180deg, var(--app-bg-start) 0%, var(--app-bg-middle) 45%, var(--app-bg-end) 100%);
+
+  /* —— Surfaces —— */
+  --surface-main: #ffffff;
+  --surface-solid: #ffffff;
+  --surface-muted: #f3f8ff;
+  --surface-panel: #f4f8fd;
+  --surface-glass: rgba(255, 255, 255, 0.8);
+  --surface-glass-strong: rgba(255, 255, 255, 0.94);
+  --surface-sidebar: #ffffff;
+  --surface-sidebar-edge: rgba(228, 232, 239, 0.9);
+  --surface-hero: #ffffff;
+  --surface-empty: #f3f4f6;
+  --surface-customize: #f3f4f6;
+
+  /* —— Text —— */
+  --text-main: #121c2e;
+  --text-soft: #2b3a4f;
+  --text-muted: #4f6074;
+  --text-faint: #7b8a9c;
+
+  /* —— Brand —— */
+  --brand-primary: #1f6fbf;
+  --brand-primary-strong: #155a9c;
+  --brand-aqua: #2aa8b8;
+  --brand-mint: #2f9d7a;
+  --brand-amber: #c98a1a;
+  --brand-rose: #c44d63;
+  --brand-violet: #6f62b0;
+  --brand-success: #2f9d7a;
+  --brand-warning: #c98a1a;
+  --brand-danger: #c44d63;
+
+  /* —— Soft fills —— */
+  --soft-blue: #e5f0ff;
+  --soft-aqua: #e3f6f7;
+  --soft-mint: #e5f6ef;
+  --soft-amber: #fff3dc;
+  --soft-rose: #fdecef;
+  --soft-violet: #efeafb;
+
+  /* —— Shape —— */
+  --radius-page: 28px;
+  --radius-card: 18px;
+  --radius-widget: 18px;
+  --radius-panel: 22px;
+  --radius-button: 14px;
+  --radius-control: 12px;
+  --radius-pill: 999px;
+  --radius-tile: 14px;
+
+  /* —— Start Page / Wall Display card surfaces —— */
+  --surface-widget: #ffffff;
+  --surface-widget-highlight: none;
+  --surface-widget-inset: #f3f4f6;
+  --widget-accent: var(--brand-primary);
+  --widget-accent-soft: var(--soft-blue);
+
+  /* —— Shadows (Wall Display soft, not heavy glass) —— */
+  --shadow-card: 0 4px 12px rgb(15 23 42 / 0.07);
+  --shadow-panel: 0 10px 24px rgb(15 23 42 / 0.09);
+  --shadow-widget: 0 10px 24px rgb(15 23 42 / 0.09);
+  --shadow-widget-hover: 0 10px 24px rgb(15 23 42 / 0.11);
+  --shadow-button: 0 1px 2px rgba(18, 28, 46, 0.05), 0 8px 16px rgba(31, 111, 191, 0.16);
+  --shadow-soft: 0 1px 2px rgba(18, 28, 46, 0.035), 0 10px 20px rgba(21, 40, 72, 0.07);
+  --shadow-nav-active:
+    0 1px 2px rgba(18, 28, 46, 0.045),
+    0 10px 22px rgba(31, 111, 191, 0.16);
+  --shadow-inset-sidebar:
+    inset -1px 0 0 var(--surface-sidebar-edge),
+    inset 0 1px 0 rgba(255, 255, 255, 0.72),
+    0 12px 28px rgba(21, 40, 72, 0.06);
+
+  /* —— Borders —— */
+  --border-soft: rgba(18, 28, 46, 0.085);
+  --border-glass: rgba(255, 255, 255, 0.82);
+  --border-strong: rgba(31, 111, 191, 0.26);
+  --border-divider: rgba(18, 28, 46, 0.065);
+  --border-widget: rgba(28, 70, 118, 0.12);
+
+  /* —— Compatibility aliases (existing skins) —— */
+  --fh-bg: var(--app-bg-end);
+  --fh-surface: var(--surface-main);
+  --fh-text: var(--text-main);
+  --fh-text-muted: var(--text-muted);
+  --fh-accent: var(--brand-primary);
+  --fh-accent-2: var(--brand-aqua);
+  --fh-accent-soft: var(--soft-blue);
+  --fh-accent-strong: var(--brand-primary-strong);
+
+  --aux-theme: var(--brand-primary);
+  --aux-theme-1: var(--brand-primary);
+  --aux-theme-2: var(--brand-aqua);
+  --aux-primary: var(--brand-primary);
+  --aux-accent: var(--brand-aqua);
+  --aux-text: var(--text-main);
+  --aux-muted: var(--text-muted);
+  --aux-card: var(--surface-main);
+  --aux-border: var(--border-soft);
+  --aux-radius: var(--radius-card);
+  --aux-success: var(--brand-success);
+  --aux-warning: var(--brand-warning);
+  --aux-danger: var(--brand-danger);
+  --aux-purple: var(--brand-violet);
+  --aux-teal: var(--brand-aqua);
+
+  --bd-primary: var(--brand-primary);
+  --bd-text-heading: var(--text-main);
+  --bd-text-body: var(--text-soft);
+  --bd-text-muted: var(--text-muted);
+  --bd-border: var(--border-soft);
+  --bd-radius-card: var(--radius-card);
+  --bd-radius-widget: var(--radius-panel);
+  --bd-radius-pill: var(--radius-pill);
+  --bd-radius-control: var(--radius-button);
+  --bd-shadow-card: var(--shadow-card);
+}
+
+/* Premium reusable primitives */
+.fh-theme-label {
+  font-family: var(--font-ui);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.fh-icon-tile {
+  width: 2.45rem;
+  height: 2.45rem;
+  border-radius: var(--radius-tile);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background: var(--soft-blue);
+  color: var(--brand-primary-strong);
+  box-shadow:
+    inset 0 0 0 1px rgba(21, 32, 51, 0.05),
+    0 4px 12px rgba(31, 111, 191, 0.1);
+}
+
+.fh-icon-tile--aqua {
+  background: var(--soft-aqua);
+  color: #176f7a;
+}
+.fh-icon-tile--mint {
+  background: var(--soft-mint);
+  color: #1f6f56;
+}
+.fh-icon-tile--amber {
+  background: var(--soft-amber);
+  color: #8a5d0f;
+}
+.fh-icon-tile--rose {
+  background: var(--soft-rose);
+  color: #9d3348;
+}
+.fh-icon-tile--violet {
+  background: var(--soft-violet);
+  color: #52478a;
+}
+
+.fh-status-pill {
+  display: inline-flex;
+  align-items: center;
+  min-height: 1.75rem;
+  padding: 0.22rem 0.75rem;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--border-soft);
+  background: var(--surface-muted);
+  color: var(--text-soft);
+  font-family: var(--font-ui);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+.fh-status-pill--neutral {
+  background: rgba(255, 255, 255, 0.92);
+  border-color: var(--border-soft);
+  color: var(--text-soft);
+  box-shadow: var(--shadow-soft);
+}
+
+.fh-status-pill--open {
+  background: var(--soft-amber);
+  border-color: rgba(201, 138, 26, 0.28);
+  color: #8a5d0f;
+  box-shadow: 0 1px 2px rgba(201, 138, 26, 0.08);
+}
+
+.fh-status-pill--done {
+  background: var(--soft-mint);
+  border-color: rgba(47, 157, 122, 0.26);
+  color: #1f6f56;
+}
+
+.fh-ghost-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.3rem;
+  padding: 0.32rem 0.9rem;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--border-soft);
+  background: rgba(255, 255, 255, 0.82);
+  color: var(--brand-primary-strong);
+  font-family: var(--font-ui);
+  font-size: 0.82rem;
+  font-weight: 720;
+  cursor: pointer;
+  transition:
+    background 160ms ease,
+    border-color 160ms ease,
+    box-shadow 160ms ease,
+    transform 160ms ease;
+}
+
+.fh-ghost-pill:hover,
+.fh-ghost-pill:focus-visible {
+  background: var(--soft-blue);
+  border-color: var(--border-strong);
+  box-shadow: var(--shadow-soft);
+  outline: none;
+}
+
+.fh-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.65rem;
+  padding: 0.45rem 1.2rem;
+  border: 1px solid var(--brand-primary);
+  border-radius: var(--radius-pill);
+  background: var(--brand-primary);
+  color: #fff;
+  font-family: var(--font-ui);
+  font-size: 0.9rem;
+  font-weight: 740;
+  cursor: pointer;
+  box-shadow: var(--shadow-button);
+  transition: background 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
+}
+
+.fh-btn-primary:hover,
+.fh-btn-primary:focus-visible {
+  background: var(--brand-primary-strong);
+  border-color: var(--brand-primary-strong);
+  outline: none;
+}
+
+.fh-empty-panel {
+  margin: 0;
+  padding: 0.85rem 0.95rem;
+  border-radius: var(--radius-control);
+  border: 1px solid var(--border-divider);
+  background: var(--surface-empty);
+  color: var(--text-muted);
+  font-family: var(--font-ui);
+  font-size: 0.9rem;
+  font-weight: 600;
+  line-height: 1.45;
+}

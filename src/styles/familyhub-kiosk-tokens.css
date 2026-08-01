@@ -1,0 +1,59 @@
+/**
+ * FamilyHub kiosk template tokens (Office Inventory visual reference).
+ * Variables are global; visual rules apply only under `.fh-kiosk-home`.
+ */
+
+:root {
+  --fh-kiosk-primary: #1e3a8a;
+  --fh-kiosk-primary-bright: #2563eb;
+  --fh-kiosk-secondary: #14b8a6;
+  --fh-kiosk-secondary-dark: #0f8f8a;
+  --fh-kiosk-accent: #facc15;
+
+  --fh-kiosk-page: #f7f9fc;
+  --fh-kiosk-surface: #ffffff;
+  --fh-kiosk-surface-soft: #f3f4f6;
+  --fh-kiosk-surface-tint: #eef5fb;
+
+  --fh-kiosk-text: #172033;
+  --fh-kiosk-text-soft: #64748b;
+  --fh-kiosk-text-muted: #94a3b8;
+
+  --fh-kiosk-border: #e4e8ef;
+  --fh-kiosk-border-strong: #d6dce6;
+
+  --fh-kiosk-success: #16a34a;
+  --fh-kiosk-success-soft: #e9f9ef;
+
+  --fh-kiosk-warning: #eab308;
+  --fh-kiosk-warning-soft: #fff8da;
+
+  --fh-kiosk-danger: #ef4444;
+  --fh-kiosk-danger-soft: #feecec;
+
+  --fh-kiosk-info: #2563eb;
+  --fh-kiosk-info-soft: #eaf2ff;
+
+  --fh-kiosk-violet: #9333ea;
+  --fh-kiosk-violet-soft: #f4eaff;
+
+  --fh-kiosk-orange: #ea580c;
+  --fh-kiosk-orange-soft: #ffedd5;
+
+  --fh-kiosk-teal: #0d9488;
+  --fh-kiosk-teal-soft: #ccfbf1;
+
+  --fh-kiosk-radius-sm: 10px;
+  --fh-kiosk-radius-md: 14px;
+  --fh-kiosk-radius-lg: 18px;
+  --fh-kiosk-radius-xl: 22px;
+
+  --fh-kiosk-shadow-xs: 0 1px 2px rgb(15 23 42 / 0.04);
+  --fh-kiosk-shadow-sm: 0 4px 12px rgb(15 23 42 / 0.07);
+  --fh-kiosk-shadow-md: 0 10px 24px rgb(15 23 42 / 0.09);
+
+  --fh-kiosk-gradient: linear-gradient(135deg, #2563eb 0%, #0891b2 50%, #14b8a6 100%);
+  --fh-kiosk-gradient-banner: linear-gradient(135deg, #3b82f6 0%, #06b6d4 42%, #2dd4bf 100%);
+
+  --fh-kiosk-tap-min: 44px;
+}

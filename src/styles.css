@@ -1,13 +1,21 @@
 @import "tailwindcss";
 @import "bootstrap-icons/font/bootstrap-icons.css";
+@import "./styles/familyhub-theme.css";
 @import "./styles/design-tokens.css";
 @import "./styles/familyHubClean.css";
+@import "./styles/gogo-familyhub.css";
 @import "./styles/bankdash-components.css";
 @import "./components/widgets/widgets.css";
 @import "./styles/pantry-shopping-grofast.css";
 @import "./styles/adminux-skin.css";
 @import "./styles/pantry-adminux.css";
 @import "./styles/shopping-adminux.css";
+@import "./styles/typography.css";
+@import "./styles/notion-ui.css";
+@import "./styles/familyhub-b24-air-tokens.css";
+@import "./styles/familyhub-smart-dash.css";
+@import "./styles/familyhub-start-page.css";
+@import "./styles/familyhub-pro.css";
 
 /** Tailwind v4 — scan app sources; purges unused utilities in production */
 @source "./**/*.{ts,tsx}";
@@ -17,17 +25,18 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
-  /* Matches global app shell gradient edge — light FamilyHub */
-  --color-app-shell-edge: #eef2f0;
-  /* SmartHR tokens remapped toward FamilyHub green accent (keep names for compat) */
-  --color-smarthr-primary: #2f9e5b;
-  --color-smarthr-accent: #2f9e5b;
-  --color-smarthr-peach: #e8f7ee;
+  --font-sans: "Mulish", "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  /* Matches global app shell gradient edge — soft aqua/blue */
+  --color-app-shell-edge: #eef2f7;
+  /* SmartHR tokens remapped toward premium dashboard blue (keep names for compat) */
+  --color-smarthr-primary: #1f6fbf;
+  --color-smarthr-accent: #1f6fbf;
+  --color-smarthr-peach: #e8f2ff;
   --color-smarthr-sidebar: #ffffff;
-  --color-smarthr-border: #e2e8e6;
-  --color-smarthr-light: #f8faf9;
-  --color-smarthr-text-muted: #4b5c55;
-  --color-smarthr-primary-transparent: #e8f7ee;
+  --color-smarthr-border: #e5eaf0;
+  --color-smarthr-light: #f8fbff;
+  --color-smarthr-text-muted: #5b6b7c;
+  --color-smarthr-primary-transparent: #e8f2ff;
   --color-carbon-950: #080a0f;
   --color-carbon-900: #0e1117;
   --color-carbon-850: #121722;
@@ -39,33 +48,27 @@
 
 :root {
   color-scheme: light;
-  /* SmartHR html template: $font-family-primary — Roboto */
-  font-family:
-    "Roboto", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-    sans-serif;
+  font-family: var(--font-body);
 
   /**
    * UI customization (`familysite-491:appearance`) — set on :root at runtime.
    * Fallbacks match FamilyHub clean light (FoodFlow-style).
    */
-  --fs-primary: var(--fh-accent, #2f9e5b);
-  --fs-gradient-start: var(--fh-accent, #2f9e5b);
-  --fs-gradient-end: var(--fh-accent-strong, #248a4c);
-  --fs-page-bg: var(--fh-bg, #f5f7f6);
+  --fs-primary: var(--fh-accent, #145388);
+  --fs-gradient-start: var(--fh-accent, #145388);
+  --fs-gradient-end: var(--fh-accent-2, #2a93d5);
+  --fs-page-bg: var(--fh-bg, #f4f6f9);
   --fs-card-bg: var(--fh-surface, #ffffff);
-  --fs-sidebar-active-bg: var(--fh-accent-soft, #e8f7ee);
-  --fs-sidebar-active-text: var(--fh-accent-strong, #248a4c);
-  --fs-text: var(--fh-text, #14201b);
-  --fs-text-muted: var(--fh-text-muted, #6b7c74);
+  --fs-sidebar-active-bg: var(--fh-accent-soft, #e8f1f8);
+  --fs-sidebar-active-text: var(--fh-accent-strong, #0f3f68);
+  --fs-text: var(--fh-text, #1e293b);
+  --fs-text-muted: var(--fh-text-muted, #64748b);
 
   /**
-   * Global app backdrop — light gray / soft green wash (not dark AdminUX).
+   * Global app backdrop — soft cool gray / pale blue (Gogo-like).
    */
-  --app-shell-gradient:
-    radial-gradient(circle at 12% 0%, rgba(47, 158, 91, 0.08), transparent 28rem),
-    radial-gradient(circle at 88% 6%, rgba(59, 130, 168, 0.06), transparent 26rem),
-    linear-gradient(180deg, #ffffff 0%, var(--fh-bg, #f5f7f6) 42%, #eef2f0 100%);
-  --app-shell-fallback: var(--fh-bg, #f5f7f6);
+  --app-shell-gradient: var(--app-bg);
+  --app-shell-fallback: var(--app-bg-end, #f7f9fc);
 
   /** SmartHR template body (`base.scss`: $__mix__gray) */
   --app-light-dashboard-bg: #f7f7f7;
@@ -98,10 +101,17 @@ html {
 
 html.dark {
   color-scheme: dark;
-  background-color: var(--app-shell-fallback);
-  background-image: var(--app-shell-gradient);
+  background-color: #0a0c10;
+  background-image:
+    radial-gradient(ellipse 120% 80% at 10% -10%, rgba(91, 141, 239, 0.08), transparent 42%),
+    radial-gradient(ellipse 90% 60% at 95% 0%, rgba(61, 154, 106, 0.06), transparent 38%),
+    linear-gradient(180deg, #0c0e14 0%, #0a0c10 48%, #08090d 100%);
   background-repeat: no-repeat;
   background-size: cover;
+}
+
+html.dark.fops-workstation-root {
+  --app-shell-fallback: #0a0c10;
 }
 
 /**
@@ -134,9 +144,14 @@ body {
   min-height: 100vh;
   background: transparent;
   color: var(--fs-text, var(--fh-text, #14201b));
+  font-family: var(--font-body);
   font-size: 16px;
+  font-weight: 400;
   line-height: 1.5;
+  letter-spacing: -0.011em;
   text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 #root {

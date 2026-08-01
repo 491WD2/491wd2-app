@@ -1,0 +1,300 @@
+/**
+ * FamilyHub × Gogo visual layer
+ * Inspiration only from Gogo Admin (Yale blue / soft white dashboard).
+ * Does not import Gogo SCSS, Bootstrap, or template files.
+ */
+
+:root {
+  /* —— Typography (Inter — SaaS dashboard reference) —— */
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-heading: var(--font-sans);
+  --font-body: var(--font-sans);
+  --font-ui: var(--font-body);
+
+  /* —— Surfaces (Gogo light) —— */
+  --fh-bg: #f4f6f9;
+  --fh-surface: #ffffff;
+  --fh-surface-muted: #f8fafc;
+  --fh-border: #e5eaf0;
+  --fh-border-strong: #d7dde5;
+
+  /* —— Text —— */
+  --fh-text: #1e293b;
+  --fh-text-secondary: #475569;
+  --fh-text-muted: #64748b;
+  --fh-text-on-accent: #ffffff;
+
+  /* —— Accents (Yale blue / soft secondary) —— */
+  --fh-accent: #145388;
+  --fh-accent-soft: #e8f1f8;
+  --fh-accent-strong: #0f3f68;
+  --fh-accent-2: #2a93d5;
+  --fh-success: #3e884f;
+  --fh-success-soft: #e8f4ec;
+  --fh-warning: #b69329;
+  --fh-warning-soft: #faf4e4;
+  --fh-danger: #c43d4b;
+  --fh-danger-soft: #f9e8ea;
+  --fh-info: #3195a5;
+  --fh-info-soft: #e6f5f7;
+  --fh-purple: #7c6bb5;
+  --fh-purple-soft: #f0edf8;
+
+  /* —— Radius / depth —— */
+  --fh-radius-card: 20px;
+  --fh-radius-control: 14px;
+  --fh-radius-pill: 999px;
+  --fh-shadow-card: 0 1px 2px rgba(15, 23, 42, 0.04), 0 8px 24px rgba(15, 23, 42, 0.05);
+  --fh-shadow-card-hover: 0 2px 4px rgba(15, 23, 42, 0.05), 0 12px 28px rgba(15, 23, 42, 0.07);
+  --fh-shadow-drawer: -8px 0 32px rgba(15, 23, 42, 0.12);
+
+  /* Bridge legacy aliases */
+  --lg-bg-0: var(--fh-bg);
+  --lg-bg-1: #eef2f7;
+  --lg-bg-2: #e8edf3;
+  --lg-glass: rgba(255, 255, 255, 0.94);
+  --lg-glass-strong: #ffffff;
+  --lg-glass-muted: rgba(15, 23, 42, 0.04);
+  --lg-border: var(--fh-border);
+  --lg-border-strong: var(--fh-border-strong);
+  --lg-text: var(--fh-text);
+  --lg-text-soft: var(--fh-text-secondary);
+  --lg-text-muted: var(--fh-text-muted);
+  --lg-cyan: var(--fh-accent-2);
+  --lg-blue: var(--fh-accent);
+  --lg-mint: var(--fh-success);
+  --lg-violet: var(--fh-purple);
+  --lg-pink: #c45c5c;
+  --lg-amber: var(--fh-warning);
+  --lg-radius-xl: 22px;
+  --lg-radius-lg: 20px;
+  --lg-radius-md: 14px;
+  --lg-shadow: var(--fh-shadow-card);
+  --lg-shadow-soft: 0 1px 2px rgba(15, 23, 42, 0.04);
+  --lg-surface: var(--fh-surface);
+  --lg-surface-muted: var(--fh-surface-muted);
+
+  --bd-bg-app: var(--fh-bg);
+  --bd-bg-card: var(--fh-surface);
+  --bd-bg-card-muted: var(--fh-surface-muted);
+  --bd-bg-input: #ffffff;
+  --bd-bg-header: rgba(255, 255, 255, 0.94);
+  --bd-primary: var(--fh-accent);
+  --bd-primary-hover: var(--fh-accent-strong);
+  --bd-primary-soft: var(--fh-accent-soft);
+  --bd-primary-ring: rgba(20, 83, 136, 0.35);
+  --bd-text-heading: var(--fh-text);
+  --bd-text-body: var(--fh-text-secondary);
+  --bd-text-muted: var(--fh-text-muted);
+  --bd-text-inverse: #ffffff;
+  --bd-success: var(--fh-success);
+  --bd-danger: var(--fh-danger);
+  --bd-warning: var(--fh-warning);
+  --bd-info: var(--fh-info);
+  --bd-border: var(--fh-border);
+  --bd-border-strong: var(--fh-border-strong);
+  --bd-radius-card: var(--fh-radius-card);
+  --bd-radius-widget: 18px;
+  --bd-radius-control: var(--fh-radius-control);
+  --bd-shadow-card: var(--fh-shadow-card);
+  --bd-shadow-card-hover: var(--fh-shadow-card-hover);
+  --bd-shadow-header: 0 1px 0 rgba(15, 23, 42, 0.05);
+
+  --fh-widget-radius: var(--bd-radius-widget);
+  --fh-widget-pad: 20px;
+  --fh-widget-gap: clamp(14px, 1.5vw, 20px);
+  --fh-widget-accent: var(--fh-accent);
+  --fh-widget-bg: var(--fh-bg);
+  --fh-widget-panel: var(--fh-surface);
+  --fh-widget-border: var(--fh-border);
+  --fh-widget-shadow: var(--fh-shadow-card);
+
+  --fs-primary: var(--fh-accent);
+  --fs-gradient-start: var(--fh-accent);
+  --fs-gradient-end: var(--fh-accent-2);
+  --fs-page-bg: var(--fh-bg);
+  --fs-card-bg: var(--fh-surface);
+  --fs-sidebar-active-bg: var(--fh-accent-soft);
+  --fs-sidebar-active-text: var(--fh-accent-strong);
+  --fs-text: var(--fh-text);
+  --fs-text-muted: var(--fh-text-muted);
+  --app-shell-gradient: linear-gradient(180deg, #ffffff 0%, var(--fh-bg) 42%, #eef2f7 100%);
+  --app-shell-fallback: var(--fh-bg);
+
+  /* SmartHR theme bridge */
+  --color-smarthr-primary: var(--fh-accent);
+  --color-smarthr-accent: var(--fh-accent);
+  --color-smarthr-peach: var(--fh-accent-soft);
+  --color-smarthr-sidebar: #ffffff;
+  --color-smarthr-border: var(--fh-border);
+  --color-smarthr-light: var(--fh-surface-muted);
+  --color-smarthr-text-muted: var(--fh-text-muted);
+  --color-smarthr-primary-transparent: var(--fh-accent-soft);
+  --color-app-shell-edge: #eef2f7;
+}
+
+html {
+  font-family: var(--font-body);
+}
+
+body {
+  font-family: var(--font-body);
+  color: var(--fh-text);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.fh-heading,
+.fh-page-title,
+.fh-card-title {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--fh-text);
+}
+
+button,
+input,
+select,
+textarea,
+label,
+.fh-ui {
+  font-family: var(--font-ui);
+}
+
+::selection {
+  background: rgba(20, 83, 136, 0.18);
+  color: var(--fh-text);
+}
+
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible,
+button:focus-visible,
+a:focus-visible {
+  outline: 2px solid rgba(20, 83, 136, 0.45);
+  outline-offset: 3px;
+}
+
+/* Soft white Gogo-like card utility */
+.fh-gogo-card {
+  background: var(--fh-surface);
+  border: 1px solid var(--fh-border);
+  border-radius: var(--fh-radius-card);
+  box-shadow: var(--fh-shadow-card);
+}
+
+.fh-gogo-card--soft {
+  border-color: transparent;
+  box-shadow: var(--fh-shadow-card);
+}
+
+/* Pill badge utilities */
+.fh-gogo-badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 1.5rem;
+  padding: 0.15rem 0.65rem;
+  border-radius: var(--fh-radius-pill);
+  border: 1px solid transparent;
+  font-family: var(--font-ui);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  line-height: 1.2;
+}
+
+.fh-gogo-badge--neutral {
+  background: #f1f5f9;
+  color: #475569;
+  border-color: #e2e8f0;
+}
+.fh-gogo-badge--success {
+  background: var(--fh-success-soft);
+  color: var(--fh-success);
+  border-color: rgba(62, 136, 79, 0.22);
+}
+.fh-gogo-badge--warning {
+  background: var(--fh-warning-soft);
+  color: #8a6f1d;
+  border-color: rgba(182, 147, 41, 0.28);
+}
+.fh-gogo-badge--danger {
+  background: var(--fh-danger-soft);
+  color: var(--fh-danger);
+  border-color: rgba(196, 61, 75, 0.22);
+}
+.fh-gogo-badge--info {
+  background: var(--fh-info-soft);
+  color: var(--fh-info);
+  border-color: rgba(49, 149, 165, 0.22);
+}
+.fh-gogo-badge--primary {
+  background: var(--fh-accent-soft);
+  color: var(--fh-accent-strong);
+  border-color: rgba(20, 83, 136, 0.2);
+}
+.fh-gogo-badge--purple {
+  background: var(--fh-purple-soft);
+  color: var(--fh-purple);
+  border-color: rgba(124, 107, 181, 0.22);
+}
+.fh-gogo-badge--tentative {
+  background: #f8fafc;
+  color: #64748b;
+  border: 1px dashed #94a3b8;
+}
+.fh-gogo-badge--school {
+  background: #eff6ff;
+  color: #1d4ed8;
+  border-color: #bfdbfe;
+}
+.fh-gogo-badge--travel {
+  background: #f0fdfa;
+  color: #0f766e;
+  border-color: #99f6e4;
+}
+
+/* Right drawer polish (shared) */
+.fh-gogo-drawer {
+  background: #ffffff !important;
+  border-left: 1px solid var(--fh-border) !important;
+  box-shadow: var(--fh-shadow-drawer) !important;
+  color: var(--fh-text);
+}
+
+.fh-gogo-drawer__head {
+  border-bottom: 1px solid #f3f3f3;
+  background: #ffffff;
+}
+
+/* Compact admin toolbar strip */
+.fh-gogo-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.65rem 0;
+}
+
+/* Softer page chrome for main shell content */
+.fh-gogo-page {
+  background: transparent;
+  color: var(--fh-text);
+}
+
+.fh-gogo-page h1,
+.fh-gogo-page h2,
+.fh-gogo-page h3 {
+  font-family: var(--font-heading);
+}
+
+/* Reduce neon / glass intensity on legacy dark card classes when they appear on light shell */
+.fh-gogo-page .motion-card:not([class*="bg-\\["]) {
+  transition: box-shadow 0.15s ease, border-color 0.15s ease;
+}

@@ -1,0 +1,76 @@
+/**
+ * Global typography — Urbanist headings + Mulish UI/body.
+ * Tokens live in familyhub-theme.css.
+ */
+
+:root {
+  --font-sans: var(--font-body);
+}
+
+html {
+  font-family: var(--font-body);
+  color: var(--text-main, #152033);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  font-family: var(--font-body);
+  color: var(--text-soft, #334155);
+  font-size: 0.95rem;
+  line-height: 1.5;
+  font-weight: 500;
+}
+
+button,
+input,
+select,
+textarea,
+label,
+.fh-ui {
+  font-family: var(--font-ui);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.fh-heading,
+.fh-page-title,
+.fh-card-title,
+.notion-page__title {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.18;
+  color: var(--text-main, #152033);
+}
+
+h1,
+.fh-page-title {
+  font-size: clamp(1.75rem, 2.4vw, 2.35rem);
+  font-weight: 750;
+}
+
+h2 {
+  font-size: clamp(1.2rem, 1.5vw, 1.4rem);
+  font-weight: 700;
+}
+
+h3,
+.fh-card-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.aux-command,
+.aux-pantry,
+.aux-shopping,
+.adminux-app,
+.adminux-skin,
+.fh-smart-dash,
+.fh-sched {
+  font-family: var(--font-body);
+}
