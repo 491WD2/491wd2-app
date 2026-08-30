@@ -479,7 +479,7 @@ export function NotionHomeWorkspace({
 
       <div className="fh-bento__grid">
         <section
-          className="fh-bento-card fh-bento-card--sky fh-bento__span-4"
+          className="fh-bento-card fh-bento-card--sky fh-bento__cell-status"
           aria-label="Greeting and clock"
         >
           <div className="fh-bento-card__head">
@@ -532,7 +532,7 @@ export function NotionHomeWorkspace({
         </section>
 
         <section
-          className="fh-bento-card fh-bento__span-4"
+          className="fh-bento-card fh-bento__cell-family"
           aria-label="Family members"
         >
           <div className="fh-bento-card__head">
@@ -587,7 +587,7 @@ export function NotionHomeWorkspace({
           </div>
         </section>
 
-        <section className="fh-bento-card fh-bento-card--butter fh-bento__span-4" aria-labelledby="fh-bento-quick-add">
+        <section className="fh-bento-card fh-bento-card--butter fh-bento__cell-quick" aria-labelledby="fh-bento-quick-add">
           <div className="fh-bento-card__head">
             <div className="fh-bento-card__head-main">
               <BentoIcon tone="butter">
@@ -645,7 +645,7 @@ export function NotionHomeWorkspace({
         </section>
 
         <BentoCard
-          className="fh-bento__span-4"
+          className="fh-bento__cell-today"
           eyebrow="Snapshot"
           title="Today"
           titleId="fh-bento-today"
@@ -689,7 +689,7 @@ export function NotionHomeWorkspace({
         </BentoCard>
 
         <BentoCard
-          className="fh-fridge-home__kitchen fh-bento__span-4"
+          className="fh-fridge-home__kitchen fh-bento__cell-kitchen"
           tone="mint"
           eyebrow="Duty"
           title="Today’s kitchen duty"
@@ -772,7 +772,7 @@ export function NotionHomeWorkspace({
         </BentoCard>
 
         <BentoCard
-          className="fh-bento__span-4"
+          className="fh-bento__cell-events"
           tone="lavender"
           eyebrow="Schedule"
           title="Calendar"
@@ -859,7 +859,7 @@ export function NotionHomeWorkspace({
         </BentoCard>
 
         <BentoCard
-          className="fh-bento__span-4"
+          className="fh-bento__cell-messages"
           eyebrow="Inbox"
           title="Messages"
           titleId="fh-bento-messages"
@@ -908,7 +908,7 @@ export function NotionHomeWorkspace({
         </BentoCard>
 
         <BentoCard
-          className="fh-bento__span-4"
+          className="fh-bento__cell-shopping"
           tone="coral"
           eyebrow="Need to buy"
           title="Shopping"
@@ -971,7 +971,7 @@ export function NotionHomeWorkspace({
         </BentoCard>
 
         <BentoCard
-          className="fh-bento__span-4"
+          className="fh-bento__cell-pantry"
           tone="blush"
           eyebrow="Storage"
           title="Pantry & Storage"
