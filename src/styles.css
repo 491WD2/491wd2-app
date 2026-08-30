@@ -16,7 +16,7 @@
 @import "./styles/familyhub-smart-dash.css";
 @import "./styles/familyhub-start-page.css";
 @import "./styles/familyhub-pro.css";
-@import "./styles/family-organizer-dashboard.css";
+@import "./styles/family-organizer-dashboard.css"; /* Home: Meridian product DS */
 
 /** Tailwind v4 — scan app sources; purges unused utilities in production */
 @source "./**/*.{ts,tsx}";
