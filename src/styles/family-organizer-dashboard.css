@@ -1,632 +1,647 @@
 /**
- * Home dashboard visual skin — Quiet Editorial Luxury
- * Matches family-organizer-all-in-one-master (warm paper, ink, Garamond).
- * Scoped to .fh-fo-dash. Layout and behavior stay unchanged.
+ * Home dashboard visual skin — Meridian Web Design System (Product)
+ * Figma: https://www.figma.com/design/R1GZvm6D1FacMBmST8x8ZN
+ *
+ * Trust + clarity over decoration: Ink neutrals, Trust Blue brand,
+ * Inter type scale (Display → Title → Body → Caption), tabular figures.
+ * Scoped to .fh-meridian. Layout and behavior stay unchanged.
  */
 
-.fh-fo-dash {
-  --fo-canvas: #f3f0ea;
-  --fo-panel: #f7f5f1;
-  --fo-panel-elevated: #faf8f5;
-  --fo-ink: #111111;
-  --fo-ink-muted: #8e8a84;
-  --fo-ink-faint: #b0aa9f;
-  --fo-line: #e4dfd7;
-  --fo-line-subtle: #efece6;
-  --fo-surface-muted: #f5f3ee;
-  --fo-surface-accent: #ede7dc;
-  --fo-accent: #c8b89c;
-  --fo-accent-hover: #b8a88b;
-  --fo-accent-text: #7a6a52;
-  --fo-accent-muted: #d8cdbb;
-  --fo-on-accent: #111111;
-  --fo-shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.03);
-  --fo-shadow-md: 0 4px 16px rgba(0, 0, 0, 0.04);
-  --fo-radius: 0.75rem;
-  --fo-radius-lg: 1.25rem;
-  --fo-font-serif: "EB Garamond", Georgia, "Times New Roman", serif;
-  --fo-font-sans: "Inter", system-ui, sans-serif;
+.fh-meridian {
+  --md-page: #f4f6f8;
+  --md-surface: #ffffff;
+  --md-surface-muted: #f2f4f7;
+  --md-surface-hover: #eef2f6;
+  --md-ink: #101828;
+  --md-ink-secondary: #344054;
+  --md-ink-muted: #667085;
+  --md-ink-faint: #98a2b3;
+  --md-line: #e4e7ec;
+  --md-line-strong: #d0d5dd;
+  --md-trust-50: #eef4fb;
+  --md-trust-100: #d7e6f6;
+  --md-trust-200: #b5d0ec;
+  --md-trust-500: #1e4f8c;
+  --md-trust-600: #173f70;
+  --md-trust-700: #123257;
+  --md-on-trust: #ffffff;
+  --md-success: #027a48;
+  --md-success-bg: #ecfdf3;
+  --md-success-border: #abefc6;
+  --md-warning: #b54708;
+  --md-warning-bg: #fffaeb;
+  --md-warning-border: #fedf89;
+  --md-danger: #b42318;
+  --md-danger-bg: #fef3f2;
+  --md-danger-border: #fecdca;
+  --md-info: #175cd3;
+  --md-info-bg: #eff8ff;
+  --md-info-border: #b2ddff;
+  --md-shadow-xs: 0 1px 2px rgba(16, 24, 40, 0.05);
+  --md-shadow-sm: 0 1px 3px rgba(16, 24, 40, 0.06), 0 1px 2px rgba(16, 24, 40, 0.04);
+  --md-radius: 10px;
+  --md-radius-lg: 12px;
+  --md-radius-pill: 999px;
+  --md-font: "Inter", system-ui, sans-serif;
 
-  --font-heading: var(--fo-font-serif);
-  --font-body: var(--fo-font-sans);
-  --font-ui: var(--fo-font-sans);
-  --pro-page: var(--fo-canvas);
-  --pro-surface: var(--fo-panel);
-  --pro-surface-soft: var(--fo-surface-muted);
-  --pro-border: var(--fo-line);
-  --pro-border-strong: var(--fo-accent-muted);
-  --pro-ink: var(--fo-ink);
-  --pro-muted: var(--fo-ink-muted);
-  --pro-faint: var(--fo-ink-faint);
-  --pro-primary: var(--fo-ink);
-  --pro-primary-soft: var(--fo-surface-accent);
-  --pro-radius: var(--fo-radius-lg);
-  --pro-radius-sm: var(--fo-radius);
-  --pro-shadow: var(--fo-shadow-sm);
-  --pro-shadow-md: var(--fo-shadow-md);
-  --widget-radius: var(--fo-radius-lg);
-  --widget-border: var(--fo-line);
-  --widget-shadow: var(--fo-shadow-sm);
-  --widget-shadow-hover: var(--fo-shadow-md);
-  --widget-surface: var(--fo-panel);
-  --widget-highlight: var(--fo-panel-elevated);
-  --widget-inset: var(--fo-surface-muted);
-  --widget-accent: var(--fo-accent);
-  --widget-accent-soft: var(--fo-surface-accent);
-  --text-main: var(--fo-ink);
-  --text-soft: #2a2622;
-  --text-muted: var(--fo-ink-muted);
-  --brand-primary: var(--fo-ink);
-  --brand-primary-strong: var(--fo-ink);
-  --brand-aqua: var(--fo-accent-text);
-  --brand-mint: #4a7a62;
-  --brand-amber: var(--fo-accent-text);
-  --soft-blue: #eef2f4;
-  --soft-aqua: #ebe6dc;
-  --soft-mint: #e8efe9;
-  --soft-amber: #f4eee4;
-  --soft-rose: #f4ecec;
-  --soft-violet: #efeaf3;
+  --font-heading: var(--md-font);
+  --font-body: var(--md-font);
+  --font-ui: var(--md-font);
+  --pro-page: var(--md-page);
+  --pro-surface: var(--md-surface);
+  --pro-surface-soft: var(--md-surface-muted);
+  --pro-border: var(--md-line);
+  --pro-border-strong: var(--md-line-strong);
+  --pro-ink: var(--md-ink);
+  --pro-muted: var(--md-ink-muted);
+  --pro-faint: var(--md-ink-faint);
+  --pro-primary: var(--md-trust-500);
+  --pro-primary-soft: var(--md-trust-50);
+  --pro-radius: var(--md-radius-lg);
+  --pro-radius-sm: var(--md-radius);
+  --pro-shadow: var(--md-shadow-xs);
+  --pro-shadow-md: var(--md-shadow-sm);
+  --widget-radius: var(--md-radius-lg);
+  --widget-border: var(--md-line);
+  --widget-shadow: var(--md-shadow-xs);
+  --widget-shadow-hover: var(--md-shadow-sm);
+  --widget-surface: var(--md-surface);
+  --widget-highlight: var(--md-surface);
+  --widget-inset: var(--md-surface-muted);
+  --widget-accent: var(--md-trust-500);
+  --widget-accent-soft: var(--md-trust-50);
+  --text-main: var(--md-ink);
+  --text-soft: var(--md-ink-secondary);
+  --text-muted: var(--md-ink-muted);
+  --brand-primary: var(--md-trust-500);
+  --brand-primary-strong: var(--md-trust-600);
+  --brand-aqua: var(--md-info);
+  --brand-mint: var(--md-success);
+  --brand-amber: var(--md-warning);
+  --soft-blue: var(--md-trust-50);
+  --soft-aqua: var(--md-info-bg);
+  --soft-mint: var(--md-success-bg);
+  --soft-amber: var(--md-warning-bg);
+  --soft-rose: var(--md-danger-bg);
+  --soft-violet: #f4f3ff;
 
-  color: var(--fo-ink);
-  font-family: var(--fo-font-sans);
-  background: var(--fo-canvas);
+  color: var(--md-ink);
+  font-family: var(--md-font);
+  background: var(--md-page);
+  font-variant-numeric: tabular-nums;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
 
-.fh-fo-dash,
-.fh-fo-dash.fh-pro-page,
-.fh-fo-dash.fh-fridge-home,
-.fh-fo-dash.notion-page {
-  background: var(--fo-canvas) !important;
-  color: var(--fo-ink) !important;
-  font-family: var(--fo-font-sans) !important;
+.fh-meridian,
+.fh-meridian.fh-pro-page,
+.fh-meridian.fh-fridge-home,
+.fh-meridian.notion-page {
+  background: var(--md-page) !important;
+  color: var(--md-ink) !important;
+  font-family: var(--md-font) !important;
 }
 
-.fh-fo-dash h1,
-.fh-fo-dash h2,
-.fh-fo-dash h3 {
-  font-family: var(--fo-font-serif);
+.fh-meridian h1,
+.fh-meridian h2,
+.fh-meridian h3 {
+  font-family: var(--md-font);
   font-weight: 600;
   letter-spacing: -0.02em;
-  color: var(--fo-ink);
+  color: var(--md-ink);
 }
 
-.fh-fo-dash button,
-.fh-fo-dash input,
-.fh-fo-dash a {
-  transition-property: color, background-color, border-color, box-shadow, opacity;
-  transition-duration: 250ms;
-  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+.fh-meridian button,
+.fh-meridian input,
+.fh-meridian a {
+  font-family: var(--md-font);
+  transition-property: color, background-color, border-color, box-shadow;
+  transition-duration: 150ms;
+  transition-timing-function: ease;
 }
 
-.fh-fo-dash :focus-visible {
-  outline: 2px solid hsl(37 28% 68%);
+.fh-meridian :focus-visible {
+  outline: 2px solid var(--md-trust-500);
   outline-offset: 2px;
 }
 
-/* —— Hero —— */
-.fh-fo-dash.fh-start-page .fh-fridge-home__top,
-.fh-fo-dash .fh-home-pro__hero {
-  border: 1px solid var(--fo-line) !important;
-  border-radius: var(--fo-radius-lg) !important;
-  background: var(--fo-panel) !important;
-  box-shadow: var(--fo-shadow-sm) !important;
+/* —— Hero / page header —— */
+.fh-meridian.fh-start-page .fh-fridge-home__top,
+.fh-meridian .fh-home-pro__hero {
+  border: 1px solid var(--md-line) !important;
+  border-radius: var(--md-radius-lg) !important;
+  background: var(--md-surface) !important;
+  box-shadow: var(--md-shadow-xs) !important;
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
-  padding: 1.25rem 1.4rem !important;
+  padding: 1.15rem 1.25rem !important;
 }
 
-.fh-fo-dash.fh-start-page .fh-fridge-home__top::before,
-.fh-fo-dash.fh-start-page .fh-fridge-home__top::after {
+.fh-meridian.fh-start-page .fh-fridge-home__top::before,
+.fh-meridian.fh-start-page .fh-fridge-home__top::after {
   display: none !important;
 }
 
-.fh-fo-dash .fh-fridge-home__kicker,
-.fh-fo-dash .fh-fridge-home__kicker.fh-pro-section-title,
-.fh-fo-dash.fh-start-page .fh-fridge-home__kicker {
-  margin: 0 0 0.35rem;
-  font-family: var(--fo-font-serif) !important;
-  font-size: 0.68rem !important;
-  font-weight: 600 !important;
-  letter-spacing: 0.2em !important;
-  text-transform: uppercase !important;
-  color: var(--fo-ink-muted) !important;
-}
-
-.fh-fo-dash .fh-fridge-home__title,
-.fh-fo-dash.fh-home-pro .fh-fridge-home__title {
-  font-family: var(--fo-font-serif) !important;
-  font-size: clamp(2rem, 3.2vw, 2.65rem) !important;
+.fh-meridian .fh-fridge-home__kicker,
+.fh-meridian .fh-fridge-home__kicker.fh-pro-section-title,
+.fh-meridian.fh-start-page .fh-fridge-home__kicker {
+  margin: 0 0 0.2rem;
+  font-family: var(--md-font) !important;
+  font-size: 12px !important;
   font-weight: 500 !important;
-  letter-spacing: -0.02em !important;
-  line-height: 1.08 !important;
-  color: var(--fo-ink) !important;
-}
-
-.fh-fo-dash .fh-start-page__board-label,
-.fh-fo-dash .fh-start-page__dock-label,
-.fh-fo-dash .fh-pro-section-title {
-  font-family: var(--fo-font-serif) !important;
-  font-size: 0.68rem !important;
-  font-weight: 600 !important;
-  letter-spacing: 0.18em !important;
+  letter-spacing: 0.04em !important;
   text-transform: uppercase !important;
-  color: var(--fo-ink-muted) !important;
+  color: var(--md-ink-muted) !important;
 }
 
-/* Customize bar */
-.fh-fo-dash .fh-start-page__customize,
-.fh-fo-dash.fh-start-page .fh-start-page__customize,
-.fh-fo-dash .fh-home-customize {
+.fh-meridian .fh-fridge-home__title,
+.fh-meridian.fh-home-pro .fh-fridge-home__title {
+  font-family: var(--md-font) !important;
+  font-size: clamp(1.5rem, 2vw, 1.85rem) !important;
+  font-weight: 600 !important;
+  letter-spacing: -0.02em !important;
+  line-height: 1.2 !important;
+  color: var(--md-ink) !important;
+}
+
+.fh-meridian .fh-start-page__board-label,
+.fh-meridian .fh-start-page__dock-label,
+.fh-meridian .fh-pro-section-title {
+  font-family: var(--md-font) !important;
+  font-size: 12px !important;
+  font-weight: 500 !important;
+  letter-spacing: 0.06em !important;
+  text-transform: uppercase !important;
+  color: var(--md-ink-muted) !important;
+}
+
+.fh-meridian .fh-start-page__customize,
+.fh-meridian.fh-start-page .fh-start-page__customize,
+.fh-meridian .fh-home-customize {
   border: 0 !important;
   background: transparent !important;
   box-shadow: none !important;
   backdrop-filter: none !important;
 }
 
-.fh-fo-dash .fh-start-page__customize-btn,
-.fh-fo-dash .fh-home-customize__btn,
-.fh-fo-dash.fh-start-page .fh-start-page__customize-btn {
-  border: 1px solid var(--fo-line) !important;
-  border-radius: 999px !important;
-  background: var(--fo-surface-muted) !important;
-  color: var(--fo-ink-muted) !important;
+.fh-meridian .fh-start-page__customize-btn,
+.fh-meridian .fh-home-customize__btn,
+.fh-meridian.fh-start-page .fh-start-page__customize-btn {
+  border: 1px solid var(--md-line) !important;
+  border-radius: 8px !important;
+  background: var(--md-surface) !important;
+  color: var(--md-ink-secondary) !important;
   box-shadow: none !important;
-  font-family: var(--fo-font-sans) !important;
   font-weight: 500 !important;
 }
 
-.fh-fo-dash .fh-start-page__customize-hint,
-.fh-fo-dash.fh-start-page .fh-start-page__customize-hint {
-  background: var(--fo-surface-accent) !important;
-  border-color: var(--fo-line) !important;
-  color: var(--fo-accent-text) !important;
+.fh-meridian .fh-start-page__customize-hint,
+.fh-meridian.fh-start-page .fh-start-page__customize-hint {
+  background: var(--md-trust-50) !important;
+  border-color: var(--md-trust-100) !important;
+  color: var(--md-trust-600) !important;
 }
 
-/* Status chips */
-.fh-fo-dash .fh-fridge-home__status button,
-.fh-fo-dash .fh-home-pro__chips button,
-.fh-fo-dash.fh-start-page .fh-fridge-home__status button {
+/* KPI-style status chips */
+.fh-meridian .fh-fridge-home__status button,
+.fh-meridian .fh-home-pro__chips button,
+.fh-meridian.fh-start-page .fh-fridge-home__status button {
   min-height: 2rem !important;
-  padding: 0.28rem 0.85rem !important;
-  border: 1px solid var(--fo-line) !important;
-  border-radius: 999px !important;
-  background: var(--fo-panel) !important;
-  color: var(--fo-ink) !important;
+  padding: 0.3rem 0.7rem !important;
+  border: 1px solid var(--md-line) !important;
+  border-radius: var(--md-radius-pill) !important;
+  background: var(--md-surface-muted) !important;
+  color: var(--md-ink-secondary) !important;
   box-shadow: none !important;
-  font-family: var(--fo-font-sans) !important;
-  font-size: 0.72rem !important;
+  font-size: 12px !important;
   font-weight: 500 !important;
 }
 
-.fh-fo-dash .fh-fridge-home__status button:hover,
-.fh-fo-dash .fh-fridge-home__status button:focus-visible,
-.fh-fo-dash .fh-home-pro__chips button:hover {
-  background: var(--fo-surface-accent) !important;
-  border-color: var(--fo-accent-muted) !important;
-  color: var(--fo-ink) !important;
+.fh-meridian .fh-fridge-home__status button:hover,
+.fh-meridian .fh-fridge-home__status button:focus-visible,
+.fh-meridian .fh-home-pro__chips button:hover {
+  background: var(--md-trust-50) !important;
+  border-color: var(--md-trust-200) !important;
+  color: var(--md-trust-600) !important;
   box-shadow: none !important;
 }
 
-/* Clock / date chip */
-.fh-fo-dash .fh-fridge-home__clock,
-.fh-fo-dash .fh-home-pro__clock,
-.fh-fo-dash.fh-start-page .fh-fridge-home__clock {
-  min-width: 8.5rem;
-  padding: 0.7rem 1rem !important;
-  border: 1px solid var(--fo-line) !important;
-  border-left: 1px solid var(--fo-line) !important;
-  border-radius: var(--fo-radius-lg) !important;
-  background: var(--fo-surface-muted) !important;
+.fh-meridian .fh-fridge-home__clock,
+.fh-meridian .fh-home-pro__clock,
+.fh-meridian.fh-start-page .fh-fridge-home__clock {
+  min-width: 8.25rem;
+  padding: 0.55rem 0.85rem !important;
+  border: 1px solid var(--md-line) !important;
+  border-left: 1px solid var(--md-line) !important;
+  border-radius: var(--md-radius) !important;
+  background: var(--md-surface-muted) !important;
   box-shadow: none !important;
   text-align: right;
 }
 
-.fh-fo-dash .fh-fridge-home__clock-time {
-  font-family: var(--fo-font-serif) !important;
-  font-size: clamp(1.85rem, 2.6vw, 2.35rem) !important;
-  font-weight: 500 !important;
+.fh-meridian .fh-fridge-home__clock-time {
+  font-family: var(--md-font) !important;
+  font-size: clamp(1.45rem, 2vw, 1.75rem) !important;
+  font-weight: 600 !important;
   letter-spacing: -0.03em !important;
-  color: var(--fo-ink) !important;
+  color: var(--md-ink) !important;
+  font-variant-numeric: tabular-nums;
 }
 
-.fh-fo-dash .fh-fridge-home__clock-date {
-  font-family: var(--fo-font-sans) !important;
-  font-size: 0.68rem !important;
+.fh-meridian .fh-fridge-home__clock-date {
+  font-family: var(--md-font) !important;
+  font-size: 12px !important;
   font-weight: 500 !important;
-  letter-spacing: 0.12em !important;
-  text-transform: uppercase !important;
-  color: var(--fo-ink-muted) !important;
+  letter-spacing: 0.02em !important;
+  text-transform: none !important;
+  color: var(--md-ink-muted) !important;
 }
 
-/* —— Cards / widgets —— */
-.fh-fo-dash .fh-start-widget,
-.fh-fo-dash.fh-start-page .fh-start-widget,
-.fh-fo-dash .fh-pro-card {
-  border: 1px solid var(--fo-line) !important;
-  border-radius: var(--fo-radius-lg) !important;
-  background: var(--fo-panel) !important;
-  box-shadow: var(--fo-shadow-sm) !important;
+/* —— Cards —— */
+.fh-meridian .fh-start-widget,
+.fh-meridian.fh-start-page .fh-start-widget,
+.fh-meridian .fh-pro-card {
+  border: 1px solid var(--md-line) !important;
+  border-radius: var(--md-radius-lg) !important;
+  background: var(--md-surface) !important;
+  box-shadow: var(--md-shadow-xs) !important;
   transform: none !important;
 }
 
-.fh-fo-dash .fh-start-widget:hover,
-.fh-fo-dash.fh-start-page .fh-start-widget:hover {
-  border-color: var(--fo-accent-muted) !important;
-  box-shadow: var(--fo-shadow-md) !important;
+.fh-meridian .fh-start-widget:hover,
+.fh-meridian.fh-start-page .fh-start-widget:hover {
+  border-color: var(--md-line-strong) !important;
+  box-shadow: var(--md-shadow-sm) !important;
   transform: none !important;
 }
 
-.fh-fo-dash .fh-start-widget::before,
-.fh-fo-dash .fh-start-widget::after,
-.fh-fo-dash.fh-start-page .fh-start-widget::before,
-.fh-fo-dash.fh-start-page .fh-start-widget::after {
+.fh-meridian .fh-start-widget::before,
+.fh-meridian .fh-start-widget::after,
+.fh-meridian.fh-start-page .fh-start-widget::before,
+.fh-meridian.fh-start-page .fh-start-widget::after {
   display: none !important;
 }
 
-.fh-fo-dash .fh-start-widget.fh-fridge-home__kitchen,
-.fh-fo-dash .fh-start-widget.fh-fridge-home__calendar,
-.fh-fo-dash .fh-start-widget.fh-fridge-home__shopping,
-.fh-fo-dash .fh-start-widget.fh-fridge-home__storage {
-  --widget-accent: var(--fo-accent);
-  --widget-accent-soft: var(--fo-surface-accent);
+.fh-meridian .fh-start-widget.fh-fridge-home__kitchen,
+.fh-meridian .fh-start-widget.fh-fridge-home__calendar,
+.fh-meridian .fh-start-widget.fh-fridge-home__shopping,
+.fh-meridian .fh-start-widget.fh-fridge-home__storage {
+  --widget-accent: var(--md-trust-500);
+  --widget-accent-soft: var(--md-trust-50);
 }
 
-.fh-fo-dash .fh-start-widget__header,
-.fh-fo-dash.fh-home-pro .fh-start-widget__header {
-  border-bottom: 1px solid var(--fo-line-subtle) !important;
-  background: transparent !important;
-  padding: 1.05rem 1.15rem 0.85rem;
+.fh-meridian .fh-start-widget__header,
+.fh-meridian.fh-home-pro .fh-start-widget__header {
+  border-bottom: 1px solid var(--md-line) !important;
+  background: var(--md-surface) !important;
+  padding: 0.95rem 1.05rem 0.8rem;
 }
 
-.fh-fo-dash .fh-start-widget__title {
-  font-family: var(--fo-font-serif) !important;
-  font-size: 1.35rem !important;
-  font-weight: 500 !important;
-  letter-spacing: -0.02em !important;
-  color: var(--fo-ink) !important;
+.fh-meridian .fh-start-widget__title {
+  font-family: var(--md-font) !important;
+  font-size: 1rem !important;
+  font-weight: 600 !important;
+  letter-spacing: -0.015em !important;
+  color: var(--md-ink) !important;
 }
 
-.fh-fo-dash .fh-start-widget__subtitle {
-  font-family: var(--fo-font-sans) !important;
-  font-size: 0.78rem !important;
+.fh-meridian .fh-start-widget__subtitle {
+  font-family: var(--md-font) !important;
+  font-size: 13px !important;
   font-weight: 400 !important;
-  color: var(--fo-ink-muted) !important;
+  color: var(--md-ink-muted) !important;
 }
 
-.fh-fo-dash .fh-start-widget__icon,
-.fh-fo-dash .fh-icon-tile,
-.fh-fo-dash .fh-icon-tile--aqua,
-.fh-fo-dash .fh-icon-tile--mint,
-.fh-fo-dash .fh-icon-tile--amber,
-.fh-fo-dash .fh-icon-tile--blue,
-.fh-fo-dash .fh-icon-tile--rose,
-.fh-fo-dash .fh-icon-tile--violet {
-  background: var(--fo-surface-accent) !important;
-  color: var(--fo-accent-text) !important;
+.fh-meridian .fh-start-widget__icon,
+.fh-meridian .fh-icon-tile,
+.fh-meridian .fh-icon-tile--aqua,
+.fh-meridian .fh-icon-tile--mint,
+.fh-meridian .fh-icon-tile--amber,
+.fh-meridian .fh-icon-tile--blue,
+.fh-meridian .fh-icon-tile--rose,
+.fh-meridian .fh-icon-tile--violet {
+  background: var(--md-trust-50) !important;
+  color: var(--md-trust-500) !important;
   box-shadow: none !important;
-  border-radius: 0.85rem !important;
+  border-radius: 8px !important;
 }
 
-.fh-fo-dash .fh-start-widget__header-actions {
+.fh-meridian .fh-start-widget.fh-fridge-home__kitchen .fh-start-widget__icon,
+.fh-meridian .fh-start-widget.fh-fridge-home__kitchen .fh-icon-tile {
+  background: var(--md-warning-bg) !important;
+  color: var(--md-warning) !important;
+}
+
+.fh-meridian .fh-start-widget.fh-fridge-home__shopping .fh-start-widget__icon,
+.fh-meridian .fh-start-widget.fh-fridge-home__shopping .fh-icon-tile {
+  background: var(--md-success-bg) !important;
+  color: var(--md-success) !important;
+}
+
+.fh-meridian .fh-start-widget__header-actions {
   background: transparent !important;
   border: 0 !important;
 }
 
-.fh-fo-dash .fh-start-widget__action,
-.fh-fo-dash .fh-pro-btn,
-.fh-fo-dash .fh-pro-btn--ghost {
-  border: 1px solid var(--fo-line) !important;
-  border-radius: 999px !important;
-  background: var(--fo-panel) !important;
-  color: var(--fo-ink) !important;
+.fh-meridian .fh-start-widget__action,
+.fh-meridian .fh-pro-btn,
+.fh-meridian .fh-pro-btn--ghost {
+  border: 1px solid var(--md-line) !important;
+  border-radius: 8px !important;
+  background: var(--md-surface) !important;
+  color: var(--md-ink-secondary) !important;
   box-shadow: none !important;
-  font-family: var(--fo-font-sans) !important;
+  font-size: 13px !important;
   font-weight: 500 !important;
 }
 
-.fh-fo-dash .fh-pro-btn--primary {
-  border-color: var(--fo-ink) !important;
-  background: var(--fo-ink) !important;
-  color: #fff !important;
+.fh-meridian .fh-pro-btn--primary {
+  border-color: var(--md-trust-500) !important;
+  background: var(--md-trust-500) !important;
+  color: var(--md-on-trust) !important;
 }
 
-.fh-fo-dash .fh-pro-btn--primary:hover,
-.fh-fo-dash .fh-pro-btn--ghost:hover,
-.fh-fo-dash .fh-start-widget__action:hover {
-  background: var(--fo-surface-accent) !important;
-  border-color: var(--fo-accent-muted) !important;
-  color: var(--fo-ink) !important;
+.fh-meridian .fh-pro-btn--primary:hover {
+  background: var(--md-trust-600) !important;
+  border-color: var(--md-trust-600) !important;
+  color: var(--md-on-trust) !important;
 }
 
-.fh-fo-dash .fh-pro-btn--primary:hover {
-  background: #2a2622 !important;
-  border-color: #2a2622 !important;
-  color: #fff !important;
+.fh-meridian .fh-pro-btn--ghost:hover,
+.fh-meridian .fh-start-widget__action:hover {
+  background: var(--md-surface-muted) !important;
+  border-color: var(--md-line-strong) !important;
+  color: var(--md-ink) !important;
 }
 
-.fh-fo-dash .fh-start-widget__menu {
-  border-color: var(--fo-line) !important;
-  background: var(--fo-surface-muted) !important;
-  color: var(--fo-ink-muted) !important;
+.fh-meridian .fh-start-widget__menu {
+  border-color: var(--md-line) !important;
+  background: var(--md-surface) !important;
+  color: var(--md-ink-muted) !important;
+  border-radius: 8px !important;
 }
 
-.fh-fo-dash .fh-start-widget__menu:hover:not(:disabled),
-.fh-fo-dash .fh-start-widget__menu:focus-visible {
-  background: var(--fo-surface-accent) !important;
-  border-color: var(--fo-accent-muted) !important;
-  color: var(--fo-ink) !important;
+.fh-meridian .fh-start-widget__menu:hover:not(:disabled),
+.fh-meridian .fh-start-widget__menu:focus-visible {
+  background: var(--md-trust-50) !important;
+  border-color: var(--md-trust-200) !important;
+  color: var(--md-trust-600) !important;
 }
 
-.fh-fo-dash .fh-start-widget__footer,
-.fh-fo-dash.fh-home-pro .fh-start-widget__footer {
-  border-top: 1px solid var(--fo-line-subtle) !important;
-  background: var(--fo-surface-muted) !important;
+.fh-meridian .fh-start-widget__footer,
+.fh-meridian.fh-home-pro .fh-start-widget__footer {
+  border-top: 1px solid var(--md-line) !important;
+  background: var(--md-surface-muted) !important;
 }
 
-.fh-fo-dash .fh-start-widget__meta-chip {
-  border: 1px solid var(--fo-line) !important;
-  background: var(--fo-panel) !important;
-  color: var(--fo-ink-muted) !important;
+.fh-meridian .fh-start-widget__meta-chip {
+  border: 1px solid var(--md-line) !important;
+  background: var(--md-surface) !important;
+  color: var(--md-ink-muted) !important;
   box-shadow: none !important;
-  font-family: var(--fo-font-sans) !important;
+  border-radius: var(--md-radius-pill) !important;
+  font-size: 11px !important;
   font-weight: 500 !important;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
-  font-size: 0.62rem !important;
 }
 
-.fh-fo-dash .fh-start-widget__empty,
-.fh-fo-dash .fh-pro-empty {
-  border: 1px dashed var(--fo-line) !important;
-  background: transparent !important;
+.fh-meridian .fh-start-widget__empty,
+.fh-meridian .fh-pro-empty {
+  border: 1px dashed var(--md-line-strong) !important;
+  background: var(--md-surface-muted) !important;
   box-shadow: none !important;
-  color: var(--fo-ink-muted) !important;
-  font-family: var(--fo-font-sans) !important;
+  color: var(--md-ink-muted) !important;
+  border-radius: 8px !important;
 }
 
-/* Kitchen duty banner — amber paper, like the reference passage card */
-.fh-fo-dash .fh-fridge-home__kitchen-hero,
-.fh-fo-dash .fh-home-pro__priority,
-.fh-fo-dash.fh-start-page .fh-fridge-home__kitchen-hero {
-  border: 1px solid #e8dccb !important;
-  border-radius: var(--fo-radius) !important;
-  background:
-    linear-gradient(160deg, #faf5eb 0%, #fffdf8 52%, #f3eadc 100%) !important;
+/* Kitchen / status — semantic warning/success, not editorial amber paper */
+.fh-meridian .fh-fridge-home__kitchen-hero,
+.fh-meridian .fh-home-pro__priority,
+.fh-meridian.fh-start-page .fh-fridge-home__kitchen-hero {
+  border: 1px solid var(--md-warning-border) !important;
+  border-radius: var(--md-radius) !important;
+  background: var(--md-warning-bg) !important;
   box-shadow: none !important;
 }
 
-.fh-fo-dash .fh-fridge-home__kitchen-name,
-.fh-fo-dash .fh-home-pro__priority .fh-fridge-home__kitchen-name {
-  font-family: var(--fo-font-serif) !important;
-  font-size: clamp(1.7rem, 2.4vw, 2.2rem) !important;
-  font-weight: 500 !important;
+.fh-meridian .fh-fridge-home__kitchen-name,
+.fh-meridian .fh-home-pro__priority .fh-fridge-home__kitchen-name {
+  font-family: var(--md-font) !important;
+  font-size: clamp(1.35rem, 2vw, 1.65rem) !important;
+  font-weight: 600 !important;
   letter-spacing: -0.02em !important;
-  color: #3d2e12 !important;
+  color: var(--md-ink) !important;
 }
 
-.fh-fo-dash .fh-fridge-home__kitchen-summary,
-.fh-fo-dash .fh-fridge-home__kitchen-meta {
-  color: var(--fo-accent-text) !important;
+.fh-meridian .fh-fridge-home__kitchen-summary,
+.fh-meridian .fh-fridge-home__kitchen-meta {
+  color: var(--md-ink-secondary) !important;
 }
 
-.fh-fo-dash .fh-status-pill {
-  border: 1px solid var(--fo-line);
-  background: var(--fo-panel);
-  color: var(--fo-ink-muted);
-  font-family: var(--fo-font-sans);
-  font-size: 0.68rem;
+.fh-meridian .fh-status-pill {
+  border: 1px solid var(--md-line);
+  background: var(--md-surface);
+  color: var(--md-ink-muted);
+  border-radius: var(--md-radius-pill);
+  font-size: 11px;
   font-weight: 500;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
 }
 
-.fh-fo-dash .fh-status-pill--done {
-  border-color: #c9ddd0;
-  background: #e8efe9;
-  color: #3f6a52;
+.fh-meridian .fh-status-pill--done {
+  border-color: var(--md-success-border);
+  background: var(--md-success-bg);
+  color: var(--md-success);
 }
 
-.fh-fo-dash .fh-status-pill--open {
-  border-color: #e8dccb;
-  background: #f4eee4;
-  color: #8a6a3a;
+.fh-meridian .fh-status-pill--open {
+  border-color: var(--md-warning-border);
+  background: var(--md-warning-bg);
+  color: var(--md-warning);
 }
 
-.fh-fo-dash .fh-status-pill--neutral {
-  border-color: var(--fo-line);
-  background: var(--fo-surface-muted);
-  color: var(--fo-ink-muted);
+.fh-meridian .fh-status-pill--neutral {
+  border-color: var(--md-line);
+  background: var(--md-surface);
+  color: var(--md-ink-muted);
 }
 
-/* List rows */
-.fh-fo-dash .fh-pro-list-row,
-.fh-fo-dash .fh-home-pro__list .fh-pro-list-row {
-  border: 1px solid var(--fo-line) !important;
-  border-radius: 0.7rem !important;
-  background: var(--fo-surface-muted) !important;
+/* List rows — table-like, data-first */
+.fh-meridian .fh-pro-list-row,
+.fh-meridian .fh-home-pro__list .fh-pro-list-row {
+  border: 1px solid var(--md-line) !important;
+  border-radius: 8px !important;
+  background: var(--md-surface) !important;
   box-shadow: none !important;
-  padding: 0.7rem 0.85rem !important;
+  padding: 0.7rem 0.8rem !important;
 }
 
-.fh-fo-dash .fh-home-pro__list .fh-pro-list-row:hover,
-.fh-fo-dash .fh-home-pro__list .fh-pro-list-row:focus-visible {
-  background: var(--fo-panel-elevated) !important;
-  border-color: var(--fo-accent-muted) !important;
+.fh-meridian .fh-home-pro__list .fh-pro-list-row:hover,
+.fh-meridian .fh-home-pro__list .fh-pro-list-row:focus-visible {
+  background: var(--md-trust-50) !important;
+  border-color: var(--md-trust-200) !important;
 }
 
-.fh-fo-dash .fh-pro-list-row__title {
-  font-family: var(--fo-font-serif) !important;
-  font-size: 0.98rem !important;
+.fh-meridian .fh-pro-list-row__title {
+  font-family: var(--md-font) !important;
+  font-size: 14px !important;
   font-weight: 500 !important;
-  color: var(--fo-ink) !important;
+  color: var(--md-ink) !important;
 }
 
-.fh-fo-dash .fh-pro-list-row__meta {
-  font-family: var(--fo-font-sans) !important;
-  font-size: 0.74rem !important;
+.fh-meridian .fh-pro-list-row__meta {
+  font-family: var(--md-font) !important;
+  font-size: 12px !important;
   font-weight: 400 !important;
-  color: var(--fo-ink-muted) !important;
+  color: var(--md-ink-muted) !important;
 }
 
-.fh-fo-dash .fh-home-pro__qty {
-  border: 1px solid var(--fo-line) !important;
-  background: var(--fo-panel) !important;
-  color: var(--fo-accent-text) !important;
+.fh-meridian .fh-home-pro__qty {
+  border: 1px solid var(--md-line) !important;
+  background: var(--md-surface-muted) !important;
+  color: var(--md-ink-secondary) !important;
+  border-radius: 6px !important;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600 !important;
 }
 
-/* Shopping composer */
-.fh-fo-dash .fh-home-pro__composer input {
-  border: 1px solid var(--fo-line) !important;
-  border-radius: 999px !important;
-  background: var(--fo-panel-elevated) !important;
-  color: var(--fo-ink) !important;
-  font-family: var(--fo-font-sans) !important;
+.fh-meridian .fh-home-pro__composer input {
+  border: 1px solid var(--md-line) !important;
+  border-radius: 8px !important;
+  background: var(--md-surface) !important;
+  color: var(--md-ink) !important;
   font-weight: 400 !important;
 }
 
-.fh-fo-dash .fh-home-pro__composer input::placeholder {
-  color: var(--fo-ink-faint);
+.fh-meridian .fh-home-pro__composer input::placeholder {
+  color: var(--md-ink-faint);
 }
 
-.fh-fo-dash .fh-home-pro__composer input:focus {
-  border-color: var(--fo-accent) !important;
-  background: #fff !important;
-  box-shadow: 0 0 0 3px rgba(200, 184, 156, 0.28) !important;
+.fh-meridian .fh-home-pro__composer input:focus {
+  border-color: var(--md-trust-500) !important;
+  background: var(--md-surface) !important;
+  box-shadow: 0 0 0 3px rgba(30, 79, 140, 0.16) !important;
 }
 
 /* Mini calendar */
-.fh-fo-dash .fh-fridge-home__mini-cal,
-.fh-fo-dash .fh-home-pro__mini-cal,
-.fh-fo-dash.fh-start-page .fh-fridge-home__mini-cal {
-  border: 1px solid var(--fo-line) !important;
-  border-radius: var(--fo-radius) !important;
-  background: var(--fo-surface-muted) !important;
+.fh-meridian .fh-fridge-home__mini-cal,
+.fh-meridian .fh-home-pro__mini-cal,
+.fh-meridian.fh-start-page .fh-fridge-home__mini-cal {
+  border: 1px solid var(--md-line) !important;
+  border-radius: var(--md-radius) !important;
+  background: var(--md-surface-muted) !important;
   box-shadow: none !important;
 }
 
-.fh-fo-dash .fh-fridge-home__mini-cal-label {
-  font-family: var(--fo-font-serif) !important;
-  font-weight: 500 !important;
-  color: var(--fo-ink) !important;
+.fh-meridian .fh-fridge-home__mini-cal-label {
+  font-family: var(--md-font) !important;
+  font-weight: 600 !important;
+  color: var(--md-ink) !important;
 }
 
-.fh-fo-dash .fh-fridge-home__mini-cal-weekdays span {
-  font-family: var(--fo-font-sans);
-  font-size: 0.62rem;
-  font-weight: 600;
-  letter-spacing: 0.1em;
+.fh-meridian .fh-fridge-home__mini-cal-weekdays span {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: var(--fo-ink-faint);
+  color: var(--md-ink-faint);
 }
 
-.fh-fo-dash .fh-fridge-home__mini-cal-day {
+.fh-meridian .fh-fridge-home__mini-cal-day {
   border: 1px solid transparent;
-  border-radius: 0.55rem;
+  border-radius: 6px;
   background: transparent;
-  color: var(--fo-ink);
-  font-family: var(--fo-font-sans);
+  color: var(--md-ink);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
 }
 
-.fh-fo-dash .fh-fridge-home__mini-cal-day.is-muted {
-  color: var(--fo-ink-faint);
+.fh-meridian .fh-fridge-home__mini-cal-day.is-muted {
+  color: var(--md-ink-faint);
 }
 
-.fh-fo-dash .fh-fridge-home__mini-cal-day.is-today {
-  background: var(--fo-ink) !important;
-  color: #fff !important;
+.fh-meridian .fh-fridge-home__mini-cal-day.is-today {
+  background: var(--md-trust-500) !important;
+  color: var(--md-on-trust) !important;
   box-shadow: none !important;
 }
 
-.fh-fo-dash .fh-fridge-home__mini-cal-day.has-events::after {
-  background: var(--fo-accent) !important;
+.fh-meridian .fh-fridge-home__mini-cal-day.has-events::after {
+  background: var(--md-trust-500) !important;
 }
 
-.fh-fo-dash .fh-fridge-home__mini-cal-day.is-today.has-events::after {
+.fh-meridian .fh-fridge-home__mini-cal-day.is-today.has-events::after {
   background: #fff !important;
 }
 
-.fh-fo-dash .fh-fridge-home__mini-cal-day:hover,
-.fh-fo-dash .fh-fridge-home__mini-cal-day:focus-visible {
-  background: var(--fo-surface-accent) !important;
-  border-color: var(--fo-line) !important;
+.fh-meridian .fh-fridge-home__mini-cal-day:hover,
+.fh-meridian .fh-fridge-home__mini-cal-day:focus-visible {
+  background: var(--md-trust-50) !important;
+  border-color: var(--md-trust-200) !important;
 }
 
-.fh-fo-dash .fh-fridge-home__mini-cal-day.is-today:hover,
-.fh-fo-dash .fh-fridge-home__mini-cal-day.is-today:focus-visible {
-  background: #2a2622 !important;
-  color: #fff !important;
+.fh-meridian .fh-fridge-home__mini-cal-day.is-today:hover,
+.fh-meridian .fh-fridge-home__mini-cal-day.is-today:focus-visible {
+  background: var(--md-trust-600) !important;
+  color: var(--md-on-trust) !important;
 }
 
-.fh-fo-dash .fh-fridge-home__agenda-day {
-  font-family: var(--fo-font-serif);
-  font-weight: 500;
-  color: var(--fo-ink);
+.fh-meridian .fh-fridge-home__agenda-day {
+  font-weight: 600;
+  color: var(--md-ink);
 }
 
-/* Storage stats — muted editorial tiles */
-.fh-fo-dash .fh-mini-stat,
-.fh-fo-dash .fh-pro-stat,
-.fh-fo-dash.fh-start-page .fh-mini-stat,
-.fh-fo-dash.fh-home-pro .fh-mini-stat {
-  border: 1px solid var(--fo-line) !important;
-  border-radius: var(--fo-radius) !important;
-  background: var(--fo-surface-muted) !important;
+/* Storage KPIs */
+.fh-meridian .fh-mini-stat,
+.fh-meridian .fh-pro-stat,
+.fh-meridian.fh-start-page .fh-mini-stat,
+.fh-meridian.fh-home-pro .fh-mini-stat {
+  border: 1px solid var(--md-line) !important;
+  border-radius: var(--md-radius) !important;
+  background: var(--md-surface-muted) !important;
   box-shadow: none !important;
 }
 
-.fh-fo-dash .fh-mini-stat--mint {
-  background: #eef4ef !important;
-  border-color: #d5e2d8 !important;
+.fh-meridian .fh-mini-stat--mint,
+.fh-meridian .fh-mini-stat--aqua,
+.fh-meridian .fh-mini-stat--blue,
+.fh-meridian .fh-mini-stat--amber {
+  background: var(--md-surface) !important;
+  border-color: var(--md-line) !important;
 }
 
-.fh-fo-dash .fh-mini-stat--aqua {
-  background: #eef2f4 !important;
-  border-color: #d7dfe4 !important;
+.fh-meridian .fh-mini-stat__value,
+.fh-meridian .fh-pro-stat strong {
+  font-family: var(--md-font) !important;
+  font-weight: 600 !important;
+  color: var(--md-ink) !important;
+  font-variant-numeric: tabular-nums;
 }
 
-.fh-fo-dash .fh-mini-stat--blue {
-  background: #eef2f6 !important;
-  border-color: #d5dde6 !important;
-}
-
-.fh-fo-dash .fh-mini-stat--amber {
-  background: #f4eee4 !important;
-  border-color: #e8dccb !important;
-}
-
-.fh-fo-dash .fh-mini-stat__value,
-.fh-fo-dash .fh-pro-stat strong {
-  font-family: var(--fo-font-serif) !important;
+.fh-meridian .fh-mini-stat__label,
+.fh-meridian .fh-pro-stat span {
+  font-family: var(--md-font) !important;
   font-weight: 500 !important;
-  color: var(--fo-ink) !important;
-}
-
-.fh-fo-dash .fh-mini-stat__label,
-.fh-fo-dash .fh-pro-stat span {
-  font-family: var(--fo-font-sans) !important;
-  font-weight: 500 !important;
-  letter-spacing: 0.12em !important;
+  letter-spacing: 0.04em !important;
   text-transform: uppercase !important;
-  color: var(--fo-ink-muted) !important;
+  color: var(--md-ink-muted) !important;
 }
 
-.fh-fo-dash .fh-fridge-home__storage-note {
-  color: var(--fo-ink-muted);
-  font-family: var(--fo-font-sans);
-  font-size: 0.88rem;
+.fh-meridian .fh-fridge-home__storage-note {
+  color: var(--md-ink-muted);
+  font-size: 14px;
   line-height: 1.5;
 }
 
-.fh-fo-dash.fh-home-pro .fh-fridge-home__storage {
-  background: var(--fo-panel) !important;
+.fh-meridian.fh-home-pro .fh-fridge-home__storage {
+  background: var(--md-surface) !important;
 }
 
 @media (max-width: 760px) {
-  .fh-fo-dash .fh-fridge-home__clock,
-  .fh-fo-dash .fh-home-pro__clock {
+  .fh-meridian .fh-fridge-home__clock,
+  .fh-meridian .fh-home-pro__clock {
     text-align: left;
   }
 }
