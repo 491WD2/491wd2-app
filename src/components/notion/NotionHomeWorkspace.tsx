@@ -201,7 +201,7 @@ export function NotionHomeWorkspace({
     needToBuy.length === 1 ? "1 item" : `${needToBuy.length} items`;
 
   return (
-    <NotionPageCanvas className="fh-notion-page fh-notion-home fh-smart-home fh-fridge-home fh-fridge-home--tablet fh-start-page fh-pro-page fh-home-pro">
+    <NotionPageCanvas className="fh-notion-page fh-notion-home fh-smart-home fh-fridge-home fh-fridge-home--tablet fh-start-page fh-pro-page fh-home-pro fh-fo-dash">
       <header className="fh-fridge-home__top fh-pro-card fh-home-pro__hero" aria-label="Greeting and clock">
         <div className="fh-fridge-home__top-copy">
           <p className="fh-fridge-home__kicker fh-pro-section-title">{greeting}</p>
