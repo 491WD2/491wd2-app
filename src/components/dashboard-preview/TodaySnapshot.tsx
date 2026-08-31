@@ -13,20 +13,20 @@ const METRICS = [
 
 export function TodaySnapshot({ model }: TodaySnapshotProps) {
   return (
-    <section className="dashboard-preview__card dashboard-preview__card--snapshot" aria-label="Today snapshot">
-      <header className="dashboard-preview__card-head dashboard-preview__card-head--compact">
-        <h2 className="dashboard-preview__section-title">Today</h2>
-        <p className="dashboard-preview__meta">At-a-glance counts</p>
-      </header>
-
-      <div className="dashboard-preview__snapshot" role="list" aria-label="Today's household counts">
+    <div className="dashboard-preview__metrics-inline" aria-label="Today snapshot">
+      <p className="dashboard-preview__metrics-inline-label">Today</p>
+      <div className="dashboard-preview__snapshot dashboard-preview__snapshot--inline" role="list">
         {METRICS.map((metric) => {
           const value = model[metric.field];
           return (
             <div
               key={metric.key}
               role="listitem"
-              className={["dashboard-preview__metric", metric.className].join(" ")}
+              className={[
+                "dashboard-preview__metric",
+                "dashboard-preview__metric--inline",
+                metric.className,
+              ].join(" ")}
               aria-label={`${metric.label}: ${value}`}
             >
               <span className="dashboard-preview__metric-count" aria-hidden="true">
@@ -37,6 +37,6 @@ export function TodaySnapshot({ model }: TodaySnapshotProps) {
           );
         })}
       </div>
-    </section>
+    </div>
   );
 }

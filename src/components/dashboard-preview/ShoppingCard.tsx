@@ -11,6 +11,7 @@ type ShoppingCardProps = {
   setData: Dispatch<SetStateAction<FamilyData>>;
   go: DashboardGo;
   onOpenShopping: () => void;
+  variant?: "default" | "primary";
 };
 
 export function ShoppingCard({
@@ -19,6 +20,7 @@ export function ShoppingCard({
   setData,
   go,
   onOpenShopping,
+  variant = "default",
 }: ShoppingCardProps) {
   const { needToBuy } = model;
   const [shoppingDraft, setShoppingDraft] = useState("");
@@ -40,7 +42,16 @@ export function ShoppingCard({
   }
 
   return (
-    <section className="dashboard-preview__card dashboard-preview__card--shopping-accent" aria-label="Shopping list">
+    <section
+      className={[
+        "dashboard-preview__card",
+        "dashboard-preview__card--shopping-accent",
+        variant === "primary" ? "dashboard-preview__card--shopping-primary" : "",
+      ]
+        .filter(Boolean)
+        .join(" ")}
+      aria-label="Shopping list"
+    >
       <header className="dashboard-preview__card-head dashboard-preview__card-head--row">
         <div className="dashboard-preview__card-head-with-icon">
           <ShoppingCart className="dashboard-preview__card-icon dashboard-preview__card-icon--shopping" aria-hidden="true" />

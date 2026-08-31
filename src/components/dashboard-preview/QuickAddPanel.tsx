@@ -11,24 +11,21 @@ type QuickAddPanelProps = {
 const QUICK_ADD_ACTIONS = [
   {
     key: "grocery",
-    label: "Add shopping",
-    hint: "Grocery item",
+    label: "Shopping",
     icon: ShoppingCart,
     onClick: (go: DashboardGo, onOpenShopping: () => void) =>
       go("/quick-add?type=grocery&name=", () => go("/shopping", onOpenShopping)),
   },
   {
     key: "chore",
-    label: "Add chore",
-    hint: "Task for today",
+    label: "Chore",
     icon: ListTodo,
     onClick: (go: DashboardGo, _shopping: () => void, onOpenTasks?: () => void) =>
       go("/quick-add?type=chore&title=", onOpenTasks),
   },
   {
     key: "event",
-    label: "Add event",
-    hint: "Calendar",
+    label: "Event",
     icon: CalendarPlus,
     onClick: (
       go: DashboardGo,
@@ -39,8 +36,7 @@ const QUICK_ADD_ACTIONS = [
   },
   {
     key: "note",
-    label: "Add note",
-    hint: "Family message",
+    label: "Note",
     icon: NotebookPen,
     onClick: (go: DashboardGo) => go("/quick-add?type=note&title=", () => go("/messages")),
   },
@@ -53,24 +49,20 @@ export function QuickAddPanel({
   onOpenCalendar,
 }: QuickAddPanelProps) {
   return (
-    <section className="dashboard-preview__card" aria-label="Quick add">
-      <header className="dashboard-preview__card-head">
-        <h2 className="dashboard-preview__section-title">Quick Add</h2>
-        <p className="dashboard-preview__meta">Jump straight into a new item</p>
-      </header>
-
-      <div className="dashboard-preview__quick-actions">
+    <section className="dashboard-preview__quick-add-compact" aria-label="Quick add">
+      <p className="dashboard-preview__quick-add-compact-label">Quick actions</p>
+      <div className="dashboard-preview__quick-add-pills">
         {QUICK_ADD_ACTIONS.map((action) => {
           const Icon = action.icon;
           return (
             <button
               key={action.key}
               type="button"
-              className="dashboard-preview__quick-action"
-              aria-label={`${action.label}, ${action.hint}`}
+              className="dashboard-preview__quick-add-pill"
+              aria-label={`Add ${action.label.toLowerCase()}`}
               onClick={() => action.onClick(go, onOpenShopping, onOpenTasks, onOpenCalendar)}
             >
-              <Icon className="dashboard-preview__action-icon" aria-hidden="true" />
+              <Icon className="dashboard-preview__quick-add-pill-icon" aria-hidden="true" />
               <span>{action.label}</span>
             </button>
           );

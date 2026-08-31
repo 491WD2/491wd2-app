@@ -43,22 +43,19 @@ export function FamilyAccessStrip({
   };
 
   return (
-    <section
-      className="dashboard-preview__card dashboard-preview__card--compact dashboard-preview__family-strip"
-      aria-label="Family access"
-    >
-      <header className="dashboard-preview__card-head dashboard-preview__card-head--row dashboard-preview__card-head--compact">
-        <h2 className="dashboard-preview__section-title">Family</h2>
-        <p className="dashboard-preview__meta">
+    <section className="dashboard-preview__family-integrated" aria-label="Family access">
+      <div className="dashboard-preview__family-integrated-head">
+        <h2 className="dashboard-preview__family-integrated-title">Family</h2>
+        <p className="dashboard-preview__family-integrated-meta">
           {orderedMembers.length === 0
             ? "Add members in Settings"
             : `${memberCountLabel} · tap to open`}
         </p>
-      </header>
+      </div>
 
       {orderedMembers.length === 0 ? (
-        <p className="dashboard-preview__placeholder">
-          No active family members yet. Add them in Settings.
+        <p className="dashboard-preview__placeholder dashboard-preview__placeholder--inline">
+          No active family members yet.
         </p>
       ) : (
         <div className="dashboard-preview__family" role="list" aria-label="Family members">
@@ -72,6 +69,7 @@ export function FamilyAccessStrip({
                 role="listitem"
                 className={[
                   "dashboard-preview__family-member",
+                  "dashboard-preview__family-member--compact",
                   selected ? "is-selected" : "",
                 ]
                   .filter(Boolean)
@@ -82,7 +80,7 @@ export function FamilyAccessStrip({
                 aria-label={`${getMemberFullName(member)}${selected ? ", current" : ""}`}
               >
                 <span
-                  className="dashboard-preview__family-avatar"
+                  className="dashboard-preview__family-avatar dashboard-preview__family-avatar--compact"
                   style={{ backgroundColor: memberDot(index) }}
                   aria-hidden="true"
                 >

@@ -2,7 +2,7 @@
  * Dashboard Preview — layout structure. Scoped to `.dashboard-preview`.
  */
 
-/* ── Viewport + frame (inner app surface; AppShell owns app nav) ── */
+/* ── Viewport + frame ── */
 .dashboard-preview__viewport {
   padding: var(--dp-frame-pad);
   min-height: 100%;
@@ -30,6 +30,144 @@
   min-width: 0;
 }
 
+/* ── Intro header ── */
+.dashboard-preview__intro {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--dp-gap);
+  min-width: 0;
+  padding-bottom: 4px;
+}
+
+.dashboard-preview__intro-copy {
+  min-width: 0;
+}
+
+.dashboard-preview__intro-greeting {
+  margin: 0 0 4px;
+  color: var(--dp-text-muted);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.dashboard-preview__intro-title {
+  margin: 0;
+  color: var(--dp-text);
+  font-size: clamp(26px, 2.4vw, 34px);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+}
+
+.dashboard-preview__intro-sub {
+  margin: 6px 0 0;
+  color: var(--dp-text-secondary);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.dashboard-preview__intro-utility {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.dashboard-preview__intro-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 180px;
+  max-width: 240px;
+  min-height: 38px;
+  padding: 0 12px;
+  border-radius: var(--dp-radius-pill);
+  background: var(--dp-card-strong);
+  border: 1px solid var(--dp-divider);
+  box-shadow: var(--dp-shadow-low);
+}
+
+.dashboard-preview__intro-search-icon {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  color: var(--dp-text-muted);
+}
+
+.dashboard-preview__intro-search-input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  background: transparent;
+  color: var(--dp-text-secondary);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  outline: none;
+}
+
+.dashboard-preview__intro-time {
+  margin: 0;
+  color: var(--dp-text);
+  font-family: var(--dp-font-nums);
+  font-size: 15px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* ── Main asymmetric split ── */
+.dashboard-preview__main-split {
+  display: grid;
+  grid-template-columns: minmax(0, 1.78fr) minmax(280px, 1fr);
+  gap: var(--dp-gap-section-lg);
+  align-items: start;
+  min-width: 0;
+}
+
+.dashboard-preview__main-col {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dp-gap);
+  min-width: 0;
+}
+
+/* ── Summary band: family + metrics ── */
+.dashboard-preview__summary-band {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+  gap: var(--dp-gap);
+  align-items: stretch;
+  padding: 14px 16px;
+  border-radius: var(--dp-radius-card);
+  background: var(--dp-card);
+  border: 1px solid var(--dp-divider);
+  box-shadow: var(--dp-shadow-low);
+}
+
+/* ── Today Snapshot inline ── */
+.dashboard-preview__snapshot {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--dp-gap-sm);
+}
+
+.dashboard-preview__snapshot--inline {
+  margin-top: 6px;
+}
+
+/* ── Family ── */
+.dashboard-preview__family {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  align-items: center;
+}
+
+/* Legacy region helpers (kept for responsive fallbacks) */
 .dashboard-preview__region {
   display: flex;
   flex-direction: column;
@@ -37,43 +175,6 @@
   min-width: 0;
 }
 
-/* ── A. Status header ── */
-.dashboard-preview__status {
-  display: grid;
-  grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.7fr) minmax(0, 1.15fr);
-  gap: var(--dp-gap-section);
-  align-items: center;
-  min-height: 132px;
-  max-height: 168px;
-  padding: 16px 18px;
-  border-radius: var(--dp-radius-large);
-  background: var(--dp-status-gradient), var(--dp-card);
-  border: 1px solid var(--dp-border);
-  box-shadow: var(--dp-shadow-low);
-  backdrop-filter: blur(var(--dp-blur));
-  -webkit-backdrop-filter: blur(var(--dp-blur));
-}
-
-.dashboard-preview__status-col {
-  min-width: 0;
-}
-
-.dashboard-preview__status-col--chips {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 6px;
-}
-
-/* ── B. Family strip ── */
-.dashboard-preview__family {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  align-items: center;
-}
-
-/* ── C. Quick Add + Today Snapshot ── */
 .dashboard-preview__tools-row {
   display: grid;
   grid-template-columns: minmax(0, 0.42fr) minmax(0, 0.58fr);
@@ -81,14 +182,6 @@
   min-width: 0;
 }
 
-/* ── D. Today Snapshot internal grid ── */
-.dashboard-preview__snapshot {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: var(--dp-gap-sm);
-}
-
-/* ── E. Main household grid ── */
 .dashboard-preview__household-grid {
   display: grid;
   grid-template-columns: minmax(280px, 0.38fr) minmax(0, 0.62fr);
@@ -119,7 +212,11 @@
 
   .dashboard-preview__content {
     padding: 20px;
-    gap: 22px;
+    gap: 20px;
+  }
+
+  .dashboard-preview__main-split {
+    gap: 20px;
   }
 }
 
@@ -132,51 +229,60 @@
 
 @media (max-width: 1320px) {
   .dashboard-preview__viewport {
-    padding: 18px;
+    padding: 16px;
   }
 
-  .dashboard-preview__household-grid {
-    grid-template-columns: minmax(260px, 0.38fr) minmax(0, 0.62fr);
+  .dashboard-preview__main-split {
+    grid-template-columns: minmax(0, 1.55fr) minmax(260px, 1fr);
   }
 }
 
 @media (max-width: 1280px) {
-  .dashboard-preview__status-time {
-    font-size: 34px;
+  .dashboard-preview__metric--inline {
+    min-height: 52px;
+    padding: 8px;
   }
 
-  .dashboard-preview__metric {
-    min-height: 68px;
-    padding: 10px;
+  .dashboard-preview__metric--inline .dashboard-preview__metric-count {
+    font-size: 18px;
   }
 
-  .dashboard-preview__metric-count {
-    font-size: 22px;
-  }
-
-  .dashboard-preview__metric-label {
-    font-size: 11px;
-  }
-
-  .dashboard-preview__snapshot {
-    gap: 8px;
+  .dashboard-preview__snapshot--inline {
+    gap: 6px;
   }
 }
 
 @media (max-width: 1180px) {
+  .dashboard-preview__main-split,
+  .dashboard-preview__summary-band,
   .dashboard-preview__tools-row,
   .dashboard-preview__household-grid {
     grid-template-columns: minmax(0, 1fr);
   }
 
-  .dashboard-preview__status {
-    grid-template-columns: minmax(0, 1fr);
-    max-height: none;
-    min-height: 0;
-    padding: 16px;
+  .dashboard-preview__intro {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .dashboard-preview__intro-utility {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .dashboard-preview__intro-search {
+    flex: 1;
+    max-width: none;
   }
 
   .dashboard-preview__calendar-upcoming-body {
     grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .dashboard-preview__snapshot,
+  .dashboard-preview__snapshot--inline {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }

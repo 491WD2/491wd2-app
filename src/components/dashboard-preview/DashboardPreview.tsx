@@ -2,19 +2,19 @@ import { useEffect, useState } from "react";
 import { useDashboardPreviewModel } from "../../lib/dashboard-preview/useDashboardPreviewModel";
 import "../../styles/dashboard-preview/dashboard-preview.css";
 import { CalendarUpcomingCard } from "./CalendarUpcomingCard";
+import { DashboardIntroHeader } from "./DashboardIntroHeader";
 import { DashboardPreviewShell } from "./DashboardPreviewShell";
-import { DashboardStatusHeader } from "./DashboardStatusHeader";
 import { FamilyAccessStrip } from "./FamilyAccessStrip";
-import { KitchenChoresCard } from "./KitchenChoresCard";
 import { MessagesNotificationsCard } from "./MessagesNotificationsCard";
 import { PantryAlertsCard } from "./PantryAlertsCard";
 import { QuickAddPanel } from "./QuickAddPanel";
 import { ShoppingCard } from "./ShoppingCard";
+import { SpotlightPanel } from "./SpotlightPanel";
 import { TodaySnapshot } from "./TodaySnapshot";
 import type { DashboardPreviewProps } from "./types";
 
 /**
- * Dashboard preview — live household data wired to the visual experiment shell.
+ * Dashboard preview — editorial asymmetric layout with live household data.
  */
 export function DashboardPreview({
   data,
@@ -41,61 +41,60 @@ export function DashboardPreview({
 
   return (
     <DashboardPreviewShell>
-      <DashboardStatusHeader
-        model={model}
-        go={go}
-        onOpenTasks={onOpenTasks}
-        onOpenShopping={onOpenShopping}
-      />
+      <DashboardIntroHeader model={model} />
 
-      <FamilyAccessStrip model={model} go={go} onOpenMemberDashboard={onOpenMemberDashboard} />
+      <div className="dashboard-preview__main-split">
+        <div className="dashboard-preview__main-col dashboard-preview__main-col--left">
+          <div className="dashboard-preview__summary-band" aria-label="Household summary">
+            <FamilyAccessStrip
+              model={model}
+              go={go}
+              onOpenMemberDashboard={onOpenMemberDashboard}
+            />
+            <TodaySnapshot model={model} />
+          </div>
 
-      <section className="dashboard-preview__region" aria-label="Household tools">
-        <div className="dashboard-preview__tools-row">
           <QuickAddPanel
             go={go}
             onOpenShopping={onOpenShopping}
             onOpenTasks={onOpenTasks}
             onOpenCalendar={onOpenCalendar}
           />
-          <TodaySnapshot model={model} />
-        </div>
-      </section>
 
-      <section className="dashboard-preview__region" aria-label="Household overview">
-        <div className="dashboard-preview__household-grid">
-          <div className="dashboard-preview__utility" aria-label="Tasks and storage">
-            <KitchenChoresCard
-              data={data}
-              model={model}
-              now={now}
-              setData={setData}
-              go={go}
-              onOpenTasks={onOpenTasks}
-            />
-            <ShoppingCard
-              data={data}
-              model={model}
-              setData={setData}
-              go={go}
-              onOpenShopping={onOpenShopping}
-            />
-            <PantryAlertsCard
-              model={model}
-              go={go}
-              onOpenPantry={onOpenPantry}
-              onOpenCalendar={onOpenCalendar}
-              onOpenTasks={onOpenTasks}
-              onOpenShopping={onOpenShopping}
-            />
-          </div>
+          <ShoppingCard
+            data={data}
+            model={model}
+            setData={setData}
+            go={go}
+            onOpenShopping={onOpenShopping}
+            variant="primary"
+          />
 
-          <div className="dashboard-preview__information" aria-label="Schedule and messages">
-            <CalendarUpcomingCard model={model} go={go} onOpenCalendar={onOpenCalendar} />
-            <MessagesNotificationsCard model={model} go={go} />
-          </div>
+          <PantryAlertsCard
+            model={model}
+            go={go}
+            onOpenPantry={onOpenPantry}
+            onOpenCalendar={onOpenCalendar}
+            onOpenTasks={onOpenTasks}
+            onOpenShopping={onOpenShopping}
+          />
+
+          <CalendarUpcomingCard model={model} go={go} onOpenCalendar={onOpenCalendar} />
         </div>
-      </section>
+
+        <div className="dashboard-preview__main-col dashboard-preview__main-col--right">
+          <SpotlightPanel
+            model={model}
+            go={go}
+            onOpenTasks={onOpenTasks}
+            onOpenShopping={onOpenShopping}
+            onOpenCalendar={onOpenCalendar}
+            onOpenPantry={onOpenPantry}
+          />
+
+          <MessagesNotificationsCard model={model} go={go} />
+        </div>
+      </div>
     </DashboardPreviewShell>
   );
 }
