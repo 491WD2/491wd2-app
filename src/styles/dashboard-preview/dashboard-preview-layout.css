@@ -1,0 +1,149 @@
+/**
+ * Dashboard Preview — layout structure only (no widget skin).
+ * Requires dashboard-preview-tokens.css. Scoped to `.dashboard-preview`.
+ */
+
+/* ── Outer viewport frame ── */
+.dashboard-preview__viewport {
+  padding: var(--dp-frame-pad);
+  min-height: 100%;
+  min-width: var(--dp-shell-min-width);
+}
+
+.dashboard-preview__shell {
+  width: var(--dp-shell-width);
+  max-width: var(--dp-shell-max-width);
+  margin-inline: auto;
+  border-radius: var(--dp-radius-shell);
+  background: var(--dp-shell-bg);
+  border: var(--dp-shell-border);
+  box-shadow: var(--dp-shell-shadow);
+  backdrop-filter: blur(var(--dp-shell-blur));
+  -webkit-backdrop-filter: blur(var(--dp-shell-blur));
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100vh - (var(--dp-frame-pad) * 2));
+}
+
+/* ── Shell chrome: sidebar + main column ── */
+.dashboard-preview__body {
+  display: flex;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.dashboard-preview__sidebar {
+  flex: 0 0 var(--dp-sidebar-width);
+  width: var(--dp-sidebar-width);
+  padding: var(--dp-sidebar-pad);
+  background: var(--dp-sidebar-bg);
+  border-right: var(--dp-sidebar-border);
+  backdrop-filter: blur(var(--dp-topbar-blur));
+  -webkit-backdrop-filter: blur(var(--dp-topbar-blur));
+}
+
+.dashboard-preview__main {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.dashboard-preview__topbar {
+  flex: 0 0 auto;
+  height: var(--dp-topbar-h);
+  padding-inline: var(--dp-topbar-px);
+  display: flex;
+  align-items: center;
+  gap: var(--dp-topbar-gap);
+  background: var(--dp-topbar-bg);
+  border-bottom: var(--dp-topbar-border);
+  backdrop-filter: blur(var(--dp-topbar-blur));
+  -webkit-backdrop-filter: blur(var(--dp-topbar-blur));
+}
+
+.dashboard-preview__content {
+  flex: 1 1 auto;
+  padding: var(--dp-content-pad);
+  display: flex;
+  flex-direction: column;
+  gap: var(--dp-gap-section-lg);
+  min-height: 0;
+  overflow: auto;
+}
+
+/* ── Compact status header (span full content width) ── */
+.dashboard-preview__status {
+  flex: 0 0 auto;
+  min-height: var(--dp-status-h-min);
+  max-height: var(--dp-status-h-max);
+  padding: var(--dp-status-pad);
+  border-radius: var(--dp-radius-status);
+  background: var(--dp-glass-bg);
+  border: var(--dp-glass-border);
+  box-shadow: var(--dp-glass-shadow);
+  backdrop-filter: blur(var(--dp-card-blur));
+  -webkit-backdrop-filter: blur(var(--dp-card-blur));
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr) minmax(0, 0.9fr);
+  gap: var(--dp-gap-section);
+  align-items: center;
+}
+
+/* ── Today snapshot: 4 equal columns ── */
+.dashboard-preview__snapshot {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--dp-gap);
+}
+
+/* ── Primary dashboard: 38% utility | 62% information ── */
+.dashboard-preview__grid {
+  display: grid;
+  grid-template-columns: var(--dp-grid-utility) var(--dp-grid-main);
+  gap: var(--dp-gap);
+  align-items: start;
+}
+
+.dashboard-preview__utility {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dp-gap);
+  min-width: 0;
+}
+
+.dashboard-preview__information {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dp-gap);
+  min-width: 0;
+}
+
+/* Right region top row: calendar ~64% | upcoming ~36% */
+.dashboard-preview__calendar-row {
+  display: grid;
+  grid-template-columns: var(--dp-grid-calendar) var(--dp-grid-upcoming);
+  gap: var(--dp-gap);
+  align-items: stretch;
+  min-height: var(--dp-calendar-min-h);
+}
+
+/* Top strip above main grid: family + quick add + today snapshot handled in markup order */
+.dashboard-preview__top-strip {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: var(--dp-gap);
+}
+
+.dashboard-preview__cell-family {
+  grid-column: span 4;
+}
+
+.dashboard-preview__cell-quick {
+  grid-column: span 4;
+}
+
+.dashboard-preview__cell-today {
+  grid-column: span 4;
+}

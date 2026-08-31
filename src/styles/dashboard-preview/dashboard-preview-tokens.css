@@ -1,0 +1,335 @@
+/**
+ * Dashboard Preview — locked design tokens
+ * Scoped to `.dashboard-preview` only. Do NOT import from src/styles.css.
+ * Import from AdminUxDashboardPreviewPage or DashboardPreviewWorkspace only.
+ */
+
+.dashboard-preview {
+  /* ═══════════════════════════════════════════════════════════════════════
+   * 2. PAGE BACKGROUND
+   * ═══════════════════════════════════════════════════════════════════════ */
+  --dp-bg-base: #f4f7fb;
+  --dp-bg-accent-blue: #dcebff;
+  --dp-bg-accent-lavender: #e9e2ff;
+  --dp-bg-accent-peach: #ffe4d6;
+  --dp-bg-accent-mint: #ddf5ec;
+  --dp-page-bg:
+    radial-gradient(circle at 10% 10%, rgba(220, 235, 255, 0.75), transparent 30%),
+    radial-gradient(circle at 90% 12%, rgba(233, 226, 255, 0.55), transparent 32%),
+    radial-gradient(circle at 80% 88%, rgba(255, 228, 214, 0.45), transparent 30%),
+    var(--dp-bg-base);
+
+  /* ═══════════════════════════════════════════════════════════════════════
+   * 3. OUTER DESKTOP FRAME
+   * ═══════════════════════════════════════════════════════════════════════ */
+  --dp-frame-pad: 24px;
+  --dp-frame-pad-min: 20px;
+  --dp-frame-pad-max: 28px;
+  --dp-shell-width: calc(100vw - 48px);
+  --dp-shell-max-width: 1720px;
+  --dp-shell-min-width: 1180px;
+  --dp-radius-shell: 28px;
+  --dp-shell-bg: rgba(255, 255, 255, 0.46);
+  --dp-shell-border: 1px solid rgba(255, 255, 255, 0.78);
+  --dp-shell-shadow: 0 20px 60px rgba(30, 41, 59, 0.08);
+  --dp-shell-blur: 18px;
+
+  /* ═══════════════════════════════════════════════════════════════════════
+   * 4. SIDEBAR
+   * ═══════════════════════════════════════════════════════════════════════ */
+  --dp-sidebar-width: 220px;
+  --dp-sidebar-width-min: 208px;
+  --dp-sidebar-width-max: 232px;
+  --dp-sidebar-pad: 16px;
+  --dp-nav-item-h: 44px;
+  --dp-nav-item-px: 12px;
+  --dp-nav-item-gap: 6px;
+  --dp-radius-nav: 12px;
+  --dp-sidebar-section-mt: 24px;
+  --dp-sidebar-section-mb: 8px;
+  --dp-sidebar-bg: rgba(255, 255, 255, 0.62);
+  --dp-sidebar-border: 1px solid rgba(255, 255, 255, 0.72);
+  --dp-nav-active-bg: rgba(255, 255, 255, 0.82);
+
+  /* ═══════════════════════════════════════════════════════════════════════
+   * 5. TOP BAR
+   * ═══════════════════════════════════════════════════════════════════════ */
+  --dp-topbar-h: 60px;
+  --dp-topbar-h-min: 56px;
+  --dp-topbar-h-max: 64px;
+  --dp-topbar-px: 18px;
+  --dp-topbar-gap: 8px;
+  --dp-topbar-bg: rgba(255, 255, 255, 0.62);
+  --dp-topbar-blur: 16px;
+  --dp-topbar-border: 1px solid rgba(255, 255, 255, 0.7);
+  --dp-radius-topbar: 17px;
+  --dp-icon-btn: 40px;
+  --dp-icon-size: 18px;
+  --dp-icon-size-lg: 20px;
+
+  /* ═══════════════════════════════════════════════════════════════════════
+   * 6. MAIN CONTENT SPACING
+   * ═══════════════════════════════════════════════════════════════════════ */
+  --dp-content-pad: 22px;
+  --dp-gap: 18px;
+  --dp-gap-min: 16px;
+  --dp-gap-max: 20px;
+  --dp-gap-sm: 8px;
+  --dp-gap-md: 12px;
+  --dp-gap-section: 16px;
+  --dp-gap-section-lg: 24px;
+  /* Rhythm: 4 · 8 · 12 · 16 · 20 · 24 · 32 */
+  --dp-space-1: 4px;
+  --dp-space-2: 8px;
+  --dp-space-3: 12px;
+  --dp-space-4: 16px;
+  --dp-space-5: 20px;
+  --dp-space-6: 24px;
+  --dp-space-8: 32px;
+
+  /* ═══════════════════════════════════════════════════════════════════════
+   * 7. CARD SYSTEM
+   * ═══════════════════════════════════════════════════════════════════════ */
+  --dp-card-bg: rgba(255, 255, 255, 0.72);
+  --dp-card-bg-fallback: rgba(255, 255, 255, 0.92);
+  --dp-card-border: 1px solid rgba(255, 255, 255, 0.82);
+  --dp-card-blur: 14px;
+  --dp-radius-card: 20px;
+  --dp-shadow-card: 0 10px 30px rgba(30, 41, 59, 0.07);
+  --dp-card-pad: 18px;
+  --dp-card-pad-lg: 20px;
+  --dp-card-pad-sm: 15px;
+  --dp-shadow-card-hover: 0 14px 36px rgba(30, 41, 59, 0.1);
+
+  /* ═══════════════════════════════════════════════════════════════════════
+   * 8. NESTED SURFACES
+   * ═══════════════════════════════════════════════════════════════════════ */
+  --dp-row-bg: rgba(248, 250, 252, 0.82);
+  --dp-radius-row: 12px;
+  --dp-row-pad: 11px;
+  --dp-row-border: 1px solid rgba(226, 232, 240, 0.72);
+  --dp-row-shadow: none;
+
+  /* ═══════════════════════════════════════════════════════════════════════
+   * 9. TYPOGRAPHY
+   * ═══════════════════════════════════════════════════════════════════════ */
+  --dp-font: "Mulish", "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --dp-font-nums: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --dp-text: #18212f;
+  --dp-text-secondary: #667085;
+  --dp-text-muted: #98a2b3;
+  --dp-text-strong-muted: #475467;
+  --dp-text-page-title: 28px;
+  --dp-text-time: clamp(40px, 3.2vw, 48px);
+  --dp-text-time-max: 52px;
+  --dp-text-card-heading: 18px;
+  --dp-text-section-heading: 14px;
+  --dp-text-body: 14px;
+  --dp-text-meta: 12px;
+  --dp-text-label: 11px;
+  --dp-lh-tight: 1.15;
+  --dp-lh-time: 1;
+  --dp-lh-heading: 1.25;
+  --dp-lh-body: 1.45;
+  --dp-lh-meta: 1.4;
+  --dp-tracking-label: 0.02em;
+
+  /* ═══════════════════════════════════════════════════════════════════════
+   * 10. COLOR SYSTEM — semantic accents
+   * ═══════════════════════════════════════════════════════════════════════ */
+  --dp-accent: #4f7cff;
+  --dp-accent-soft: #e8efff;
+  --dp-accent-calendar: #6376f6;
+  --dp-accent-calendar-soft: #eceeff;
+  --dp-accent-messages: #8b6fe8;
+  --dp-accent-messages-soft: #f0ebff;
+  --dp-accent-shopping: #32b88b;
+  --dp-accent-shopping-soft: #e2f7f0;
+  --dp-accent-kitchen: #f18b64;
+  --dp-accent-kitchen-soft: #fff0e8;
+  --dp-accent-pantry: #eaa43a;
+  --dp-accent-pantry-soft: #fff4dc;
+  --dp-success: #32a675;
+  --dp-success-soft: #e6f6ef;
+  --dp-warning: #d99124;
+  --dp-warning-soft: #fff3da;
+  --dp-error: #d95757;
+  --dp-error-soft: #fdeaea;
+
+  /* ═══════════════════════════════════════════════════════════════════════
+   * 11. GRADIENTS (subtle, occasional)
+   * ═══════════════════════════════════════════════════════════════════════ */
+  --dp-gradient-blue-lavender: linear-gradient(
+    135deg,
+    rgba(79, 124, 255, 0.16),
+    rgba(139, 111, 232, 0.12)
+  );
+  --dp-gradient-peach-lavender: linear-gradient(
+    135deg,
+    rgba(241, 139, 100, 0.15),
+    rgba(139, 111, 232, 0.1)
+  );
+  --dp-gradient-mint-blue: linear-gradient(
+    135deg,
+    rgba(50, 184, 139, 0.12),
+    rgba(79, 124, 255, 0.1)
+  );
+
+  /* ═══════════════════════════════════════════════════════════════════════
+   * 12. GLASS EFFECT (primary treatment)
+   * ═══════════════════════════════════════════════════════════════════════ */
+  --dp-glass-bg: rgba(255, 255, 255, 0.7);
+  --dp-glass-border: 1px solid rgba(255, 255, 255, 0.8);
+  --dp-glass-blur: 14px;
+  --dp-glass-blur-max: 18px;
+  --dp-glass-blur-cap: 20px;
+  --dp-glass-shadow: 0 10px 30px rgba(30, 41, 59, 0.07);
+
+  /* ═══════════════════════════════════════════════════════════════════════
+   * 13. CARD RADII hierarchy
+   * ═══════════════════════════════════════════════════════════════════════ */
+  --dp-radius-surface-lg: 22px;
+  --dp-radius-card-compact: 16px;
+  --dp-radius-btn: 11px;
+  --dp-radius-pill: 9999px;
+
+  /* ═══════════════════════════════════════════════════════════════════════
+   * 14. BUTTONS
+   * ═══════════════════════════════════════════════════════════════════════ */
+  --dp-btn-h: 40px;
+  --dp-btn-h-compact: 36px;
+  --dp-btn-px: 15px;
+  --dp-btn-primary-bg: var(--dp-accent);
+  --dp-btn-primary-text: #ffffff;
+  --dp-btn-secondary-bg: rgba(255, 255, 255, 0.76);
+  --dp-btn-secondary-border: 1px solid rgba(208, 213, 221, 0.85);
+
+  /* ═══════════════════════════════════════════════════════════════════════
+   * 15. ICONS
+   * ═══════════════════════════════════════════════════════════════════════ */
+  --dp-icon-sm: 16px;
+  --dp-icon-md: 18px;
+  --dp-icon-status: 21px;
+  --dp-icon-stroke: 1.85;
+
+  /* ═══════════════════════════════════════════════════════════════════════
+   * 16. STATUS CHIPS
+   * ═══════════════════════════════════════════════════════════════════════ */
+  --dp-chip-h: 30px;
+  --dp-chip-h-min: 28px;
+  --dp-chip-h-max: 32px;
+  --dp-chip-px: 9px;
+  --dp-chip-text: 12px;
+  --dp-chip-kitchen-bg: #fff0e8;
+  --dp-chip-kitchen-text: #b95f3c;
+  --dp-chip-shopping-bg: #e2f7f0;
+  --dp-chip-shopping-text: #247a61;
+  --dp-chip-calendar-bg: #eceeff;
+  --dp-chip-calendar-text: #4f5fc7;
+  --dp-chip-messages-bg: #f0ebff;
+  --dp-chip-messages-text: #674ec1;
+
+  /* ═══════════════════════════════════════════════════════════════════════
+   * 17. FAMILY ACCESS STRIP
+   * ═══════════════════════════════════════════════════════════════════════ */
+  --dp-avatar: 32px;
+  --dp-avatar-selected: 36px;
+  --dp-avatar-gap: 8px;
+  --dp-member-chip-h: 36px;
+  --dp-member-chip-pad: 6px 10px 6px 6px;
+
+  /* ═══════════════════════════════════════════════════════════════════════
+   * 18. COMPACT STATUS HEADER
+   * ═══════════════════════════════════════════════════════════════════════ */
+  --dp-status-h: 160px;
+  --dp-status-h-min: 145px;
+  --dp-status-h-max: 180px;
+  --dp-status-pad: 22px;
+  --dp-radius-status: 22px;
+
+  /* ═══════════════════════════════════════════════════════════════════════
+   * 19. TODAY SNAPSHOT
+   * ═══════════════════════════════════════════════════════════════════════ */
+  --dp-snapshot-min-h: 88px;
+  --dp-snapshot-h: 102px;
+  --dp-snapshot-pad: 14px;
+  --dp-snapshot-num: 26px;
+  --dp-snapshot-label: 12px;
+
+  /* ═══════════════════════════════════════════════════════════════════════
+   * 20. MAIN DASHBOARD GRID
+   * ═══════════════════════════════════════════════════════════════════════ */
+  --dp-grid-utility: minmax(300px, 0.38fr);
+  --dp-grid-main: minmax(0, 0.62fr);
+  --dp-grid-calendar: minmax(0, 0.64fr);
+  --dp-grid-upcoming: minmax(0, 0.36fr);
+
+  /* ═══════════════════════════════════════════════════════════════════════
+   * 21. CALENDAR + UPCOMING
+   * ═══════════════════════════════════════════════════════════════════════ */
+  --dp-calendar-min-h: 360px;
+
+  /* ═══════════════════════════════════════════════════════════════════════
+   * 22. LIST DENSITY
+   * ═══════════════════════════════════════════════════════════════════════ */
+  --dp-list-row-min: 44px;
+  --dp-list-row: 48px;
+  --dp-list-gap: 7px;
+
+  /* ═══════════════════════════════════════════════════════════════════════
+   * 23. SHADOW SYSTEM
+   * ═══════════════════════════════════════════════════════════════════════ */
+  --dp-shadow-low: 0 4px 14px rgba(30, 41, 59, 0.045);
+  --dp-shadow-standard: 0 10px 30px rgba(30, 41, 59, 0.07);
+  --dp-shadow-elevated: 0 16px 40px rgba(30, 41, 59, 0.1);
+
+  /* ═══════════════════════════════════════════════════════════════════════
+   * 24. BORDERS
+   * ═══════════════════════════════════════════════════════════════════════ */
+  --dp-divider: 1px solid rgba(226, 232, 240, 0.72);
+  --dp-divider-strong: 1px solid #e4e7ec;
+
+  /* ═══════════════════════════════════════════════════════════════════════
+   * 25. MOTION
+   * ═══════════════════════════════════════════════════════════════════════ */
+  --dp-transition: 165ms ease;
+  --dp-transition-drawer: 210ms ease;
+  --dp-hover-lift: 1px;
+
+  /* ═══════════════════════════════════════════════════════════════════════
+   * Base scope styles (container only — no widgets)
+   * ═══════════════════════════════════════════════════════════════════════ */
+  box-sizing: border-box;
+  color: var(--dp-text);
+  font-family: var(--dp-font);
+  font-size: var(--dp-text-body);
+  line-height: var(--dp-lh-body);
+  -webkit-font-smoothing: antialiased;
+  background: var(--dp-page-bg);
+  min-height: 100%;
+}
+
+.dashboard-preview *,
+.dashboard-preview *::before,
+.dashboard-preview *::after {
+  box-sizing: border-box;
+}
+
+/* Fallback when backdrop-filter is unavailable */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .dashboard-preview {
+    --dp-card-bg: var(--dp-card-bg-fallback);
+    --dp-glass-bg: var(--dp-card-bg-fallback);
+    --dp-shell-bg: rgba(255, 255, 255, 0.94);
+    --dp-sidebar-bg: rgba(255, 255, 255, 0.94);
+    --dp-topbar-bg: rgba(255, 255, 255, 0.94);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dashboard-preview {
+    --dp-transition: 0ms;
+    --dp-transition-drawer: 0ms;
+    --dp-hover-lift: 0px;
+  }
+}
