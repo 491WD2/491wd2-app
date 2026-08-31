@@ -27,7 +27,9 @@ export function ChoresCard({ model, setData, go, onOpenTasks }: ChoresCardProps)
     >
       <header className="dashboard-preview__card-head dashboard-preview__card-head--row">
         <div className="dashboard-preview__card-head-with-icon">
-          <Sparkles className="dashboard-preview__card-icon dashboard-preview__card-icon--chores" aria-hidden="true" />
+          <span className="dashboard-preview__icon-badge dashboard-preview__icon-badge--chores" aria-hidden="true">
+            <Sparkles className="dashboard-preview__icon-badge-svg" />
+          </span>
           <div>
             <h2 className="dashboard-preview__section-title">Chores</h2>
             <p className="dashboard-preview__meta">

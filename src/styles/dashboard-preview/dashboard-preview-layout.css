@@ -16,13 +16,11 @@
   background: var(--dp-frame-bg);
   border: var(--dp-frame-border);
   box-shadow: var(--dp-frame-shadow);
-  backdrop-filter: blur(var(--dp-frame-blur));
-  -webkit-backdrop-filter: blur(var(--dp-frame-blur));
-  overflow: hidden;
+  overflow: visible;
 }
 
 .dashboard-preview__content {
-  padding: var(--dp-content-pad);
+  padding: 0;
   display: flex;
   flex-direction: column;
   gap: var(--dp-gap-section-lg);
@@ -32,18 +30,16 @@
 /* ── Utility band ── */
 .dashboard-preview__utility-band {
   display: grid;
-  grid-template-columns: minmax(160px, 0.9fr) minmax(0, 2fr) minmax(140px, 0.75fr);
+  grid-template-columns: minmax(160px, 0.85fr) minmax(0, 2.2fr) minmax(140px, 0.7fr);
   gap: var(--dp-gap);
   align-items: center;
-  min-height: 110px;
-  max-height: 145px;
-  padding: 14px 18px;
+  min-height: 100px;
+  max-height: 132px;
+  padding: 16px 20px;
   border-radius: var(--dp-radius-large);
   background: var(--dp-utility-bg);
-  border: 1px solid var(--dp-border);
+  border: 1px solid var(--dp-divider);
   box-shadow: var(--dp-shadow-low);
-  backdrop-filter: blur(var(--dp-blur));
-  -webkit-backdrop-filter: blur(var(--dp-blur));
 }
 
 .dashboard-preview__utility-datetime {
@@ -63,10 +59,11 @@
   margin: 0;
   color: var(--dp-text);
   font-family: var(--dp-font-nums);
-  font-size: 28px;
+  font-size: 32px;
   font-weight: 700;
   line-height: 1;
   font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
 }
 
 .dashboard-preview__utility-date {

@@ -1,3 +1,4 @@
+import { MessageCircle } from "lucide-react";
 import type { DashboardPreviewModel } from "../../lib/dashboard-preview/useDashboardPreviewModel";
 import type { DashboardGo } from "./types";
 
@@ -19,7 +20,9 @@ export function MessagesNotificationsCard({ model, go }: MessagesNotificationsCa
     >
       <header className="dashboard-preview__card-head dashboard-preview__card-head--row">
         <div className="dashboard-preview__card-head-with-icon">
-          <span className="dashboard-preview__card-accent dashboard-preview__card-accent--messages" aria-hidden="true" />
+          <span className="dashboard-preview__icon-badge dashboard-preview__icon-badge--messages" aria-hidden="true">
+            <MessageCircle className="dashboard-preview__icon-badge-svg" />
+          </span>
           <div>
             <h2 className="dashboard-preview__section-title">Messages</h2>
             <p className="dashboard-preview__meta">{countLabel} pinned or unread</p>

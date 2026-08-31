@@ -54,7 +54,9 @@ export function ShoppingCard({
     >
       <header className="dashboard-preview__card-head dashboard-preview__card-head--row">
         <div className="dashboard-preview__card-head-with-icon">
-          <ShoppingCart className="dashboard-preview__card-icon dashboard-preview__card-icon--shopping" aria-hidden="true" />
+          <span className="dashboard-preview__icon-badge dashboard-preview__icon-badge--shopping" aria-hidden="true">
+            <ShoppingCart className="dashboard-preview__icon-badge-svg" />
+          </span>
           <div>
             <h2 className="dashboard-preview__section-title">Shopping</h2>
             <p className="dashboard-preview__meta">{shoppingItemLabel} on the list</p>

@@ -1,3 +1,4 @@
+import { Package } from "lucide-react";
 import type { DashboardPreviewModel } from "../../lib/dashboard-preview/useDashboardPreviewModel";
 import type { DashboardGo } from "./types";
 
@@ -29,7 +30,9 @@ export function PantryAlertsCard({
     >
       <header className="dashboard-preview__card-head dashboard-preview__card-head--row">
         <div className="dashboard-preview__card-head-with-icon">
-          <span className="dashboard-preview__card-accent dashboard-preview__card-accent--pantry" aria-hidden="true" />
+          <span className="dashboard-preview__icon-badge dashboard-preview__icon-badge--pantry" aria-hidden="true">
+            <Package className="dashboard-preview__icon-badge-svg" />
+          </span>
           <div>
             <h2 className="dashboard-preview__section-title">Pantry &amp; storage</h2>
             <p className="dashboard-preview__meta">
