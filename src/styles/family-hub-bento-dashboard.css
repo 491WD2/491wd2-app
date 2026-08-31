@@ -1,46 +1,42 @@
 /**
- * Home/Dashboard-only “soft 3D bento” skin.
- * Scoped to .fh-bento so Calendar, Shopping, and other pages stay unchanged.
+ * Home/Dashboard-only Prism-inspired shadcn skin.
+ * Inter, white cards, slate primary, bright member dots.
+ * Layout and 491 data stay in NotionHomeWorkspace. Other pages stay unchanged.
  */
 
 .fh-bento {
-  --bento-gutter: 18px;
-  --bento-radius: 22px;
-  --bento-radius-sm: 14px;
-  --bento-pad: 1.15rem 1.2rem 1.2rem;
-  --bento-ink: #101418;
-  --bento-ink-soft: #3a434c;
-  --bento-muted: #5b6770;
-  --bento-line: rgba(16, 20, 24, 0.08);
-  --bento-page: #eef3f4;
+  --bento-gutter: 16px;
+  --bento-radius: 0.5rem;
+  --bento-radius-sm: calc(0.5rem - 2px);
+  --bento-pad: 1rem 1.05rem 1.05rem;
+  --bento-ink: #0f172a;
+  --bento-ink-soft: #334155;
+  --bento-muted: #64748b;
+  --bento-line: #e2e8f0;
+  --bento-page: #f8fafc;
   --bento-white: #ffffff;
-  --bento-mint: #c8f3e4;
-  --bento-mint-deep: #8fdec4;
-  --bento-sky: #c5ebf6;
-  --bento-sky-deep: #8ed4ea;
-  --bento-lavender: #e3eaf3;
-  --bento-lavender-deep: #c5d4e6;
-  --bento-butter: #ffe9a8;
-  --bento-butter-deep: #f5d36a;
-  --bento-coral: #ffd2c4;
-  --bento-coral-deep: #f7b39c;
-  --bento-blush: #f8e3ea;
-  --bento-mint-strong: #0d8a6c;
-  --bento-sky-strong: #1480a8;
-  --bento-coral-strong: #d24f38;
-  --bento-butter-strong: #b07a00;
-  --bento-accent: #0f8f7b;
-  --bento-accent-2: #1578a6;
-  --bento-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.78),
-    0 1px 2px rgba(16, 20, 24, 0.04),
-    0 10px 28px rgba(16, 20, 24, 0.07);
-  --bento-shadow-hover:
-    inset 0 1px 0 rgba(255, 255, 255, 0.86),
-    0 2px 4px rgba(16, 20, 24, 0.05),
-    0 14px 32px rgba(16, 20, 24, 0.1);
-  --bento-display: "Outfit", "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
-  --bento-font: "Plus Jakarta Sans", "Outfit", ui-sans-serif, system-ui, sans-serif;
+  --bento-muted-bg: #f1f5f9;
+  --bento-mint: #ffffff;
+  --bento-mint-deep: #e2e8f0;
+  --bento-sky: #ffffff;
+  --bento-sky-deep: #e2e8f0;
+  --bento-lavender: #ffffff;
+  --bento-lavender-deep: #e2e8f0;
+  --bento-butter: #ffffff;
+  --bento-butter-deep: #e2e8f0;
+  --bento-coral: #ffffff;
+  --bento-coral-deep: #e2e8f0;
+  --bento-blush: #ffffff;
+  --bento-mint-strong: #10b981;
+  --bento-sky-strong: #3b82f6;
+  --bento-coral-strong: #ef4444;
+  --bento-butter-strong: #f59e0b;
+  --bento-accent: #2a4074;
+  --bento-accent-2: #1e3a5f;
+  --bento-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
+  --bento-shadow-hover: 0 1px 3px rgba(15, 23, 42, 0.08), 0 4px 12px rgba(15, 23, 42, 0.04);
+  --bento-display: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --bento-font: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
 
   box-sizing: border-box;
   width: 100%;
@@ -49,13 +45,9 @@
   padding: 1rem 1.1rem 1.6rem;
   color: var(--bento-ink);
   font-family: var(--bento-font);
-  font-feature-settings: "ss01" on, "cv11" on;
   letter-spacing: -0.011em;
   -webkit-font-smoothing: antialiased;
-  background:
-    radial-gradient(1200px 480px at 8% -10%, rgba(142, 212, 234, 0.42), transparent 58%),
-    radial-gradient(900px 420px at 96% 0%, rgba(143, 222, 196, 0.32), transparent 50%),
-    linear-gradient(180deg, #f5f8f9 0%, var(--bento-page) 42%, #e8eef0 100%);
+  background: var(--bento-page);
 }
 
 .fh-bento *,
@@ -81,7 +73,7 @@
 .fh-bento-zone strong {
   font-family: var(--bento-display);
   font-weight: 700;
-  letter-spacing: -0.04em;
+  letter-spacing: -0.025em;
 }
 
 .fh-bento__masthead {
@@ -109,10 +101,10 @@
 .fh-bento__title {
   margin: 0;
   color: var(--bento-ink);
-  font-size: clamp(1.7rem, 2.4vw, 2.2rem);
-  font-weight: 800;
-  letter-spacing: -0.045em;
-  line-height: 1.08;
+  font-size: clamp(1.55rem, 2.2vw, 2rem);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
 }
 
 .fh-bento__grid {
@@ -142,46 +134,17 @@
   padding: var(--bento-pad);
   border: 1px solid var(--bento-line);
   border-radius: var(--bento-radius);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0.42)),
-    var(--bento-white);
+  background: var(--bento-white);
   box-shadow: var(--bento-shadow);
 }
 
-.fh-bento-card--sky {
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.62), rgba(197, 235, 246, 0.58)),
-    var(--bento-sky);
-}
-
-.fh-bento-card--mint {
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.55), rgba(200, 243, 228, 0.7)),
-    var(--bento-mint);
-}
-
-.fh-bento-card--lavender {
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.68), rgba(227, 234, 243, 0.55)),
-    var(--bento-lavender);
-}
-
-.fh-bento-card--butter {
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.5), rgba(255, 233, 168, 0.72)),
-    var(--bento-butter);
-}
-
-.fh-bento-card--coral {
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.58), rgba(255, 210, 196, 0.6)),
-    var(--bento-coral);
-}
-
+.fh-bento-card--sky,
+.fh-bento-card--mint,
+.fh-bento-card--lavender,
+.fh-bento-card--butter,
+.fh-bento-card--coral,
 .fh-bento-card--blush {
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.68), rgba(248, 227, 234, 0.5)),
-    var(--bento-blush);
+  background: var(--bento-white);
 }
 
 .fh-bento-card__head {
@@ -208,18 +171,18 @@
   color: var(--bento-muted);
   font-family: var(--bento-font);
   font-size: 0.7rem;
-  font-weight: 700;
-  letter-spacing: 0.12em;
+  font-weight: 600;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
 .fh-bento-card__title {
   margin: 0;
   color: var(--bento-ink);
-  font-size: 1.18rem;
-  font-weight: 700;
-  letter-spacing: -0.035em;
-  line-height: 1.15;
+  font-size: 1.05rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
 }
 
 .fh-bento-card__subtitle {
@@ -236,23 +199,19 @@
   display: inline-grid;
   place-items: center;
   flex: 0 0 auto;
-  width: 2.5rem;
-  height: 2.5rem;
-  border-radius: 12px;
-  color: var(--bento-ink);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.45));
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.9),
-    inset 0 -1px 0 rgba(28, 36, 56, 0.06),
-    0 6px 12px rgba(28, 36, 56, 0.08);
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: var(--bento-radius-sm);
+  color: var(--bento-accent);
+  background: var(--bento-muted-bg);
+  box-shadow: none;
 }
 
-.fh-bento-icon--sky { background: linear-gradient(180deg, #f4faff, var(--bento-sky-deep)); }
-.fh-bento-icon--mint { background: linear-gradient(180deg, #f4fffa, var(--bento-mint-deep)); }
-.fh-bento-icon--lavender { background: linear-gradient(180deg, #f7f5ff, var(--bento-lavender-deep)); }
-.fh-bento-icon--butter { background: linear-gradient(180deg, #fffdf4, var(--bento-butter-deep)); }
-.fh-bento-icon--coral { background: linear-gradient(180deg, #fff7f4, var(--bento-coral-deep)); }
+.fh-bento-icon--sky { color: #3b82f6; background: #eff6ff; }
+.fh-bento-icon--mint { color: #059669; background: #ecfdf5; }
+.fh-bento-icon--lavender { color: #8b5cf6; background: #f5f3ff; }
+.fh-bento-icon--butter { color: #d97706; background: #fffbeb; }
+.fh-bento-icon--coral { color: #ef4444; background: #fef2f2; }
 
 .fh-bento-card__body {
   display: flex;
@@ -272,11 +231,11 @@
   margin: 0;
   color: var(--bento-ink);
   font-size: clamp(2.55rem, 4.6vw, 3.5rem);
-  font-weight: 800;
-  letter-spacing: -0.055em;
+  font-weight: 700;
+  letter-spacing: -0.04em;
   line-height: 0.92;
   font-variant-numeric: tabular-nums;
-  text-shadow: 0 10px 24px rgba(20, 128, 168, 0.18);
+  text-shadow: none;
 }
 
 .fh-bento-clock__date {
@@ -294,9 +253,10 @@
   gap: 0.65rem;
   min-height: 44px;
   padding: 0.55rem 0.7rem;
-  border-radius: 14px;
-  background: rgba(255, 255, 255, 0.55);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  border: 1px solid var(--bento-line);
+  border-radius: var(--bento-radius-sm);
+  background: var(--bento-muted-bg);
+  box-shadow: none;
 }
 
 .fh-bento-weather strong,
@@ -327,17 +287,17 @@
   align-items: center;
   min-height: 36px;
   padding: 0.28rem 0.7rem;
-  border: 1px solid rgba(28, 36, 56, 0.08);
+  border: 1px solid var(--bento-line);
   border-radius: 999px;
   color: var(--bento-ink-soft);
   font-size: 0.8rem;
   font-weight: 600;
-  background: rgba(255, 255, 255, 0.72);
+  background: var(--bento-muted-bg);
 }
 
-.fh-bento-chip--open { background: #fff1d6; color: #8a5208; }
-.fh-bento-chip--done { background: #d8f6ea; color: #0b6b52; }
-.fh-bento-chip--alert { background: #ffe4dc; color: #b23a28; }
+.fh-bento-chip--open { background: #fffbeb; color: #b45309; border-color: #fde68a; }
+.fh-bento-chip--done { background: #ecfdf5; color: #047857; border-color: #a7f3d0; }
+.fh-bento-chip--alert { background: #fef2f2; color: #b91c1c; border-color: #fecaca; }
 
 .fh-bento-members {
   display: flex;
@@ -352,30 +312,25 @@
   min-height: 48px;
   min-width: 7.4rem;
   padding: 0.35rem 0.7rem 0.35rem 0.35rem;
-  border: 1px solid transparent;
-  border-radius: 999px;
+  border: 1px solid var(--bento-line);
+  border-radius: var(--bento-radius);
   color: var(--bento-ink);
   font: inherit;
   font-weight: 600;
-  background: rgba(255, 255, 255, 0.78);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.9),
-    0 4px 10px rgba(28, 36, 56, 0.06);
+  background: var(--bento-white);
+  box-shadow: none;
   cursor: pointer;
 }
 
 .fh-bento-member:hover,
 .fh-bento-member:focus-visible {
   outline: none;
-  box-shadow: var(--bento-shadow-hover);
+  background: var(--bento-muted-bg);
 }
 
 .fh-bento-member.is-selected {
-  border-color: rgba(28, 36, 56, 0.18);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.95),
-    0 0 0 2px rgba(15, 143, 123, 0.32),
-    0 6px 14px rgba(28, 36, 56, 0.1);
+  border-color: var(--bento-accent);
+  box-shadow: 0 0 0 2px rgba(42, 64, 116, 0.25);
 }
 
 .fh-bento-avatar {
@@ -383,10 +338,10 @@
   place-items: center;
   width: 2.15rem;
   height: 2.15rem;
-  border-radius: 50%;
-  font-size: 0.78rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
   font-weight: 700;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.55);
+  box-shadow: none;
 }
 
 .fh-bento-actions {
@@ -403,29 +358,25 @@
   gap: 0.28rem;
   min-height: 56px;
   padding: 0.7rem 0.75rem;
-  border: 1px solid rgba(28, 36, 56, 0.07);
-  border-radius: 16px;
+  border: 1px solid var(--bento-line);
+  border-radius: var(--bento-radius);
   color: var(--bento-ink);
   font: inherit;
-  font-weight: 700;
+  font-weight: 600;
   text-align: left;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.55));
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.95),
-    0 5px 12px rgba(28, 36, 56, 0.08);
+  background: var(--bento-muted-bg);
+  box-shadow: none;
   cursor: pointer;
 }
 
 .fh-bento-action:hover,
 .fh-bento-action:focus-visible {
   outline: none;
-  transform: translateY(-1px);
-  box-shadow: var(--bento-shadow-hover);
+  background: #e2e8f0;
 }
 
 .fh-bento-action:active {
-  transform: translateY(1px);
+  transform: none;
 }
 
 .fh-bento-action small {
@@ -441,38 +392,39 @@
   gap: 0.35rem;
   min-height: 44px;
   padding: 0.45rem 0.85rem;
-  border: 1px solid rgba(28, 36, 56, 0.08);
-  border-radius: 999px;
+  border: 1px solid var(--bento-line);
+  border-radius: var(--bento-radius);
   color: var(--bento-ink);
   font: inherit;
   font-size: 0.86rem;
-  font-weight: 700;
-  background:
-    linear-gradient(180deg, #ffffff, #f3f5f8);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.95),
-    0 4px 10px rgba(28, 36, 56, 0.07);
+  font-weight: 600;
+  background: var(--bento-white);
+  box-shadow: none;
   cursor: pointer;
 }
 
 .fh-bento-btn:hover,
 .fh-bento-btn:focus-visible {
   outline: none;
-  box-shadow:
-    0 0 0 3px rgba(15, 143, 123, 0.22),
-    var(--bento-shadow);
+  background: var(--bento-muted-bg);
+  box-shadow: 0 0 0 2px rgba(42, 64, 116, 0.28);
 }
 
 .fh-bento-btn--primary {
   color: #fff;
   border-color: transparent;
-  background: linear-gradient(180deg, #1a9bb8, #1578a6);
+  background: var(--bento-accent);
+}
+
+.fh-bento-btn--primary:hover,
+.fh-bento-btn--primary:focus-visible {
+  background: var(--bento-accent-2);
 }
 
 .fh-bento-btn--mint {
   color: #fff;
   border-color: transparent;
-  background: linear-gradient(180deg, #1aa886, #0d8a6c);
+  background: #10b981;
 }
 
 .fh-bento-snapshot {
@@ -489,10 +441,8 @@
   width: 5.5rem;
   height: 5.5rem;
   border-radius: 50%;
-  background: conic-gradient(var(--bento-mint-strong) calc(var(--pct) * 1%), #e4e9ef 0);
-  box-shadow:
-    inset 0 1px 2px rgba(255, 255, 255, 0.7),
-    0 8px 18px rgba(13, 138, 108, 0.18);
+  background: conic-gradient(var(--bento-mint-strong) calc(var(--pct) * 1%), #e2e8f0 0);
+  box-shadow: none;
 }
 
 .fh-bento-ring__hole {
@@ -578,19 +528,19 @@
   min-height: 48px;
   padding: 0.45rem 0.6rem;
   border: 0;
-  border-radius: 14px;
+  border-radius: var(--bento-radius-sm);
   color: inherit;
   font: inherit;
   text-align: left;
-  background: rgba(255, 255, 255, 0.62);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
+  background: var(--bento-muted-bg);
+  box-shadow: none;
   cursor: pointer;
 }
 
 .fh-bento-row:hover,
 .fh-bento-row:focus-visible {
   outline: none;
-  background: rgba(255, 255, 255, 0.9);
+  background: #e2e8f0;
 }
 
 .fh-bento-row.is-done .fh-bento-row__title {
@@ -640,7 +590,7 @@
   height: 0.55rem;
   border-radius: 50%;
   background: var(--bento-sky-strong);
-  box-shadow: 0 0 0 3px rgba(20, 128, 168, 0.18);
+  box-shadow: none;
 }
 
 .fh-bento-dot--alert { background: var(--bento-coral-strong); }
@@ -663,9 +613,10 @@
 
 .fh-bento-mini-cal {
   padding: 0.65rem 0.7rem 0.75rem;
-  border-radius: 16px;
-  background: rgba(255, 255, 255, 0.62);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  border: 1px solid var(--bento-line);
+  border-radius: var(--bento-radius);
+  background: var(--bento-muted-bg);
+  box-shadow: none;
 }
 
 .fh-bento-mini-cal__label {
@@ -706,7 +657,7 @@
 .fh-bento-mini-cal__day.is-muted { color: #9aa3b2; }
 .fh-bento-mini-cal__day.is-today {
   color: #fff;
-  background: linear-gradient(180deg, #1a9bb8, #1578a6);
+  background: var(--bento-accent);
 }
 .fh-bento-mini-cal__day.has-events:not(.is-today) {
   box-shadow: inset 0 -2px 0 var(--bento-sky-strong);
@@ -724,9 +675,10 @@
   gap: 0.1rem;
   min-height: 64px;
   padding: 0.55rem 0.6rem;
-  border-radius: 14px;
-  background: rgba(255, 255, 255, 0.7);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.85);
+  border: 1px solid var(--bento-line);
+  border-radius: var(--bento-radius);
+  background: var(--bento-muted-bg);
+  box-shadow: none;
 }
 
 .fh-bento-zone strong {
@@ -751,16 +703,16 @@
   flex: 1 1 auto;
   min-height: 44px;
   padding: 0.5rem 0.8rem;
-  border: 1px solid rgba(28, 36, 56, 0.1);
-  border-radius: 999px;
+  border: 1px solid var(--bento-line);
+  border-radius: var(--bento-radius);
   color: var(--bento-ink);
   font: inherit;
-  background: rgba(255, 255, 255, 0.86);
+  background: var(--bento-white);
 }
 
 .fh-bento-composer input:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 3px rgba(15, 143, 123, 0.22);
+  box-shadow: 0 0 0 2px rgba(42, 64, 116, 0.28);
 }
 
 .fh-bento-links {
@@ -776,7 +728,7 @@
 
 .fh-bento button:focus-visible,
 .fh-bento input:focus-visible {
-  outline: 3px solid rgba(15, 143, 123, 0.35);
+  outline: 2px solid rgba(42, 64, 116, 0.45);
   outline-offset: 2px;
 }
 

@@ -48,14 +48,8 @@ import {
   kitchenDutyRelatedNotificationId,
   labelKitchenWeekday,
 } from "../../lib/kitchenDuty";
-import { getMemberColor } from "../../lib/memberColors";
 import { selectUpcomingEventsForHousehold } from "../../lib/upcomingEvents";
-import {
-  findMemberById,
-  getMemberFullName,
-  getMemberInitials,
-  getNextDueDate,
-} from "../../lib/utils";
+import { findMemberById, getMemberFullName, getMemberInitials, getNextDueDate } from "../../lib/utils";
 import { createShoppingItemFromName } from "../../pages/shopping/shoppingUtils";
 import { findDuplicateShoppingIndex } from "../../services/rulesEngine";
 import { StartPageCustomizeBar } from "../startPage";
@@ -75,6 +69,20 @@ export type NotionHomeWorkspaceProps = {
 const WEEKDAY_LABELS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"] as const;
 const MESSAGE_PREVIEW_LIMIT = 4;
 const NOTIFICATION_PREVIEW_LIMIT = 5;
+
+/** Home-only Prism-style member dots. Does not change stored member colors. */
+const HOME_MEMBER_DOTS = [
+  "#3B82F6",
+  "#EC4899",
+  "#10B981",
+  "#F59E0B",
+  "#8B5CF6",
+  "#EF4444",
+] as const;
+
+function homeMemberDot(index: number): string {
+  return HOME_MEMBER_DOTS[index % HOME_MEMBER_DOTS.length];
+}
 
 function localTodayIso(date = new Date()): string {
   const year = date.getFullYear();
@@ -553,8 +561,8 @@ export function NotionHomeWorkspace({
             {wakeMembers.length === 0 ? (
               <p className="fh-bento-empty">No active family members yet. Add them in Settings.</p>
             ) : (
-              wakeMembers.map((member) => {
-                const color = getMemberColor(member);
+              wakeMembers.map((member, index) => {
+                const color = homeMemberDot(index);
                 const selected = member.id === selectedMemberId;
                 return (
                   <button
@@ -571,8 +579,8 @@ export function NotionHomeWorkspace({
                       className="fh-bento-avatar"
                       style={
                         {
-                          backgroundColor: `${color}22`,
-                          color,
+                          backgroundColor: color,
+                          color: "#fff",
                         } as CSSProperties
                       }
                       aria-hidden
