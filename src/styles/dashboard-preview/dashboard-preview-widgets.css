@@ -123,7 +123,7 @@
 
 .dashboard-preview__chip--shopping {
   background: var(--dp-shopping-soft);
-  color: #247a61;
+  color: #1a6b52;
 }
 
 .dashboard-preview__chip--calendar {
@@ -393,6 +393,11 @@
   display: grid;
   gap: 8px;
   padding-bottom: 4px;
+}
+
+.dashboard-preview__kitchen-block .dashboard-preview__button {
+  justify-self: start;
+  width: auto;
 }
 
 .dashboard-preview__hero-name {
@@ -729,10 +734,8 @@
 
 .dashboard-preview__pantry-stat span {
   color: var(--dp-text-secondary);
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.02em;
 }
 
 .dashboard-preview__pantry-zones {
