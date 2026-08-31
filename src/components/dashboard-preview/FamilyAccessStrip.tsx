@@ -31,6 +31,8 @@ export function FamilyAccessStrip({
   onOpenMemberDashboard,
 }: FamilyAccessStripProps) {
   const { orderedMembers, selectedMemberId } = model;
+  const memberCountLabel =
+    orderedMembers.length === 1 ? "1 member" : `${orderedMembers.length} members`;
 
   const openMember = (memberId: string) => {
     if (onOpenMemberDashboard) {
@@ -41,10 +43,17 @@ export function FamilyAccessStrip({
   };
 
   return (
-    <section className="dashboard-preview__card" aria-label="Family access">
-      <header className="dashboard-preview__card-head">
+    <section
+      className="dashboard-preview__card dashboard-preview__card--compact dashboard-preview__family-strip"
+      aria-label="Family access"
+    >
+      <header className="dashboard-preview__card-head dashboard-preview__card-head--row dashboard-preview__card-head--compact">
         <h2 className="dashboard-preview__section-title">Family</h2>
-        <p className="dashboard-preview__meta">Tap a profile to open their dashboard</p>
+        <p className="dashboard-preview__meta">
+          {orderedMembers.length === 0
+            ? "Add members in Settings"
+            : `${memberCountLabel} · tap to open`}
+        </p>
       </header>
 
       {orderedMembers.length === 0 ? (
@@ -52,13 +61,15 @@ export function FamilyAccessStrip({
           No active family members yet. Add them in Settings.
         </p>
       ) : (
-        <div className="dashboard-preview__family">
+        <div className="dashboard-preview__family" role="list" aria-label="Family members">
           {orderedMembers.map((member, index) => {
             const selected = member.id === selectedMemberId;
+            const displayName = firstName(getMemberFullName(member));
             return (
               <button
                 key={member.id}
                 type="button"
+                role="listitem"
                 className={[
                   "dashboard-preview__family-member",
                   selected ? "is-selected" : "",
@@ -67,6 +78,7 @@ export function FamilyAccessStrip({
                   .join(" ")}
                 onClick={() => openMember(member.id)}
                 aria-pressed={selected}
+                title={getMemberFullName(member)}
                 aria-label={`${getMemberFullName(member)}${selected ? ", current" : ""}`}
               >
                 <span
@@ -76,9 +88,7 @@ export function FamilyAccessStrip({
                 >
                   {getMemberInitials(member)}
                 </span>
-                <span className="dashboard-preview__family-name">
-                  {firstName(getMemberFullName(member))}
-                </span>
+                <span className="dashboard-preview__family-name">{displayName}</span>
               </button>
             );
           })}

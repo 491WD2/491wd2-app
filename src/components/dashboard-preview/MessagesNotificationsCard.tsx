@@ -1,4 +1,3 @@
-import { Bell } from "lucide-react";
 import type { DashboardPreviewModel } from "../../lib/dashboard-preview/useDashboardPreviewModel";
 import type { DashboardGo } from "./types";
 
@@ -47,7 +46,6 @@ export function MessagesNotificationsCard({ model, go }: MessagesNotificationsCa
           {attentionNotifications.map((note) => (
             <li key={note.id}>
               <button type="button" className="dashboard-preview__row" onClick={() => go("/notifications")}>
-                <Bell className="dashboard-preview__row-icon" aria-hidden="true" />
                 <span className="dashboard-preview__row-badge dashboard-preview__row-badge--notification">
                   Alert
                 </span>

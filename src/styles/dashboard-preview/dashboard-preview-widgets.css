@@ -19,6 +19,49 @@
   padding: 14px 16px;
 }
 
+.dashboard-preview__card-head--compact {
+  margin-bottom: 8px;
+}
+
+.dashboard-preview__card-head--compact .dashboard-preview__meta {
+  margin-top: 0;
+}
+
+.dashboard-preview__card-head--row.dashboard-preview__card-head--compact {
+  align-items: center;
+}
+
+.dashboard-preview__card-head--row.dashboard-preview__card-head--compact .dashboard-preview__section-title {
+  font-size: 15px;
+}
+
+.dashboard-preview__family-strip .dashboard-preview__family {
+  margin-top: 2px;
+}
+
+.dashboard-preview__card--snapshot .dashboard-preview__snapshot {
+  margin-top: 2px;
+}
+
+.dashboard-preview__card--pantry .dashboard-preview__pantry-body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.dashboard-preview__placeholder--inline {
+  padding: 4px 0 0;
+}
+
+.dashboard-preview__row--alert {
+  border-color: rgba(234, 164, 58, 0.22);
+  background: var(--dp-pantry-soft);
+}
+
+.dashboard-preview__pantry-alerts {
+  margin: 0;
+}
+
 .dashboard-preview__card-head {
   margin-bottom: var(--dp-gap-section);
 }
@@ -630,16 +673,30 @@
   border-left: 1px solid var(--dp-divider);
 }
 
-.dashboard-preview__upcoming .dashboard-preview__subsection-title {
-  margin-top: 0;
-  font-size: 12px;
-  color: var(--dp-text-secondary);
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
+.dashboard-preview__upcoming-panel {
+  min-width: 0;
+  padding-left: 12px;
+  border-left: 1px solid var(--dp-divider);
 }
 
-.dashboard-preview__upcoming .dashboard-preview__list {
+.dashboard-preview__upcoming-label {
+  margin: 0 0 2px;
+  color: var(--dp-text-muted);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.dashboard-preview__upcoming-heading {
+  margin: 0 0 8px;
+  color: var(--dp-text);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.dashboard-preview__upcoming-panel .dashboard-preview__list {
   max-height: 220px;
   overflow-y: auto;
 }
@@ -757,7 +814,7 @@
 }
 
 @media (max-width: 1180px) {
-  .dashboard-preview__upcoming {
+  .dashboard-preview__upcoming-panel {
     padding-left: 0;
     border-left: none;
     padding-top: 12px;
