@@ -1557,14 +1557,6 @@
   outline-offset: 2px;
 }
 
-/* ── Family below grid ── */
-.dashboard-preview__family-below .dashboard-preview__family-integrated-head {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 8px;
-}
-
 .dashboard-preview__upcoming-row:focus-visible {
   outline: 2px solid var(--dp-blue);
   outline-offset: 2px;

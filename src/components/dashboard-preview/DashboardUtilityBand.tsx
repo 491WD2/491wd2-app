@@ -18,8 +18,14 @@ export function DashboardUtilityBand({
   onOpenTasks,
   onOpenCalendar,
 }: DashboardUtilityBandProps) {
-  const { greeting, clock, kitchenStatus, openChoreCount, shoppingCount, todayEventCount } =
+  const { greeting, clock, kitchenAssigned, kitchenComplete, openChoreCount, shoppingCount, todayEventCount } =
     model;
+
+  const kitchenLabel = kitchenComplete
+    ? "Kitchen complete"
+    : kitchenAssigned
+      ? "Kitchen assigned"
+      : "Kitchen";
 
   return (
     <header className="dashboard-preview__utility-band" aria-label="Dashboard utility band">
@@ -38,7 +44,7 @@ export function DashboardUtilityBand({
             className="dashboard-preview__chip dashboard-preview__chip--kitchen"
             onClick={() => go("/tasks", onOpenTasks)}
           >
-            Kitchen · {kitchenStatus}
+            Kitchen · {kitchenLabel}
           </button>
           <button
             type="button"

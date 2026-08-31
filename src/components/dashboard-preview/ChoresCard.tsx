@@ -3,7 +3,6 @@ import type { Dispatch, SetStateAction } from "react";
 import type { FamilyData, Task } from "../../data/familyData";
 import { createToggleTodayChore, isDoneToday } from "../../lib/dashboard-preview/dashboardPreviewHandlers";
 import type { DashboardPreviewModel } from "../../lib/dashboard-preview/useDashboardPreviewModel";
-import { findMemberById, getMemberFullName } from "../../lib/utils";
 import type { DashboardGo } from "./types";
 
 type ChoresCardProps = {
@@ -14,8 +13,8 @@ type ChoresCardProps = {
   onOpenTasks?: () => void;
 };
 
-export function ChoresCard({ data, model, setData, go, onOpenTasks }: ChoresCardProps) {
-  const { todayIso, todayChores, todayRows, openChoreCount, kitchenName } = model;
+export function ChoresCard({ model, setData, go, onOpenTasks }: ChoresCardProps) {
+  const { todayIso, todayChores, todayRows, openChoreCount } = model;
   const toggleTodayChore = createToggleTodayChore({ todayIso, setData });
 
   const choreRows = todayChores.length > 0 ? todayChores.slice(0, 6) : [];
@@ -33,7 +32,6 @@ export function ChoresCard({ data, model, setData, go, onOpenTasks }: ChoresCard
             <h2 className="dashboard-preview__section-title">Chores</h2>
             <p className="dashboard-preview__meta">
               {openChoreCount === 1 ? "1 open today" : `${openChoreCount} open today`}
-              {kitchenName ? ` · Kitchen: ${kitchenName}` : ""}
             </p>
           </div>
         </div>
@@ -50,7 +48,6 @@ export function ChoresCard({ data, model, setData, go, onOpenTasks }: ChoresCard
             <ChoreRow
               key={task.id}
               task={task}
-              data={data}
               todayIso={todayIso}
               onToggle={() => toggleTodayChore(task)}
             />
@@ -75,19 +72,16 @@ export function ChoresCard({ data, model, setData, go, onOpenTasks }: ChoresCard
 
 function ChoreRow({
   task,
-  data,
   todayIso,
   onToggle,
 }: {
   task: Task;
-  data: FamilyData;
   todayIso: string;
   onToggle: () => void;
 }) {
   const done = isDoneToday(task, todayIso);
-  const assignee = task.assignedMemberId
-    ? findMemberById(data, task.assignedMemberId)
-    : undefined;
+  const assignmentLabel =
+    task.assignedMemberId || task.owner?.trim() ? "Assigned" : "Household";
 
   return (
     <li>
@@ -103,8 +97,7 @@ function ChoreRow({
         <span className="dashboard-preview__row-main">
           <span className="dashboard-preview__row-title">{task.title}</span>
           <span className="dashboard-preview__row-meta">
-            {assignee ? getMemberFullName(assignee) : task.owner || "Household"} ·{" "}
-            {done ? "Done" : "Open"}
+            {assignmentLabel} · {done ? "Done" : "Open"}
           </span>
         </span>
       </button>

@@ -18,6 +18,11 @@ function formatDateBlock(dateIso: string): { day: string; month: string } {
   };
 }
 
+function upcomingTimeMeta(meta: string): string {
+  const [whenLabel] = meta.split(" · ");
+  return whenLabel?.trim() || meta;
+}
+
 export function UpcomingCard({ model, go, onOpenCalendar }: UpcomingCardProps) {
   const { upcomingAgendaHeading, upcomingRows } = model;
   const openCalendar = () => go("/calendar", onOpenCalendar);
@@ -57,7 +62,7 @@ export function UpcomingCard({ model, go, onOpenCalendar }: UpcomingCardProps) {
                   <span className="dashboard-preview__upcoming-dot" aria-hidden="true" />
                   <span className="dashboard-preview__upcoming-copy">
                     <span className="dashboard-preview__upcoming-title">{row.title}</span>
-                    <span className="dashboard-preview__upcoming-meta">{row.meta}</span>
+                    <span className="dashboard-preview__upcoming-meta">{upcomingTimeMeta(row.meta)}</span>
                   </span>
                 </button>
               </li>

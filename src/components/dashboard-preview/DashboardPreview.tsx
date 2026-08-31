@@ -5,7 +5,6 @@ import { CalendarCard } from "./CalendarCard";
 import { ChoresCard } from "./ChoresCard";
 import { DashboardPreviewShell } from "./DashboardPreviewShell";
 import { DashboardUtilityBand } from "./DashboardUtilityBand";
-import { FamilyAccessStrip } from "./FamilyAccessStrip";
 import { MessagesNotificationsCard } from "./MessagesNotificationsCard";
 import { PantryAlertsCard } from "./PantryAlertsCard";
 import { ShoppingCard } from "./ShoppingCard";
@@ -23,7 +22,6 @@ export function DashboardPreview({
   onOpenShopping,
   onOpenCalendar,
   onOpenTasks,
-  onOpenMemberDashboard,
 }: DashboardPreviewProps) {
   const [now, setNow] = useState(() => new Date());
   const model = useDashboardPreviewModel(data, now);
@@ -76,12 +74,6 @@ export function DashboardPreview({
         />
         <MessagesNotificationsCard model={model} go={go} />
       </div>
-
-      <FamilyAccessStrip
-        model={model}
-        go={go}
-        onOpenMemberDashboard={onOpenMemberDashboard}
-      />
     </DashboardPreviewShell>
   );
 }

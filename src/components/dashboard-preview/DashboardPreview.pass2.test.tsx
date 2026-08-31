@@ -34,7 +34,11 @@ describe("DashboardPreview Pass 2 smoke", () => {
     ).not.toBeInTheDocument();
     expect(screen.getByLabelText(/Dashboard utility band/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/Primary dashboard widgets/i)).toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: /^Family$/i })).toBeInTheDocument();
+    expect(screen.queryByRole("heading", { name: /^Family$/i })).not.toBeInTheDocument();
+    expect(screen.queryByLabelText(/Family access/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/tap to open/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Hershel/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Lorraine/i)).not.toBeInTheDocument();
     expect(screen.getByRole("region", { name: /Quick add/i })).toBeInTheDocument();
     expect(screen.queryByRole("heading", { name: /Today's kitchen duty/i })).not.toBeInTheDocument();
     expect(screen.queryByText(/Kitchen today/i)).not.toBeInTheDocument();

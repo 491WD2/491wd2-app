@@ -125,25 +125,6 @@
   min-width: 0;
 }
 
-/* ── Family below grid ── */
-.dashboard-preview__family-below {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  padding: 12px 16px;
-  border-radius: var(--dp-radius-card);
-  background: var(--dp-card);
-  border: 1px solid var(--dp-divider);
-  box-shadow: var(--dp-shadow-low);
-}
-
-.dashboard-preview__family {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 5px;
-  align-items: center;
-}
-
 /* Legacy helpers kept for component internals */
 .dashboard-preview__region,
 .dashboard-preview__main-split,
