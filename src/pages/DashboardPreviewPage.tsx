@@ -15,28 +15,28 @@ export type DashboardPreviewPageProps = {
 };
 
 /**
- * `/dashboard-preview` — isolated visual experiment.
- * Props mirror Home for CurrentBuild wiring; mutations are not used in the shell pass.
+ * `/dashboard-preview` — isolated visual experiment with live household data.
  */
 export function DashboardPreviewPage({
   data,
-  setData: _setData,
-  navigateWithinApp: _navigate,
-  onOpenPantry: _pantry,
-  onOpenShopping: _shopping,
-  onOpenTasks: _tasks,
-  onOpenCalendar: _calendar,
-  onOpenSettings: _settings,
-  onOpenMemberDashboard: _member,
+  setData,
+  navigateWithinApp,
+  onOpenPantry,
+  onOpenShopping,
+  onOpenTasks,
+  onOpenCalendar,
+  onOpenMemberDashboard,
 }: DashboardPreviewPageProps) {
-  void _setData;
-  void _navigate;
-  void _pantry;
-  void _shopping;
-  void _tasks;
-  void _calendar;
-  void _settings;
-  void _member;
-
-  return <DashboardPreview data={data} />;
+  return (
+    <DashboardPreview
+      data={data}
+      setData={setData}
+      navigateWithinApp={navigateWithinApp}
+      onOpenPantry={onOpenPantry}
+      onOpenShopping={onOpenShopping}
+      onOpenCalendar={onOpenCalendar}
+      onOpenTasks={onOpenTasks}
+      onOpenMemberDashboard={onOpenMemberDashboard}
+    />
+  );
 }

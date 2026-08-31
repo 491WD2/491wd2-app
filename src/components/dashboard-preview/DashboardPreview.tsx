@@ -1,144 +1,95 @@
-import type { ReactNode } from "react";
-import type { FamilyData } from "../../data/familyData";
+import { useEffect, useState } from "react";
+import { useDashboardPreviewModel } from "../../lib/dashboard-preview/useDashboardPreviewModel";
 import "../../styles/dashboard-preview/dashboard-preview.css";
+import { CalendarUpcomingCard } from "./CalendarUpcomingCard";
 import { DashboardPreviewShell } from "./DashboardPreviewShell";
-
-export type DashboardPreviewProps = {
-  data: FamilyData;
-};
-
-const PLACEHOLDER_COPY = "Preview data will connect in the next implementation pass.";
-
-const QUICK_ADD_ACTIONS = [
-  { label: "Add shopping", hint: "Grocery item" },
-  { label: "Add chore", hint: "Task for today" },
-  { label: "Add event", hint: "Calendar" },
-  { label: "Add note", hint: "Family message" },
-] as const;
-
-const SNAPSHOT_METRICS = [
-  { key: "chores", label: "Chores", className: "dashboard-preview__metric--chores" },
-  { key: "events", label: "Events", className: "dashboard-preview__metric--events" },
-  { key: "shopping", label: "Shopping", className: "dashboard-preview__metric--shopping" },
-  { key: "messages", label: "Messages", className: "dashboard-preview__metric--messages" },
-] as const;
-
-function PreviewCard({
-  title,
-  subtitle,
-  compact,
-  children,
-}: {
-  title: string;
-  subtitle?: string;
-  compact?: boolean;
-  children?: ReactNode;
-}) {
-  return (
-    <section
-      className={[
-        "dashboard-preview__card",
-        compact ? "dashboard-preview__card--compact" : "",
-      ]
-        .filter(Boolean)
-        .join(" ")}
-      aria-label={title}
-    >
-      <header className="dashboard-preview__card-head">
-        <h2 className="dashboard-preview__section-title">{title}</h2>
-        {subtitle ? <p className="dashboard-preview__meta">{subtitle}</p> : null}
-      </header>
-      <div className="dashboard-preview__card-body">
-        {children ?? <p className="dashboard-preview__placeholder">{PLACEHOLDER_COPY}</p>}
-      </div>
-    </section>
-  );
-}
+import { DashboardStatusHeader } from "./DashboardStatusHeader";
+import { FamilyAccessStrip } from "./FamilyAccessStrip";
+import { KitchenChoresCard } from "./KitchenChoresCard";
+import { MessagesNotificationsCard } from "./MessagesNotificationsCard";
+import { PantryAlertsCard } from "./PantryAlertsCard";
+import { QuickAddPanel } from "./QuickAddPanel";
+import { ShoppingCard } from "./ShoppingCard";
+import { TodaySnapshot } from "./TodaySnapshot";
+import type { DashboardPreviewProps } from "./types";
 
 /**
- * Dashboard preview — Pass 1: shell, layout, and labeled placeholders only.
+ * Dashboard preview — live household data wired to the visual experiment shell.
  */
-export function DashboardPreview({ data: _data }: DashboardPreviewProps) {
-  void _data;
+export function DashboardPreview({
+  data,
+  setData,
+  navigateWithinApp,
+  onOpenPantry,
+  onOpenShopping,
+  onOpenCalendar,
+  onOpenTasks,
+  onOpenMemberDashboard,
+}: DashboardPreviewProps) {
+  const [now, setNow] = useState(() => new Date());
+  const model = useDashboardPreviewModel(data, now);
+
+  useEffect(() => {
+    const id = window.setInterval(() => setNow(new Date()), 15_000);
+    return () => window.clearInterval(id);
+  }, []);
+
+  function go(href: string, fallback?: () => void) {
+    navigateWithinApp(href);
+    fallback?.();
+  }
 
   return (
     <DashboardPreviewShell>
-      <section className="dashboard-preview__status" aria-label="Household status header">
-        <div className="dashboard-preview__status-col">
-          <p className="dashboard-preview__status-label">Greeting</p>
-          <p className="dashboard-preview__status-time" aria-hidden>
-            —
-          </p>
-          <p className="dashboard-preview__status-sub">Date</p>
-        </div>
-        <div className="dashboard-preview__status-col">
-          <p className="dashboard-preview__status-label">Household status</p>
-          <div className="dashboard-preview__status-chips">
-            <span className="dashboard-preview__chip dashboard-preview__chip--kitchen">
-              Kitchen
-            </span>
-            <span className="dashboard-preview__chip dashboard-preview__chip--calendar">
-              Chores
-            </span>
-            <span className="dashboard-preview__chip dashboard-preview__chip--shopping">
-              Shopping
-            </span>
-          </div>
-        </div>
-        <div className="dashboard-preview__status-col">
-          <p className="dashboard-preview__status-label">Weather</p>
-          <p className="dashboard-preview__status-sub">Local forecast unavailable</p>
-        </div>
-      </section>
+      <DashboardStatusHeader
+        model={model}
+        go={go}
+        onOpenTasks={onOpenTasks}
+        onOpenShopping={onOpenShopping}
+      />
 
-      <PreviewCard title="Family members" subtitle="Member access">
-        <div className="dashboard-preview__family">
-          <p className="dashboard-preview__placeholder">{PLACEHOLDER_COPY}</p>
-        </div>
-      </PreviewCard>
+      <FamilyAccessStrip model={model} go={go} onOpenMemberDashboard={onOpenMemberDashboard} />
 
       <div className="dashboard-preview__tools-row">
-        <PreviewCard title="Quick Add" subtitle="Household actions">
-          <div className="dashboard-preview__quick-actions">
-            {QUICK_ADD_ACTIONS.map((action) => (
-              <div key={action.label} className="dashboard-preview__action-tile">
-                {action.label}
-                <small>{action.hint}</small>
-              </div>
-            ))}
-          </div>
-        </PreviewCard>
-
-        <PreviewCard title="Today snapshot" subtitle="Chores · Events · Shopping · Messages">
-          <div className="dashboard-preview__snapshot">
-            {SNAPSHOT_METRICS.map((metric) => (
-              <div
-                key={metric.key}
-                className={["dashboard-preview__metric", metric.className].join(" ")}
-              >
-                <span className="dashboard-preview__metric-count" aria-hidden>
-                  —
-                </span>
-                <span className="dashboard-preview__metric-label">{metric.label}</span>
-              </div>
-            ))}
-          </div>
-        </PreviewCard>
+        <QuickAddPanel
+          go={go}
+          onOpenShopping={onOpenShopping}
+          onOpenTasks={onOpenTasks}
+          onOpenCalendar={onOpenCalendar}
+        />
+        <TodaySnapshot model={model} />
       </div>
 
       <div className="dashboard-preview__household-grid">
         <div className="dashboard-preview__utility">
-          <PreviewCard title="Kitchen duty & today's chores" />
-          <PreviewCard title="Shopping list" />
-          <PreviewCard title="Pantry & storage alerts" />
+          <KitchenChoresCard
+            data={data}
+            model={model}
+            now={now}
+            setData={setData}
+            go={go}
+            onOpenTasks={onOpenTasks}
+          />
+          <ShoppingCard
+            data={data}
+            model={model}
+            setData={setData}
+            go={go}
+            onOpenShopping={onOpenShopping}
+          />
+          <PantryAlertsCard
+            model={model}
+            go={go}
+            onOpenPantry={onOpenPantry}
+            onOpenCalendar={onOpenCalendar}
+            onOpenTasks={onOpenTasks}
+            onOpenShopping={onOpenShopping}
+          />
         </div>
 
         <div className="dashboard-preview__information">
-          <div className="dashboard-preview__calendar-row">
-            <PreviewCard title="Calendar" subtitle="Mini month" />
-            <PreviewCard title="Upcoming" subtitle="Event list" compact />
-          </div>
-          <PreviewCard title="Messages & notifications" />
+          <CalendarUpcomingCard model={model} go={go} onOpenCalendar={onOpenCalendar} />
+          <MessagesNotificationsCard model={model} go={go} />
         </div>
       </div>
     </DashboardPreviewShell>
