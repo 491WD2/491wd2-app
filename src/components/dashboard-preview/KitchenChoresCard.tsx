@@ -70,30 +70,33 @@ export function KitchenChoresCard({
         </button>
       </header>
 
-      <p className="dashboard-preview__hero-name">{kitchenName}</p>
-      <p className="dashboard-preview__chip-row">
-        <span className="dashboard-preview__chip">{kitchenDayLabel}</span>
-        <span
+      <div className="dashboard-preview__kitchen-block">
+        <p className="dashboard-preview__hero-name">{kitchenName}</p>
+        <p className="dashboard-preview__chip-row">
+          <span className="dashboard-preview__chip">{kitchenDayLabel}</span>
+          <span
+            className={[
+              "dashboard-preview__chip",
+              kitchenComplete ? "dashboard-preview__chip--done" : "dashboard-preview__chip--open",
+            ].join(" ")}
+          >
+            {kitchenComplete ? "Completed" : "Still open"}
+          </span>
+        </p>
+        <button
+          type="button"
           className={[
-            "dashboard-preview__chip",
-            kitchenComplete ? "dashboard-preview__chip--done" : "dashboard-preview__chip--open",
-          ].join(" ")}
+            "dashboard-preview__button",
+            "dashboard-preview__button--compact",
+            kitchenComplete ? "dashboard-preview__button--secondary" : "",
+          ]
+            .filter(Boolean)
+            .join(" ")}
+          onClick={toggleKitchenTodayDone}
         >
-          {kitchenComplete ? "Completed" : "Still open"}
-        </span>
-      </p>
-      <button
-        type="button"
-        className={[
-          "dashboard-preview__button",
-          kitchenComplete ? "dashboard-preview__button--secondary" : "",
-        ]
-          .filter(Boolean)
-          .join(" ")}
-        onClick={toggleKitchenTodayDone}
-      >
-        {kitchenComplete ? "Mark kitchen duty open" : "Mark kitchen duty done"}
-      </button>
+          {kitchenComplete ? "Mark kitchen duty open" : "Mark kitchen duty done"}
+        </button>
+      </div>
 
       <h3 className="dashboard-preview__subsection-title">Today&apos;s chores</h3>
       {todayChores.length === 0 && todayRows.length === 0 ? (

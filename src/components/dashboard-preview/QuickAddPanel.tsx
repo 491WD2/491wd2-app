@@ -66,12 +66,12 @@ export function QuickAddPanel({
             <button
               key={action.key}
               type="button"
-              className="dashboard-preview__action-tile"
+              className="dashboard-preview__quick-action"
+              aria-label={`${action.label}, ${action.hint}`}
               onClick={() => action.onClick(go, onOpenShopping, onOpenTasks, onOpenCalendar)}
             >
               <Icon className="dashboard-preview__action-icon" aria-hidden="true" />
-              {action.label}
-              <small>{action.hint}</small>
+              <span>{action.label}</span>
             </button>
           );
         })}

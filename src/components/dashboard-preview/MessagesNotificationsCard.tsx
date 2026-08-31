@@ -30,13 +30,15 @@ export function MessagesNotificationsCard({ model, go }: MessagesNotificationsCa
           {importantMessages.map((msg) => (
             <li key={msg.id}>
               <button type="button" className="dashboard-preview__row" onClick={() => go("/messages")}>
-                <span className="dashboard-preview__row-dot" aria-hidden="true" />
+                <span className="dashboard-preview__row-badge dashboard-preview__row-badge--message">
+                  {msg.pinned ? "Pinned" : "Message"}
+                </span>
                 <span className="dashboard-preview__row-main">
                   <span className="dashboard-preview__row-title">
                     {msg.title?.trim() || msg.message}
                   </span>
                   <span className="dashboard-preview__row-meta">
-                    {msg.pinned ? "Pinned" : msg.priority}
+                    {msg.pinned ? "Pinned note" : msg.priority}
                   </span>
                 </span>
               </button>
@@ -46,9 +48,12 @@ export function MessagesNotificationsCard({ model, go }: MessagesNotificationsCa
             <li key={note.id}>
               <button type="button" className="dashboard-preview__row" onClick={() => go("/notifications")}>
                 <Bell className="dashboard-preview__row-icon" aria-hidden="true" />
+                <span className="dashboard-preview__row-badge dashboard-preview__row-badge--notification">
+                  Alert
+                </span>
                 <span className="dashboard-preview__row-main">
                   <span className="dashboard-preview__row-title">{note.title}</span>
-                  <span className="dashboard-preview__row-meta">Notification</span>
+                  <span className="dashboard-preview__row-meta">Unread notification</span>
                 </span>
               </button>
             </li>

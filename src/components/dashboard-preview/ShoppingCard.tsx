@@ -40,7 +40,7 @@ export function ShoppingCard({
   }
 
   return (
-    <section className="dashboard-preview__card" aria-label="Shopping list">
+    <section className="dashboard-preview__card dashboard-preview__card--shopping-accent" aria-label="Shopping list">
       <header className="dashboard-preview__card-head dashboard-preview__card-head--row">
         <div className="dashboard-preview__card-head-with-icon">
           <ShoppingCart className="dashboard-preview__card-icon dashboard-preview__card-icon--shopping" aria-hidden="true" />

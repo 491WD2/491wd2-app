@@ -34,7 +34,8 @@ export function DashboardStatusHeader({
         </div>
       </div>
 
-      <div className="dashboard-preview__status-col">
+      <div className="dashboard-preview__status-col dashboard-preview__status-col--chips">
+        <p className="dashboard-preview__status-chips-label">Today at a glance</p>
         <div className="dashboard-preview__status-chips">
           <button
             type="button"

@@ -7,9 +7,9 @@
   /* Background */
   --dp-bg: #f4f7fb;
   --dp-page-bg:
-    radial-gradient(circle at 10% 10%, rgba(220, 235, 255, 0.75), transparent 30%),
-    radial-gradient(circle at 90% 12%, rgba(233, 226, 255, 0.55), transparent 32%),
-    radial-gradient(circle at 80% 88%, rgba(255, 228, 214, 0.45), transparent 30%),
+    radial-gradient(circle at 10% 10%, rgba(220, 235, 255, 0.65), transparent 28%),
+    radial-gradient(circle at 90% 12%, rgba(233, 226, 255, 0.45), transparent 30%),
+    radial-gradient(circle at 80% 88%, rgba(255, 228, 214, 0.35), transparent 28%),
     var(--dp-bg);
 
   /* Typography */
@@ -33,51 +33,51 @@
   --dp-pantry: #eaa43a;
   --dp-pantry-soft: #fff4dc;
 
-  /* Surfaces */
-  --dp-card: rgba(255, 255, 255, 0.72);
-  --dp-card-strong: rgba(255, 255, 255, 0.86);
-  --dp-card-fallback: rgba(255, 255, 255, 0.92);
-  --dp-nested: rgba(248, 250, 252, 0.82);
-  --dp-border: rgba(255, 255, 255, 0.82);
-  --dp-divider: rgba(226, 232, 240, 0.72);
+  /* Surfaces — flatter cards, opaque nested rows */
+  --dp-card: rgba(255, 255, 255, 0.9);
+  --dp-card-strong: #ffffff;
+  --dp-card-fallback: #ffffff;
+  --dp-nested: #f8fafc;
+  --dp-border: rgba(255, 255, 255, 0.92);
+  --dp-divider: rgba(226, 232, 240, 0.9);
 
-  /* Frame */
-  --dp-frame-pad: 24px;
-  --dp-shell-max-width: 1720px;
-  --dp-frame-bg: rgba(255, 255, 255, 0.46);
-  --dp-frame-border: 1px solid rgba(255, 255, 255, 0.78);
-  --dp-frame-shadow: 0 20px 60px rgba(30, 41, 59, 0.08);
-  --dp-frame-blur: 18px;
+  /* Frame — softened double-frame inside AppShell */
+  --dp-frame-pad: 20px;
+  --dp-shell-max-width: 1680px;
+  --dp-frame-bg: rgba(255, 255, 255, 0.34);
+  --dp-frame-border: 1px solid rgba(255, 255, 255, 0.62);
+  --dp-frame-shadow: 0 12px 36px rgba(30, 41, 59, 0.055);
+  --dp-frame-blur: 12px;
 
   /* Radii */
-  --dp-radius-shell: 28px;
-  --dp-radius-large: 22px;
-  --dp-radius-card: 20px;
-  --dp-radius-compact: 16px;
-  --dp-radius-row: 12px;
-  --dp-radius-btn: 11px;
+  --dp-radius-shell: 24px;
+  --dp-radius-large: 20px;
+  --dp-radius-card: 18px;
+  --dp-radius-compact: 14px;
+  --dp-radius-row: 10px;
+  --dp-radius-btn: 10px;
   --dp-radius-pill: 9999px;
 
   /* Spacing */
-  --dp-gap: 18px;
+  --dp-gap: 16px;
   --dp-gap-sm: 8px;
-  --dp-gap-section: 16px;
-  --dp-gap-section-lg: 24px;
-  --dp-content-pad: 22px;
+  --dp-gap-section: 12px;
+  --dp-gap-section-lg: 20px;
+  --dp-content-pad: 18px;
 
   /* Shadows */
-  --dp-shadow-low: 0 4px 14px rgba(30, 41, 59, 0.045);
-  --dp-shadow: 0 10px 30px rgba(30, 41, 59, 0.07);
-  --dp-shadow-elevated: 0 16px 40px rgba(30, 41, 59, 0.1);
+  --dp-shadow-low: 0 2px 8px rgba(30, 41, 59, 0.04);
+  --dp-shadow: 0 6px 20px rgba(30, 41, 59, 0.055);
+  --dp-shadow-elevated: 0 12px 32px rgba(30, 41, 59, 0.08);
 
-  /* Glass */
-  --dp-blur: 14px;
+  /* Glass — restrained; cards stay flat */
+  --dp-blur: 10px;
 
-  /* Status header gradient (approved accent) */
+  /* Status header gradient (approved accent, reduced) */
   --dp-status-gradient: linear-gradient(
     135deg,
-    rgba(79, 124, 255, 0.16),
-    rgba(139, 111, 232, 0.12)
+    rgba(79, 124, 255, 0.1),
+    rgba(139, 111, 232, 0.07)
   );
 
   /* Motion */

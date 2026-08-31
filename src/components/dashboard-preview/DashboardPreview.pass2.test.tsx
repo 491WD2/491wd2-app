@@ -2,7 +2,7 @@ import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { useState } from "react";
 import { DashboardPreview } from "./DashboardPreview";
-import { createDefaultFamilyData, type FamilyData } from "../../data/familyData";
+import { createDefaultFamilyData } from "../../data/familyData";
 
 function PreviewHarness() {
   const [data, setData] = useState(() => {
