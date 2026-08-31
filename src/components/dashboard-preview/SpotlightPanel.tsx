@@ -1,4 +1,4 @@
-import { CalendarDays, ChefHat, ShoppingCart, Sparkles } from "lucide-react";
+import { CalendarDays, Package, ShoppingCart, Sparkles, Users } from "lucide-react";
 import type { DashboardPreviewModel } from "../../lib/dashboard-preview/useDashboardPreviewModel";
 import type { DashboardGo } from "./types";
 
@@ -20,9 +20,7 @@ export function SpotlightPanel({
   onOpenPantry,
 }: SpotlightPanelProps) {
   const {
-    kitchenName,
-    kitchenComplete,
-    kitchenDayLabel,
+    orderedMembers,
     upcomingRows,
     upcomingAgendaHeading,
     needToBuy,
@@ -30,10 +28,14 @@ export function SpotlightPanel({
     openChoreCount,
     shoppingCount,
     todayEventCount,
+    messagesAndAlertsCount,
   } = model;
 
-  const topShopping = needToBuy.slice(0, 2);
+  const topShopping = needToBuy.slice(0, 3);
   const hasPantryAlerts = pantryModel.pantryAlertCount > 0;
+  const memberLabel =
+    orderedMembers.length === 1 ? "1 member" : `${orderedMembers.length} members`;
+  const hasReminders = topShopping.length > 0 || hasPantryAlerts;
 
   return (
     <aside className="dashboard-preview__spotlight" aria-label="Today's household focus">
@@ -76,33 +78,51 @@ export function SpotlightPanel({
 
       <div className="dashboard-preview__spotlight-block">
         <div className="dashboard-preview__spotlight-block-head">
-          <ChefHat className="dashboard-preview__spotlight-block-icon" aria-hidden="true" />
+          <Users className="dashboard-preview__spotlight-block-icon dashboard-preview__spotlight-block-icon--household" aria-hidden="true" />
           <div>
-            <p className="dashboard-preview__spotlight-block-label">Kitchen today</p>
-            <p className="dashboard-preview__spotlight-block-value">{kitchenName}</p>
+            <p className="dashboard-preview__spotlight-block-label">Household</p>
+            <p className="dashboard-preview__spotlight-block-value">{memberLabel}</p>
           </div>
         </div>
         <div className="dashboard-preview__spotlight-pills">
-          <span className="dashboard-preview__spotlight-pill">{kitchenDayLabel}</span>
-          <span
-            className={[
-              "dashboard-preview__spotlight-pill",
-              kitchenComplete ? "is-done" : "is-open",
-            ].join(" ")}
-          >
-            {kitchenComplete ? "Complete" : "In progress"}
-          </span>
+          {shoppingCount > 0 ? (
+            <button
+              type="button"
+              className="dashboard-preview__spotlight-pill dashboard-preview__spotlight-pill--action"
+              onClick={() => go("/shopping", onOpenShopping)}
+            >
+              {shoppingCount} on shopping list
+            </button>
+          ) : null}
+          {pantryModel.lowStockCount > 0 || pantryModel.expiringCount > 0 ? (
+            <button
+              type="button"
+              className="dashboard-preview__spotlight-pill dashboard-preview__spotlight-pill--action"
+              onClick={() => go("/pantry", onOpenPantry)}
+            >
+              {pantryModel.lowStockCount} low · {pantryModel.expiringCount} expiring
+            </button>
+          ) : null}
+          {messagesAndAlertsCount > 0 ? (
+            <button
+              type="button"
+              className="dashboard-preview__spotlight-pill dashboard-preview__spotlight-pill--action"
+              onClick={() => go("/messages")}
+            >
+              {messagesAndAlertsCount} messages &amp; alerts
+            </button>
+          ) : null}
         </div>
       </div>
 
-      <div className="dashboard-preview__spotlight-block">
+      <div className="dashboard-preview__spotlight-block dashboard-preview__spotlight-block--grow">
         <p className="dashboard-preview__spotlight-block-label">Up next</p>
         <p className="dashboard-preview__spotlight-block-sub">{upcomingAgendaHeading}</p>
         {upcomingRows.length === 0 ? (
           <p className="dashboard-preview__spotlight-empty">No upcoming events on the planner.</p>
         ) : (
           <ul className="dashboard-preview__spotlight-list">
-            {upcomingRows.slice(0, 3).map((row) => (
+            {upcomingRows.slice(0, 4).map((row) => (
               <li key={row.id}>
                 <button
                   type="button"
@@ -118,36 +138,41 @@ export function SpotlightPanel({
         )}
       </div>
 
-      {(topShopping.length > 0 || hasPantryAlerts) && (
-        <div className="dashboard-preview__spotlight-block dashboard-preview__spotlight-block--reminders">
-          <p className="dashboard-preview__spotlight-block-label">Reminders</p>
-          {topShopping.length > 0 ? (
-            <ul className="dashboard-preview__spotlight-reminders">
-              {topShopping.map((item) => (
-                <li key={item.id}>
-                  <button
-                    type="button"
-                    className="dashboard-preview__spotlight-reminder"
-                    onClick={() => go("/shopping", onOpenShopping)}
-                  >
-                    <ShoppingCart aria-hidden="true" />
-                    <span>Buy {item.name}</span>
-                  </button>
-                </li>
-              ))}
-            </ul>
-          ) : null}
-          {hasPantryAlerts ? (
-            <button
-              type="button"
-              className="dashboard-preview__spotlight-reminder dashboard-preview__spotlight-reminder--pantry"
-              onClick={() => go("/pantry", onOpenPantry)}
-            >
-              <span>{pantryModel.pantryAlertCount} pantry alerts need attention</span>
-            </button>
-          ) : null}
-        </div>
-      )}
+      <div className="dashboard-preview__spotlight-block dashboard-preview__spotlight-block--reminders">
+        <p className="dashboard-preview__spotlight-block-label">Reminders</p>
+        {hasReminders ? (
+          <>
+            {topShopping.length > 0 ? (
+              <ul className="dashboard-preview__spotlight-reminders">
+                {topShopping.map((item) => (
+                  <li key={item.id}>
+                    <button
+                      type="button"
+                      className="dashboard-preview__spotlight-reminder"
+                      onClick={() => go("/shopping", onOpenShopping)}
+                    >
+                      <ShoppingCart aria-hidden="true" />
+                      <span>Buy {item.name}</span>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            ) : null}
+            {hasPantryAlerts ? (
+              <button
+                type="button"
+                className="dashboard-preview__spotlight-reminder dashboard-preview__spotlight-reminder--pantry"
+                onClick={() => go("/pantry", onOpenPantry)}
+              >
+                <Package aria-hidden="true" />
+                <span>{pantryModel.pantryAlertCount} pantry alerts need attention</span>
+              </button>
+            ) : null}
+          </>
+        ) : (
+          <p className="dashboard-preview__spotlight-empty">No urgent reminders right now.</p>
+        )}
+      </div>
     </aside>
   );
 }

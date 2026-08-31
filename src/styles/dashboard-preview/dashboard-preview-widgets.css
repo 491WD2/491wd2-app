@@ -1239,6 +1239,30 @@
   cursor: pointer;
 }
 
+.dashboard-preview__spotlight-block--grow {
+  flex: 1 1 auto;
+}
+
+.dashboard-preview__spotlight-block-icon--household {
+  color: var(--dp-blue);
+}
+
+.dashboard-preview__spotlight-pill--action {
+  border: none;
+  cursor: pointer;
+  font: inherit;
+  transition: background-color var(--dp-transition);
+}
+
+.dashboard-preview__spotlight-pill--action:hover {
+  background: rgba(255, 255, 255, 0.92);
+}
+
+.dashboard-preview__spotlight-pill--action:focus-visible {
+  outline: 2px solid var(--dp-blue);
+  outline-offset: 2px;
+}
+
 .dashboard-preview__spotlight-reminder svg {
   width: 14px;
   height: 14px;

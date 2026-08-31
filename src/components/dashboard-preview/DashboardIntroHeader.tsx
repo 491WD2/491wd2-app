@@ -1,4 +1,3 @@
-import { Search } from "lucide-react";
 import type { DashboardPreviewModel } from "../../lib/dashboard-preview/useDashboardPreviewModel";
 
 type DashboardIntroHeaderProps = {
@@ -13,28 +12,15 @@ export function DashboardIntroHeader({ model }: DashboardIntroHeaderProps) {
       <div className="dashboard-preview__intro-copy">
         <p className="dashboard-preview__intro-greeting">{greeting}</p>
         <h1 className="dashboard-preview__intro-title">Family Dashboard</h1>
-        <p className="dashboard-preview__intro-sub">
-          {clock.dateLine} · household overview
-        </p>
+        <p className="dashboard-preview__intro-sub">Household overview</p>
       </div>
 
-      <div className="dashboard-preview__intro-utility" aria-label="Dashboard utilities">
-        <label className="dashboard-preview__intro-search">
-          <Search className="dashboard-preview__intro-search-icon" aria-hidden="true" />
-          <input
-            type="search"
-            className="dashboard-preview__intro-search-input"
-            placeholder="Search household…"
-            aria-label="Search household"
-            readOnly
-            tabIndex={-1}
-          />
-        </label>
+      <div className="dashboard-preview__intro-utility" aria-label="Current time">
         <p className="dashboard-preview__intro-time" aria-live="polite">
           {clock.time}
         </p>
+        <p className="dashboard-preview__intro-date">{clock.dateLine}</p>
       </div>
     </header>
   );
-
 }
