@@ -7,5 +7,4 @@
  */
 @import "./dashboard-preview-tokens.css";
 @import "./dashboard-preview-layout.css";
-
-/* Widget + component skin — added in a later pass after token approval */
+@import "./dashboard-preview-widgets.css";

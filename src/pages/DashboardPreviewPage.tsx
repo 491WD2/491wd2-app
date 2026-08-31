@@ -1,7 +1,6 @@
 import type { Dispatch, SetStateAction } from "react";
 import type { FamilyData } from "../data/familyData";
 import { DashboardPreview } from "../components/dashboard-preview/DashboardPreview";
-import { getAppDisplayName } from "../lib/customization";
 
 export type DashboardPreviewPageProps = {
   data: FamilyData;
@@ -39,10 +38,5 @@ export function DashboardPreviewPage({
   void _settings;
   void _member;
 
-  return (
-    <DashboardPreview
-      data={data}
-      householdName={getAppDisplayName(data.adminSettings)}
-    />
-  );
+  return <DashboardPreview data={data} />;
 }

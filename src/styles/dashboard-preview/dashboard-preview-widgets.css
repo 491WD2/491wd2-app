@@ -1,0 +1,237 @@
+/**
+ * Dashboard Preview — widget skin. Scoped to `.dashboard-preview`.
+ */
+
+/* ── Cards ── */
+.dashboard-preview__card {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding: var(--dp-content-pad);
+  border-radius: var(--dp-radius-card);
+  background: var(--dp-card);
+  border: 1px solid var(--dp-border);
+  box-shadow: var(--dp-shadow);
+  backdrop-filter: blur(var(--dp-blur));
+  -webkit-backdrop-filter: blur(var(--dp-blur));
+}
+
+.dashboard-preview__card--compact {
+  padding: 14px 16px;
+}
+
+.dashboard-preview__card-head {
+  margin-bottom: var(--dp-gap-section);
+}
+
+.dashboard-preview__card-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--dp-gap-sm);
+}
+
+/* ── Typography helpers ── */
+.dashboard-preview__section-title {
+  margin: 0;
+  color: var(--dp-text);
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+}
+
+.dashboard-preview__meta {
+  margin: 4px 0 0;
+  color: var(--dp-text-secondary);
+  font-size: 12px;
+  line-height: 1.4;
+  font-weight: 500;
+}
+
+.dashboard-preview__placeholder {
+  margin: 0;
+  color: var(--dp-text-muted);
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+/* ── Nested rows ── */
+.dashboard-preview__nested-row {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 10px 12px;
+  border-radius: var(--dp-radius-row);
+  background: var(--dp-nested);
+  border: 1px solid var(--dp-divider);
+}
+
+/* ── Chips ── */
+.dashboard-preview__chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 0 10px;
+  border-radius: var(--dp-radius-pill);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.dashboard-preview__chip--kitchen {
+  background: var(--dp-kitchen-soft);
+  color: #b95f3c;
+}
+
+.dashboard-preview__chip--shopping {
+  background: var(--dp-shopping-soft);
+  color: #247a61;
+}
+
+.dashboard-preview__chip--calendar {
+  background: var(--dp-calendar-soft);
+  color: #4f5fc7;
+}
+
+.dashboard-preview__chip--message {
+  background: var(--dp-message-soft);
+  color: #674ec1;
+}
+
+/* ── Buttons ── */
+.dashboard-preview__button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 40px;
+  padding: 0 15px;
+  border: none;
+  border-radius: var(--dp-radius-btn);
+  background: var(--dp-blue);
+  color: #ffffff;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: default;
+  transition: background-color var(--dp-transition), box-shadow var(--dp-transition);
+}
+
+.dashboard-preview__button--secondary {
+  background: rgba(255, 255, 255, 0.76);
+  color: var(--dp-text);
+  border: 1px solid rgba(208, 213, 221, 0.85);
+}
+
+.dashboard-preview__icon-button {
+  display: inline-grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--dp-divider);
+  border-radius: var(--dp-radius-btn);
+  background: var(--dp-card-strong);
+  color: var(--dp-text-secondary);
+}
+
+.dashboard-preview__action-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 4px;
+  min-height: 58px;
+  padding: 10px 12px;
+  border-radius: var(--dp-radius-row);
+  background: var(--dp-nested);
+  border: 1px solid var(--dp-divider);
+  color: var(--dp-text);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.dashboard-preview__action-tile small {
+  color: var(--dp-text-muted);
+  font-size: 11px;
+  font-weight: 500;
+}
+
+/* ── Metrics (Today Snapshot) ── */
+.dashboard-preview__metric {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+  min-height: 88px;
+  padding: 14px;
+  border-radius: var(--dp-radius-row);
+  background: var(--dp-nested);
+  border: 1px solid var(--dp-divider);
+}
+
+.dashboard-preview__metric-count {
+  color: var(--dp-text);
+  font-family: var(--dp-font-nums);
+  font-size: 26px;
+  font-weight: 700;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.dashboard-preview__metric-label {
+  color: var(--dp-text-secondary);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.dashboard-preview__metric--chores {
+  border-top: 3px solid var(--dp-kitchen);
+}
+
+.dashboard-preview__metric--events {
+  border-top: 3px solid var(--dp-calendar);
+}
+
+.dashboard-preview__metric--shopping {
+  border-top: 3px solid var(--dp-shopping);
+}
+
+.dashboard-preview__metric--messages {
+  border-top: 3px solid var(--dp-message);
+}
+
+/* ── Status header type ── */
+.dashboard-preview__status-label {
+  margin: 0 0 4px;
+  color: var(--dp-text-secondary);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.dashboard-preview__status-time {
+  margin: 0;
+  color: var(--dp-text);
+  font-family: var(--dp-font-nums);
+  font-size: clamp(40px, 3.2vw, 48px);
+  font-weight: 700;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.dashboard-preview__status-sub {
+  margin: 4px 0 0;
+  color: var(--dp-text-secondary);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.dashboard-preview__status-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--dp-gap-sm);
+  margin-top: var(--dp-gap-sm);
+}
