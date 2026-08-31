@@ -49,25 +49,25 @@ export function QuickAddPanel({
   onOpenCalendar,
 }: QuickAddPanelProps) {
   return (
-    <section className="dashboard-preview__quick-add-compact" aria-label="Quick add">
-      <p className="dashboard-preview__quick-add-compact-label">Quick actions</p>
-      <div className="dashboard-preview__quick-add-pills">
+    <div className="dashboard-preview__quick-add-inline" aria-label="Quick add" role="region">
+      <span className="dashboard-preview__quick-add-inline-label">Quick Add</span>
+      <div className="dashboard-preview__quick-add-inline-actions">
         {QUICK_ADD_ACTIONS.map((action) => {
           const Icon = action.icon;
           return (
             <button
               key={action.key}
               type="button"
-              className="dashboard-preview__quick-add-pill"
+              className="dashboard-preview__quick-add-inline-btn"
               aria-label={`Add ${action.label.toLowerCase()}`}
               onClick={() => action.onClick(go, onOpenShopping, onOpenTasks, onOpenCalendar)}
             >
-              <Icon className="dashboard-preview__quick-add-pill-icon" aria-hidden="true" />
+              <Icon className="dashboard-preview__quick-add-inline-icon" aria-hidden="true" />
               <span>{action.label}</span>
             </button>
           );
         })}
       </div>
-    </section>
+    </div>
   );
 }

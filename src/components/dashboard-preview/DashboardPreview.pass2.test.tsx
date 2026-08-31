@@ -32,18 +32,19 @@ describe("DashboardPreview Pass 2 smoke", () => {
     expect(
       screen.queryByText(/Preview data will connect in the next implementation pass/i),
     ).not.toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: /Family Dashboard/i })).toBeInTheDocument();
+    expect(screen.getByLabelText(/Dashboard utility band/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/Primary dashboard widgets/i)).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: /^Family$/i })).toBeInTheDocument();
     expect(screen.getByRole("region", { name: /Quick add/i })).toBeInTheDocument();
     expect(screen.queryByRole("heading", { name: /Today's kitchen duty/i })).not.toBeInTheDocument();
     expect(screen.queryByText(/Kitchen today/i)).not.toBeInTheDocument();
-    expect(screen.queryByText(/Kitchen ·/i)).not.toBeInTheDocument();
-    expect(screen.queryByPlaceholderText(/Search household/i)).not.toBeInTheDocument();
     expect(screen.getByRole("heading", { name: /^Shopping$/i })).toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: /Pantry & storage/i })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: /^Calendar$/i })).toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: /Messages & alerts/i })).toBeInTheDocument();
-    expect(screen.getByLabelText(/Today's household focus/i)).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: /^Upcoming$/i })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: /Pantry & storage/i })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: /^Chores$/i })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: /^Messages$/i })).toBeInTheDocument();
+    expect(screen.queryByLabelText(/Today's household focus/i)).not.toBeInTheDocument();
   });
 
   it("navigates via Quick Add grocery route contract", async () => {

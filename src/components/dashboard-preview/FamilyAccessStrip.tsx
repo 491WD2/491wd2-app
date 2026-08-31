@@ -43,7 +43,7 @@ export function FamilyAccessStrip({
   };
 
   return (
-    <section className="dashboard-preview__family-integrated" aria-label="Family access">
+    <section className="dashboard-preview__family-below" aria-label="Family access">
       <div className="dashboard-preview__family-integrated-head">
         <h2 className="dashboard-preview__family-integrated-title">Family</h2>
         <p className="dashboard-preview__family-integrated-meta">

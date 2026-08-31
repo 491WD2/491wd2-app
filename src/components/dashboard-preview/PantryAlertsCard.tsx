@@ -24,13 +24,18 @@ export function PantryAlertsCard({
 
   return (
     <section
-      className="dashboard-preview__card dashboard-preview__card--pantry"
+      className="dashboard-preview__card dashboard-preview__card--pantry-primary"
       aria-label="Pantry and storage"
     >
       <header className="dashboard-preview__card-head dashboard-preview__card-head--row">
-        <div>
-          <h2 className="dashboard-preview__section-title">Pantry &amp; storage</h2>
-          <p className="dashboard-preview__meta">Stock levels and storage zones</p>
+        <div className="dashboard-preview__card-head-with-icon">
+          <span className="dashboard-preview__card-accent dashboard-preview__card-accent--pantry" aria-hidden="true" />
+          <div>
+            <h2 className="dashboard-preview__section-title">Pantry &amp; storage</h2>
+            <p className="dashboard-preview__meta">
+              {lowStockCount} low · {expiringCount} expiring
+            </p>
+          </div>
         </div>
         <button type="button" className="dashboard-preview__button--secondary" onClick={() => go("/pantry", onOpenPantry)}>
           Open storage

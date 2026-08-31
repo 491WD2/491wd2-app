@@ -1314,3 +1314,258 @@
     border-top: 1px solid var(--dp-divider);
   }
 }
+
+/* ── Structure reset: card accents & variants ── */
+.dashboard-preview__card-accent {
+  display: block;
+  width: 4px;
+  height: 28px;
+  flex-shrink: 0;
+  border-radius: 4px;
+  margin-top: 2px;
+}
+
+.dashboard-preview__card-accent--calendar {
+  background: linear-gradient(180deg, var(--dp-calendar), #8b9cf8);
+}
+
+.dashboard-preview__card-accent--upcoming {
+  background: linear-gradient(180deg, var(--dp-upcoming), #b8a8f0);
+}
+
+.dashboard-preview__card-accent--pantry {
+  background: linear-gradient(180deg, var(--dp-pantry), #f0b86a);
+}
+
+.dashboard-preview__card-accent--messages {
+  background: linear-gradient(180deg, var(--dp-message), #c8a8f0);
+}
+
+.dashboard-preview__card--calendar-primary {
+  min-height: 320px;
+  border-color: rgba(99, 118, 246, 0.15);
+  box-shadow: var(--dp-shadow);
+}
+
+.dashboard-preview__calendar-panel--primary {
+  flex: 1;
+}
+
+.dashboard-preview__calendar-panel--primary .dashboard-preview__mini-month-day {
+  min-height: 28px;
+  font-size: 12px;
+}
+
+.dashboard-preview__calendar-panel--primary .dashboard-preview__mini-month-day.is-today {
+  background: var(--dp-calendar);
+  color: #fff;
+  font-weight: 700;
+}
+
+.dashboard-preview__card--upcoming {
+  border-color: rgba(139, 111, 232, 0.15);
+}
+
+.dashboard-preview__upcoming-agenda {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.dashboard-preview__upcoming-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 44px;
+  padding: 6px 8px;
+  border: 1px solid transparent;
+  border-radius: var(--dp-radius-row);
+  background: var(--dp-nested);
+  color: var(--dp-text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color var(--dp-transition), border-color var(--dp-transition);
+}
+
+.dashboard-preview__upcoming-row:hover {
+  background: #fff;
+  border-color: var(--dp-divider);
+}
+
+.dashboard-preview__upcoming-date {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  flex-shrink: 0;
+  padding: 4px;
+  border-radius: 8px;
+  background: var(--dp-upcoming-soft);
+  color: var(--dp-upcoming);
+}
+
+.dashboard-preview__upcoming-date-day {
+  font-family: var(--dp-font-nums);
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.dashboard-preview__upcoming-date-month {
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.dashboard-preview__upcoming-dot {
+  width: 6px;
+  height: 6px;
+  flex-shrink: 0;
+  border-radius: 999px;
+  background: var(--dp-upcoming);
+}
+
+.dashboard-preview__upcoming-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+  flex: 1;
+}
+
+.dashboard-preview__upcoming-title {
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.35;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dashboard-preview__upcoming-meta {
+  color: var(--dp-text-muted);
+  font-size: 10px;
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dashboard-preview__card--chores {
+  border-color: rgba(241, 139, 100, 0.18);
+}
+
+.dashboard-preview__card-icon--chores {
+  color: var(--dp-chores);
+}
+
+.dashboard-preview__list--chores .dashboard-preview__row {
+  min-height: 36px;
+}
+
+.dashboard-preview__card--messages {
+  border-color: rgba(168, 127, 232, 0.15);
+}
+
+.dashboard-preview__list--messages .dashboard-preview__row {
+  min-height: 36px;
+}
+
+.dashboard-preview__card--pantry-primary {
+  border-color: rgba(232, 168, 74, 0.18);
+}
+
+.dashboard-preview__card--pantry-primary .dashboard-preview__pantry-body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.dashboard-preview__card--shopping-primary {
+  border-top: 3px solid var(--dp-shopping);
+  background: linear-gradient(180deg, var(--dp-shopping-soft) 0%, #fff 48px);
+}
+
+.dashboard-preview__card--shopping-primary .dashboard-preview__composer {
+  background: rgba(47, 184, 150, 0.06);
+  padding: 8px;
+  margin-top: 8px;
+  border-radius: var(--dp-radius-row);
+}
+
+/* ── Quick add inline (utility band) ── */
+.dashboard-preview__quick-add-inline {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  min-width: 0;
+}
+
+.dashboard-preview__quick-add-inline-label {
+  color: var(--dp-text-muted);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.dashboard-preview__quick-add-inline-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.dashboard-preview__quick-add-inline-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 28px;
+  padding: 0 9px;
+  border: 1px solid var(--dp-divider);
+  border-radius: var(--dp-radius-pill);
+  background: #fff;
+  color: var(--dp-text);
+  font: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color var(--dp-transition), border-color var(--dp-transition);
+}
+
+.dashboard-preview__quick-add-inline-btn:hover {
+  border-color: rgba(91, 124, 250, 0.3);
+  background: var(--dp-blue-soft);
+}
+
+.dashboard-preview__quick-add-inline-icon {
+  width: 12px;
+  height: 12px;
+  color: var(--dp-text-secondary);
+}
+
+.dashboard-preview__quick-add-inline-btn:focus-visible {
+  outline: 2px solid var(--dp-blue);
+  outline-offset: 2px;
+}
+
+/* ── Family below grid ── */
+.dashboard-preview__family-below .dashboard-preview__family-integrated-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.dashboard-preview__upcoming-row:focus-visible {
+  outline: 2px solid var(--dp-blue);
+  outline-offset: 2px;
+}
