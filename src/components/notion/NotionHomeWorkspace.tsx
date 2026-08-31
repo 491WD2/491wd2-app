@@ -70,14 +70,14 @@ const WEEKDAY_LABELS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"] as cons
 const MESSAGE_PREVIEW_LIMIT = 4;
 const NOTIFICATION_PREVIEW_LIMIT = 5;
 
-/** Home-only Prism-style member dots. Does not change stored member colors. */
+/** Home-only member dots — bright aqua-family accents for identity. */
 const HOME_MEMBER_DOTS = [
-  "#3B82F6",
-  "#EC4899",
-  "#10B981",
-  "#F59E0B",
-  "#8B5CF6",
-  "#EF4444",
+  "#2F9BC4",
+  "#3CBC95",
+  "#4FC3D9",
+  "#E8A317",
+  "#5B8DEF",
+  "#E15A4A",
 ] as const;
 
 function homeMemberDot(index: number): string {
@@ -487,7 +487,7 @@ export function NotionHomeWorkspace({
 
       <div className="fh-bento__grid">
         <section
-          className="fh-bento-card fh-bento-card--sky fh-bento__cell-status"
+          className="fh-bento-card fh-bento-card--sky fh-bento-card--hero fh-bento__cell-status"
           aria-label="Greeting and clock"
         >
           <div className="fh-bento-card__head">

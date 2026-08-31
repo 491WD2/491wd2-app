@@ -16,7 +16,7 @@
 @import "./styles/familyhub-smart-dash.css";
 @import "./styles/familyhub-start-page.css";
 @import "./styles/familyhub-pro.css";
-@import "./styles/family-hub-bento-dashboard.css"; /* Home: soft 3D bento prototype */
+@import "./styles/family-hub-bento-dashboard.css"; /* Home: soft 3D aqua bento */
 
 /** Tailwind v4 — scan app sources; purges unused utilities in production */
 @source "./**/*.{ts,tsx}";
