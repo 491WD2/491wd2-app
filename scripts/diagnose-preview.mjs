@@ -27,7 +27,9 @@ async function main() {
 
     const components = {
       DashboardStatusHeader: !!document.querySelector(".dashboard-preview__status"),
-      FamilyAccessStrip: !!document.querySelector(".dashboard-preview__family-strip"),
+      FamilyAccessStrip:
+        !!document.querySelector(".dashboard-preview__family-strip") ||
+        !!document.querySelector(".dashboard-preview__family-below"),
       QuickAddPanel: !!document.querySelector('[aria-label="Quick add"]'),
       TodaySnapshot: !!document.querySelector('[aria-label="Today snapshot"]'),
       KitchenChoresCard: !!document.querySelector('[aria-label*="Kitchen duty"]'),
