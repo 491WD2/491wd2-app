@@ -46,7 +46,7 @@ describe("Stage N1A Home workspace", () => {
     render(<HomeHarness />);
     expect(screen.getByRole("heading", { level: 1, name: /Roskens Household/i })).toBeInTheDocument();
     expect(screen.getByLabelText("Greeting and clock")).toBeInTheDocument();
-    expect(screen.queryByRole("region", { name: "Family members" })).not.toBeInTheDocument();
+    expect(screen.getByRole("region", { name: "Family members" })).toBeInTheDocument();
   });
 
   it("leads with kitchen duty and calendar; storage is a link only", () => {
@@ -70,6 +70,9 @@ describe("Stage N1A Home workspace", () => {
     expect(screen.queryByRole("navigation", { name: "Modules" })).not.toBeInTheDocument();
     expect(screen.queryByText(/Sample Member/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/Notion AI/i)).not.toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: /^Quick Add$/i })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: /^Today$/i })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: /^Messages$/i })).toBeInTheDocument();
   });
 
   it("renders today chore data under kitchen duty and excludes inventing sample tasks", () => {

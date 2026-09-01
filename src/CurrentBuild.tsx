@@ -31,6 +31,11 @@ const AdminUxHouseholdDashboard = lazy(() =>
     default: m.AdminUxHouseholdDashboard,
   })),
 );
+const DashboardPreviewPage = lazy(() =>
+  import("./pages/DashboardPreviewPage").then((m) => ({
+    default: m.DashboardPreviewPage,
+  })),
+);
 const HiddenModulePage = lazy(() =>
   import("./pages/HiddenModulePage").then((m) => ({ default: m.HiddenModulePage })),
 );
@@ -179,6 +184,7 @@ export default function App() {
       routeLabels={{
         dashboard: "Dashboard",
         adminux: "Home",
+        dashboardPreview: "Dashboard Preview",
         messages: "Messages",
         family: getModuleFamilyLabel(data.adminSettings),
         tasks: "Cleaning / Kitchen",
@@ -227,6 +233,26 @@ export default function App() {
           onOpenSettings={() => navigateToRoute("settings")}
         >
           <AdminUxHouseholdDashboard
+            data={data}
+            setData={setData}
+            navigateWithinApp={navigateTo}
+            onOpenPantry={() => navigateToRoute("pantry")}
+            onOpenShopping={() => navigateToRoute("shopping")}
+            onOpenTasks={() => navigateToRoute("tasks")}
+            onOpenCalendar={() => navigateToRoute("calendar")}
+            onOpenSettings={() => navigateToRoute("settings")}
+            onOpenMemberDashboard={navigateToMember}
+          />
+        </ModuleGate>
+      ) : null}
+      {activeRoute === "dashboardPreview" ? (
+        <ModuleGate
+          moduleKey="dashboard"
+          moduleVisibility={data.adminSettings.moduleVisibility}
+          onOpenDashboard={() => navigateToRoute("dashboard")}
+          onOpenSettings={() => navigateToRoute("settings")}
+        >
+          <DashboardPreviewPage
             data={data}
             setData={setData}
             navigateWithinApp={navigateTo}
@@ -478,6 +504,7 @@ export default function App() {
 const routePathMap: Record<RouteKey, string> = {
   dashboard: "/adminux",
   adminux: "/adminux",
+  dashboardPreview: "/dashboard-preview",
   messages: "/messages",
   kiosk: "/kiosk",
   family: "/family",
@@ -519,6 +546,10 @@ function parsePath(pathname: string): {
 
   if (firstSegment === "dashboard") {
     return { activeRoute: "adminux" };
+  }
+
+  if (firstSegment === "dashboard-preview") {
+    return { activeRoute: "dashboardPreview" };
   }
 
   if (firstSegment === "cloud-login") {
