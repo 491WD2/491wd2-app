@@ -4,7 +4,6 @@ import "../../styles/dashboard-preview/dashboard-preview.css";
 import { CalendarUpcomingCard } from "./CalendarUpcomingCard";
 import { DashboardPreviewShell } from "./DashboardPreviewShell";
 import { DashboardStatusHeader } from "./DashboardStatusHeader";
-import { FamilyAccessStrip } from "./FamilyAccessStrip";
 import { KitchenChoresCard } from "./KitchenChoresCard";
 import { MessagesNotificationsCard } from "./MessagesNotificationsCard";
 import { PantryAlertsCard } from "./PantryAlertsCard";
@@ -24,7 +23,6 @@ export function DashboardPreview({
   onOpenShopping,
   onOpenCalendar,
   onOpenTasks,
-  onOpenMemberDashboard,
 }: DashboardPreviewProps) {
   const [now, setNow] = useState(() => new Date());
   const model = useDashboardPreviewModel(data, now);
@@ -47,8 +45,6 @@ export function DashboardPreview({
         onOpenTasks={onOpenTasks}
         onOpenShopping={onOpenShopping}
       />
-
-      <FamilyAccessStrip model={model} go={go} onOpenMemberDashboard={onOpenMemberDashboard} />
 
       <section className="dashboard-preview__region" aria-label="Household tools">
         <div className="dashboard-preview__tools-row">
