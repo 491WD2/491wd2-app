@@ -1,0 +1,193 @@
+/**
+ * Dashboard Preview — layout structure. Scoped to `.dashboard-preview`.
+ */
+
+.dashboard-preview__viewport {
+  padding: var(--dp-frame-pad);
+  min-height: 100%;
+  min-width: 0;
+}
+
+.dashboard-preview__frame {
+  width: min(var(--dp-shell-max-width), calc(100vw - (var(--dp-frame-pad) * 2)));
+  max-width: 100%;
+  margin-inline: auto;
+  border-radius: var(--dp-radius-shell);
+  background: var(--dp-frame-bg);
+  border: var(--dp-frame-border);
+  box-shadow: var(--dp-frame-shadow);
+  overflow: visible;
+}
+
+.dashboard-preview__content {
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--dp-gap-section-lg);
+  min-width: 0;
+}
+
+/* ── Utility band ── */
+.dashboard-preview__utility-band {
+  display: grid;
+  grid-template-columns: minmax(160px, 0.85fr) minmax(0, 2.2fr) minmax(140px, 0.7fr);
+  gap: var(--dp-gap);
+  align-items: center;
+  min-height: 100px;
+  max-height: 132px;
+  padding: 16px 20px;
+  border-radius: var(--dp-radius-large);
+  background: var(--dp-utility-bg);
+  border: 1px solid var(--dp-divider);
+  box-shadow: var(--dp-shadow-low);
+}
+
+.dashboard-preview__utility-datetime {
+  min-width: 0;
+}
+
+.dashboard-preview__utility-greeting {
+  margin: 0 0 2px;
+  color: var(--dp-text-muted);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.dashboard-preview__utility-time {
+  margin: 0;
+  color: var(--dp-text);
+  font-family: var(--dp-font-nums);
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+
+.dashboard-preview__utility-date {
+  margin: 4px 0 0;
+  color: var(--dp-text-secondary);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.dashboard-preview__utility-status {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+}
+
+.dashboard-preview__utility-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.dashboard-preview__utility-chips .dashboard-preview__chip {
+  cursor: pointer;
+  border: none;
+  font: inherit;
+}
+
+.dashboard-preview__utility-weather {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 6px;
+  min-width: 0;
+  text-align: right;
+}
+
+.dashboard-preview__utility-weather-text {
+  margin: 0;
+  color: var(--dp-text-muted);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+/* ── Six-widget primary grid ── */
+.dashboard-preview__six-grid {
+  display: grid;
+  grid-template-columns:
+    minmax(300px, 1.05fr)
+    minmax(420px, 1.35fr)
+    minmax(260px, 0.8fr);
+  gap: 20px;
+  align-items: start;
+  min-width: 0;
+}
+
+/* Legacy helpers kept for component internals */
+.dashboard-preview__region,
+.dashboard-preview__main-split,
+.dashboard-preview__summary-band {
+  display: contents;
+}
+
+.dashboard-preview__tools-row,
+.dashboard-preview__household-grid {
+  display: contents;
+}
+
+.dashboard-preview__snapshot {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--dp-gap-sm);
+}
+
+@media (min-width: 1440px) {
+  .dashboard-preview__viewport {
+    padding: 22px;
+  }
+
+  .dashboard-preview__content {
+    padding: 20px;
+    gap: 20px;
+  }
+
+  .dashboard-preview__six-grid {
+    gap: 22px;
+  }
+}
+
+@media (min-width: 1600px) {
+  .dashboard-preview__frame {
+    max-width: min(var(--dp-shell-max-width), calc(100vw - 44px));
+  }
+}
+
+@media (max-width: 1320px) {
+  .dashboard-preview__six-grid {
+    grid-template-columns: minmax(260px, 1fr) minmax(360px, 1.2fr) minmax(220px, 0.75fr);
+    gap: 18px;
+  }
+}
+
+@media (max-width: 1180px) {
+  .dashboard-preview__utility-band {
+    grid-template-columns: minmax(0, 1fr);
+    max-height: none;
+    min-height: 0;
+    gap: 12px;
+  }
+
+  .dashboard-preview__utility-weather {
+    align-items: flex-start;
+    text-align: left;
+  }
+
+  .dashboard-preview__six-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .dashboard-preview__snapshot {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
