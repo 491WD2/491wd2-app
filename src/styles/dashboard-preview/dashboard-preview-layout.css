@@ -1,0 +1,182 @@
+/**
+ * Dashboard Preview — layout structure. Scoped to `.dashboard-preview`.
+ */
+
+/* ── Viewport + frame (inner app surface; AppShell owns app nav) ── */
+.dashboard-preview__viewport {
+  padding: var(--dp-frame-pad);
+  min-height: 100%;
+  min-width: 0;
+}
+
+.dashboard-preview__frame {
+  width: min(var(--dp-shell-max-width), calc(100vw - (var(--dp-frame-pad) * 2)));
+  max-width: 100%;
+  margin-inline: auto;
+  border-radius: var(--dp-radius-shell);
+  background: var(--dp-frame-bg);
+  border: var(--dp-frame-border);
+  box-shadow: var(--dp-frame-shadow);
+  backdrop-filter: blur(var(--dp-frame-blur));
+  -webkit-backdrop-filter: blur(var(--dp-frame-blur));
+  overflow: hidden;
+}
+
+.dashboard-preview__content {
+  padding: var(--dp-content-pad);
+  display: flex;
+  flex-direction: column;
+  gap: var(--dp-gap-section-lg);
+  min-width: 0;
+}
+
+.dashboard-preview__region {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dp-gap-section-lg);
+  min-width: 0;
+}
+
+/* ── A. Status header ── */
+.dashboard-preview__status {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.7fr) minmax(0, 1.15fr);
+  gap: var(--dp-gap-section);
+  align-items: center;
+  min-height: 132px;
+  max-height: 168px;
+  padding: 16px 18px;
+  border-radius: var(--dp-radius-large);
+  background: var(--dp-status-gradient), var(--dp-card);
+  border: 1px solid var(--dp-border);
+  box-shadow: var(--dp-shadow-low);
+  backdrop-filter: blur(var(--dp-blur));
+  -webkit-backdrop-filter: blur(var(--dp-blur));
+}
+
+.dashboard-preview__status-col {
+  min-width: 0;
+}
+
+.dashboard-preview__status-col--chips {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 6px;
+}
+
+/* ── B. Family strip ── */
+.dashboard-preview__family {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+
+/* ── C. Quick Add + Today Snapshot ── */
+.dashboard-preview__tools-row {
+  display: grid;
+  grid-template-columns: minmax(0, 0.42fr) minmax(0, 0.58fr);
+  gap: var(--dp-gap);
+  min-width: 0;
+}
+
+/* ── D. Today Snapshot internal grid ── */
+.dashboard-preview__snapshot {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--dp-gap-sm);
+}
+
+/* ── E. Main household grid ── */
+.dashboard-preview__household-grid {
+  display: grid;
+  grid-template-columns: minmax(280px, 0.38fr) minmax(0, 0.62fr);
+  gap: var(--dp-gap);
+  align-items: start;
+  min-width: 0;
+}
+
+.dashboard-preview__utility,
+.dashboard-preview__information {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dp-gap);
+  min-width: 0;
+}
+
+.dashboard-preview__quick-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--dp-gap-sm);
+}
+
+/* Desktop width tuning */
+@media (min-width: 1440px) {
+  .dashboard-preview__viewport {
+    padding: 22px;
+  }
+
+  .dashboard-preview__content {
+    padding: 20px;
+    gap: 22px;
+  }
+}
+
+@media (min-width: 1600px) {
+  .dashboard-preview__shell-max-width,
+  .dashboard-preview__frame {
+    max-width: min(var(--dp-shell-max-width), calc(100vw - 44px));
+  }
+}
+
+@media (max-width: 1320px) {
+  .dashboard-preview__viewport {
+    padding: 18px;
+  }
+
+  .dashboard-preview__household-grid {
+    grid-template-columns: minmax(260px, 0.38fr) minmax(0, 0.62fr);
+  }
+}
+
+@media (max-width: 1280px) {
+  .dashboard-preview__status-time {
+    font-size: 34px;
+  }
+
+  .dashboard-preview__metric {
+    min-height: 68px;
+    padding: 10px;
+  }
+
+  .dashboard-preview__metric-count {
+    font-size: 22px;
+  }
+
+  .dashboard-preview__metric-label {
+    font-size: 11px;
+  }
+
+  .dashboard-preview__snapshot {
+    gap: 8px;
+  }
+}
+
+@media (max-width: 1180px) {
+  .dashboard-preview__tools-row,
+  .dashboard-preview__household-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .dashboard-preview__status {
+    grid-template-columns: minmax(0, 1fr);
+    max-height: none;
+    min-height: 0;
+    padding: 16px;
+  }
+
+  .dashboard-preview__calendar-upcoming-body {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
