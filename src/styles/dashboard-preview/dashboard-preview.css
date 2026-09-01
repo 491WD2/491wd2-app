@@ -1,0 +1,10 @@
+/**
+ * Dashboard Preview — style entry (preview route only).
+ * DO NOT add to src/styles.css.
+ *
+ * Import from AdminUxDashboardPreviewPage.tsx:
+ *   import "../styles/dashboard-preview/dashboard-preview.css";
+ */
+@import "./dashboard-preview-tokens.css";
+@import "./dashboard-preview-layout.css";
+@import "./dashboard-preview-widgets.css";

@@ -289,6 +289,25 @@ export function AppShell({
     usesUnifiedKioskShell(activeRoute) &&
     showMobileChrome;
 
+  const previewChromeless = activeRoute === "dashboardPreview";
+
+  if (previewChromeless) {
+    return (
+      <QuickActionsOpenerContext.Provider
+        value={{
+          openQuickActions: () => {
+            if (!quickActionsGateOk) {
+              return;
+            }
+            setQuickActionsOpen(true);
+          },
+        }}
+      >
+        <div className="min-h-screen">{children}</div>
+      </QuickActionsOpenerContext.Provider>
+    );
+  }
+
   if (unifiedKioskChrome) {
     const activeNav = resolveKioskNavFromShell(activeRoute, locationHref);
     const hiddenKioskNav: KioskNavId[] = [];

@@ -1,0 +1,647 @@
+/**
+ * Home dashboard visual skin — Meridian Web Design System (Product)
+ * Figma: https://www.figma.com/design/R1GZvm6D1FacMBmST8x8ZN
+ *
+ * Trust + clarity over decoration: Ink neutrals, Trust Blue brand,
+ * Inter type scale (Display → Title → Body → Caption), tabular figures.
+ * Scoped to .fh-meridian. Layout and behavior stay unchanged.
+ */
+
+.fh-meridian {
+  --md-page: #f4f6f8;
+  --md-surface: #ffffff;
+  --md-surface-muted: #f2f4f7;
+  --md-surface-hover: #eef2f6;
+  --md-ink: #101828;
+  --md-ink-secondary: #344054;
+  --md-ink-muted: #667085;
+  --md-ink-faint: #98a2b3;
+  --md-line: #e4e7ec;
+  --md-line-strong: #d0d5dd;
+  --md-trust-50: #eef4fb;
+  --md-trust-100: #d7e6f6;
+  --md-trust-200: #b5d0ec;
+  --md-trust-500: #1e4f8c;
+  --md-trust-600: #173f70;
+  --md-trust-700: #123257;
+  --md-on-trust: #ffffff;
+  --md-success: #027a48;
+  --md-success-bg: #ecfdf3;
+  --md-success-border: #abefc6;
+  --md-warning: #b54708;
+  --md-warning-bg: #fffaeb;
+  --md-warning-border: #fedf89;
+  --md-danger: #b42318;
+  --md-danger-bg: #fef3f2;
+  --md-danger-border: #fecdca;
+  --md-info: #175cd3;
+  --md-info-bg: #eff8ff;
+  --md-info-border: #b2ddff;
+  --md-shadow-xs: 0 1px 2px rgba(16, 24, 40, 0.05);
+  --md-shadow-sm: 0 1px 3px rgba(16, 24, 40, 0.06), 0 1px 2px rgba(16, 24, 40, 0.04);
+  --md-radius: 10px;
+  --md-radius-lg: 12px;
+  --md-radius-pill: 999px;
+  --md-font: "Inter", system-ui, sans-serif;
+
+  --font-heading: var(--md-font);
+  --font-body: var(--md-font);
+  --font-ui: var(--md-font);
+  --pro-page: var(--md-page);
+  --pro-surface: var(--md-surface);
+  --pro-surface-soft: var(--md-surface-muted);
+  --pro-border: var(--md-line);
+  --pro-border-strong: var(--md-line-strong);
+  --pro-ink: var(--md-ink);
+  --pro-muted: var(--md-ink-muted);
+  --pro-faint: var(--md-ink-faint);
+  --pro-primary: var(--md-trust-500);
+  --pro-primary-soft: var(--md-trust-50);
+  --pro-radius: var(--md-radius-lg);
+  --pro-radius-sm: var(--md-radius);
+  --pro-shadow: var(--md-shadow-xs);
+  --pro-shadow-md: var(--md-shadow-sm);
+  --widget-radius: var(--md-radius-lg);
+  --widget-border: var(--md-line);
+  --widget-shadow: var(--md-shadow-xs);
+  --widget-shadow-hover: var(--md-shadow-sm);
+  --widget-surface: var(--md-surface);
+  --widget-highlight: var(--md-surface);
+  --widget-inset: var(--md-surface-muted);
+  --widget-accent: var(--md-trust-500);
+  --widget-accent-soft: var(--md-trust-50);
+  --text-main: var(--md-ink);
+  --text-soft: var(--md-ink-secondary);
+  --text-muted: var(--md-ink-muted);
+  --brand-primary: var(--md-trust-500);
+  --brand-primary-strong: var(--md-trust-600);
+  --brand-aqua: var(--md-info);
+  --brand-mint: var(--md-success);
+  --brand-amber: var(--md-warning);
+  --soft-blue: var(--md-trust-50);
+  --soft-aqua: var(--md-info-bg);
+  --soft-mint: var(--md-success-bg);
+  --soft-amber: var(--md-warning-bg);
+  --soft-rose: var(--md-danger-bg);
+  --soft-violet: #f4f3ff;
+
+  color: var(--md-ink);
+  font-family: var(--md-font);
+  background: var(--md-page);
+  font-variant-numeric: tabular-nums;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+.fh-meridian,
+.fh-meridian.fh-pro-page,
+.fh-meridian.fh-fridge-home,
+.fh-meridian.notion-page {
+  background: var(--md-page) !important;
+  color: var(--md-ink) !important;
+  font-family: var(--md-font) !important;
+}
+
+.fh-meridian h1,
+.fh-meridian h2,
+.fh-meridian h3 {
+  font-family: var(--md-font);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--md-ink);
+}
+
+.fh-meridian button,
+.fh-meridian input,
+.fh-meridian a {
+  font-family: var(--md-font);
+  transition-property: color, background-color, border-color, box-shadow;
+  transition-duration: 150ms;
+  transition-timing-function: ease;
+}
+
+.fh-meridian :focus-visible {
+  outline: 2px solid var(--md-trust-500);
+  outline-offset: 2px;
+}
+
+/* —— Hero / page header —— */
+.fh-meridian.fh-start-page .fh-fridge-home__top,
+.fh-meridian .fh-home-pro__hero {
+  border: 1px solid var(--md-line) !important;
+  border-radius: var(--md-radius-lg) !important;
+  background: var(--md-surface) !important;
+  box-shadow: var(--md-shadow-xs) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  padding: 1.15rem 1.25rem !important;
+}
+
+.fh-meridian.fh-start-page .fh-fridge-home__top::before,
+.fh-meridian.fh-start-page .fh-fridge-home__top::after {
+  display: none !important;
+}
+
+.fh-meridian .fh-fridge-home__kicker,
+.fh-meridian .fh-fridge-home__kicker.fh-pro-section-title,
+.fh-meridian.fh-start-page .fh-fridge-home__kicker {
+  margin: 0 0 0.2rem;
+  font-family: var(--md-font) !important;
+  font-size: 12px !important;
+  font-weight: 500 !important;
+  letter-spacing: 0.04em !important;
+  text-transform: uppercase !important;
+  color: var(--md-ink-muted) !important;
+}
+
+.fh-meridian .fh-fridge-home__title,
+.fh-meridian.fh-home-pro .fh-fridge-home__title {
+  font-family: var(--md-font) !important;
+  font-size: clamp(1.5rem, 2vw, 1.85rem) !important;
+  font-weight: 600 !important;
+  letter-spacing: -0.02em !important;
+  line-height: 1.2 !important;
+  color: var(--md-ink) !important;
+}
+
+.fh-meridian .fh-start-page__board-label,
+.fh-meridian .fh-start-page__dock-label,
+.fh-meridian .fh-pro-section-title {
+  font-family: var(--md-font) !important;
+  font-size: 12px !important;
+  font-weight: 500 !important;
+  letter-spacing: 0.06em !important;
+  text-transform: uppercase !important;
+  color: var(--md-ink-muted) !important;
+}
+
+.fh-meridian .fh-start-page__customize,
+.fh-meridian.fh-start-page .fh-start-page__customize,
+.fh-meridian .fh-home-customize {
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+}
+
+.fh-meridian .fh-start-page__customize-btn,
+.fh-meridian .fh-home-customize__btn,
+.fh-meridian.fh-start-page .fh-start-page__customize-btn {
+  border: 1px solid var(--md-line) !important;
+  border-radius: 8px !important;
+  background: var(--md-surface) !important;
+  color: var(--md-ink-secondary) !important;
+  box-shadow: none !important;
+  font-weight: 500 !important;
+}
+
+.fh-meridian .fh-start-page__customize-hint,
+.fh-meridian.fh-start-page .fh-start-page__customize-hint {
+  background: var(--md-trust-50) !important;
+  border-color: var(--md-trust-100) !important;
+  color: var(--md-trust-600) !important;
+}
+
+/* KPI-style status chips */
+.fh-meridian .fh-fridge-home__status button,
+.fh-meridian .fh-home-pro__chips button,
+.fh-meridian.fh-start-page .fh-fridge-home__status button {
+  min-height: 2rem !important;
+  padding: 0.3rem 0.7rem !important;
+  border: 1px solid var(--md-line) !important;
+  border-radius: var(--md-radius-pill) !important;
+  background: var(--md-surface-muted) !important;
+  color: var(--md-ink-secondary) !important;
+  box-shadow: none !important;
+  font-size: 12px !important;
+  font-weight: 500 !important;
+}
+
+.fh-meridian .fh-fridge-home__status button:hover,
+.fh-meridian .fh-fridge-home__status button:focus-visible,
+.fh-meridian .fh-home-pro__chips button:hover {
+  background: var(--md-trust-50) !important;
+  border-color: var(--md-trust-200) !important;
+  color: var(--md-trust-600) !important;
+  box-shadow: none !important;
+}
+
+.fh-meridian .fh-fridge-home__clock,
+.fh-meridian .fh-home-pro__clock,
+.fh-meridian.fh-start-page .fh-fridge-home__clock {
+  min-width: 8.25rem;
+  padding: 0.55rem 0.85rem !important;
+  border: 1px solid var(--md-line) !important;
+  border-left: 1px solid var(--md-line) !important;
+  border-radius: var(--md-radius) !important;
+  background: var(--md-surface-muted) !important;
+  box-shadow: none !important;
+  text-align: right;
+}
+
+.fh-meridian .fh-fridge-home__clock-time {
+  font-family: var(--md-font) !important;
+  font-size: clamp(1.45rem, 2vw, 1.75rem) !important;
+  font-weight: 600 !important;
+  letter-spacing: -0.03em !important;
+  color: var(--md-ink) !important;
+  font-variant-numeric: tabular-nums;
+}
+
+.fh-meridian .fh-fridge-home__clock-date {
+  font-family: var(--md-font) !important;
+  font-size: 12px !important;
+  font-weight: 500 !important;
+  letter-spacing: 0.02em !important;
+  text-transform: none !important;
+  color: var(--md-ink-muted) !important;
+}
+
+/* —— Cards —— */
+.fh-meridian .fh-start-widget,
+.fh-meridian.fh-start-page .fh-start-widget,
+.fh-meridian .fh-pro-card {
+  border: 1px solid var(--md-line) !important;
+  border-radius: var(--md-radius-lg) !important;
+  background: var(--md-surface) !important;
+  box-shadow: var(--md-shadow-xs) !important;
+  transform: none !important;
+}
+
+.fh-meridian .fh-start-widget:hover,
+.fh-meridian.fh-start-page .fh-start-widget:hover {
+  border-color: var(--md-line-strong) !important;
+  box-shadow: var(--md-shadow-sm) !important;
+  transform: none !important;
+}
+
+.fh-meridian .fh-start-widget::before,
+.fh-meridian .fh-start-widget::after,
+.fh-meridian.fh-start-page .fh-start-widget::before,
+.fh-meridian.fh-start-page .fh-start-widget::after {
+  display: none !important;
+}
+
+.fh-meridian .fh-start-widget.fh-fridge-home__kitchen,
+.fh-meridian .fh-start-widget.fh-fridge-home__calendar,
+.fh-meridian .fh-start-widget.fh-fridge-home__shopping,
+.fh-meridian .fh-start-widget.fh-fridge-home__storage {
+  --widget-accent: var(--md-trust-500);
+  --widget-accent-soft: var(--md-trust-50);
+}
+
+.fh-meridian .fh-start-widget__header,
+.fh-meridian.fh-home-pro .fh-start-widget__header {
+  border-bottom: 1px solid var(--md-line) !important;
+  background: var(--md-surface) !important;
+  padding: 0.95rem 1.05rem 0.8rem;
+}
+
+.fh-meridian .fh-start-widget__title {
+  font-family: var(--md-font) !important;
+  font-size: 1rem !important;
+  font-weight: 600 !important;
+  letter-spacing: -0.015em !important;
+  color: var(--md-ink) !important;
+}
+
+.fh-meridian .fh-start-widget__subtitle {
+  font-family: var(--md-font) !important;
+  font-size: 13px !important;
+  font-weight: 400 !important;
+  color: var(--md-ink-muted) !important;
+}
+
+.fh-meridian .fh-start-widget__icon,
+.fh-meridian .fh-icon-tile,
+.fh-meridian .fh-icon-tile--aqua,
+.fh-meridian .fh-icon-tile--mint,
+.fh-meridian .fh-icon-tile--amber,
+.fh-meridian .fh-icon-tile--blue,
+.fh-meridian .fh-icon-tile--rose,
+.fh-meridian .fh-icon-tile--violet {
+  background: var(--md-trust-50) !important;
+  color: var(--md-trust-500) !important;
+  box-shadow: none !important;
+  border-radius: 8px !important;
+}
+
+.fh-meridian .fh-start-widget.fh-fridge-home__kitchen .fh-start-widget__icon,
+.fh-meridian .fh-start-widget.fh-fridge-home__kitchen .fh-icon-tile {
+  background: var(--md-warning-bg) !important;
+  color: var(--md-warning) !important;
+}
+
+.fh-meridian .fh-start-widget.fh-fridge-home__shopping .fh-start-widget__icon,
+.fh-meridian .fh-start-widget.fh-fridge-home__shopping .fh-icon-tile {
+  background: var(--md-success-bg) !important;
+  color: var(--md-success) !important;
+}
+
+.fh-meridian .fh-start-widget__header-actions {
+  background: transparent !important;
+  border: 0 !important;
+}
+
+.fh-meridian .fh-start-widget__action,
+.fh-meridian .fh-pro-btn,
+.fh-meridian .fh-pro-btn--ghost {
+  border: 1px solid var(--md-line) !important;
+  border-radius: 8px !important;
+  background: var(--md-surface) !important;
+  color: var(--md-ink-secondary) !important;
+  box-shadow: none !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+}
+
+.fh-meridian .fh-pro-btn--primary {
+  border-color: var(--md-trust-500) !important;
+  background: var(--md-trust-500) !important;
+  color: var(--md-on-trust) !important;
+}
+
+.fh-meridian .fh-pro-btn--primary:hover {
+  background: var(--md-trust-600) !important;
+  border-color: var(--md-trust-600) !important;
+  color: var(--md-on-trust) !important;
+}
+
+.fh-meridian .fh-pro-btn--ghost:hover,
+.fh-meridian .fh-start-widget__action:hover {
+  background: var(--md-surface-muted) !important;
+  border-color: var(--md-line-strong) !important;
+  color: var(--md-ink) !important;
+}
+
+.fh-meridian .fh-start-widget__menu {
+  border-color: var(--md-line) !important;
+  background: var(--md-surface) !important;
+  color: var(--md-ink-muted) !important;
+  border-radius: 8px !important;
+}
+
+.fh-meridian .fh-start-widget__menu:hover:not(:disabled),
+.fh-meridian .fh-start-widget__menu:focus-visible {
+  background: var(--md-trust-50) !important;
+  border-color: var(--md-trust-200) !important;
+  color: var(--md-trust-600) !important;
+}
+
+.fh-meridian .fh-start-widget__footer,
+.fh-meridian.fh-home-pro .fh-start-widget__footer {
+  border-top: 1px solid var(--md-line) !important;
+  background: var(--md-surface-muted) !important;
+}
+
+.fh-meridian .fh-start-widget__meta-chip {
+  border: 1px solid var(--md-line) !important;
+  background: var(--md-surface) !important;
+  color: var(--md-ink-muted) !important;
+  box-shadow: none !important;
+  border-radius: var(--md-radius-pill) !important;
+  font-size: 11px !important;
+  font-weight: 500 !important;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.fh-meridian .fh-start-widget__empty,
+.fh-meridian .fh-pro-empty {
+  border: 1px dashed var(--md-line-strong) !important;
+  background: var(--md-surface-muted) !important;
+  box-shadow: none !important;
+  color: var(--md-ink-muted) !important;
+  border-radius: 8px !important;
+}
+
+/* Kitchen / status — semantic warning/success, not editorial amber paper */
+.fh-meridian .fh-fridge-home__kitchen-hero,
+.fh-meridian .fh-home-pro__priority,
+.fh-meridian.fh-start-page .fh-fridge-home__kitchen-hero {
+  border: 1px solid var(--md-warning-border) !important;
+  border-radius: var(--md-radius) !important;
+  background: var(--md-warning-bg) !important;
+  box-shadow: none !important;
+}
+
+.fh-meridian .fh-fridge-home__kitchen-name,
+.fh-meridian .fh-home-pro__priority .fh-fridge-home__kitchen-name {
+  font-family: var(--md-font) !important;
+  font-size: clamp(1.35rem, 2vw, 1.65rem) !important;
+  font-weight: 600 !important;
+  letter-spacing: -0.02em !important;
+  color: var(--md-ink) !important;
+}
+
+.fh-meridian .fh-fridge-home__kitchen-summary,
+.fh-meridian .fh-fridge-home__kitchen-meta {
+  color: var(--md-ink-secondary) !important;
+}
+
+.fh-meridian .fh-status-pill {
+  border: 1px solid var(--md-line);
+  background: var(--md-surface);
+  color: var(--md-ink-muted);
+  border-radius: var(--md-radius-pill);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.fh-meridian .fh-status-pill--done {
+  border-color: var(--md-success-border);
+  background: var(--md-success-bg);
+  color: var(--md-success);
+}
+
+.fh-meridian .fh-status-pill--open {
+  border-color: var(--md-warning-border);
+  background: var(--md-warning-bg);
+  color: var(--md-warning);
+}
+
+.fh-meridian .fh-status-pill--neutral {
+  border-color: var(--md-line);
+  background: var(--md-surface);
+  color: var(--md-ink-muted);
+}
+
+/* List rows — table-like, data-first */
+.fh-meridian .fh-pro-list-row,
+.fh-meridian .fh-home-pro__list .fh-pro-list-row {
+  border: 1px solid var(--md-line) !important;
+  border-radius: 8px !important;
+  background: var(--md-surface) !important;
+  box-shadow: none !important;
+  padding: 0.7rem 0.8rem !important;
+}
+
+.fh-meridian .fh-home-pro__list .fh-pro-list-row:hover,
+.fh-meridian .fh-home-pro__list .fh-pro-list-row:focus-visible {
+  background: var(--md-trust-50) !important;
+  border-color: var(--md-trust-200) !important;
+}
+
+.fh-meridian .fh-pro-list-row__title {
+  font-family: var(--md-font) !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  color: var(--md-ink) !important;
+}
+
+.fh-meridian .fh-pro-list-row__meta {
+  font-family: var(--md-font) !important;
+  font-size: 12px !important;
+  font-weight: 400 !important;
+  color: var(--md-ink-muted) !important;
+}
+
+.fh-meridian .fh-home-pro__qty {
+  border: 1px solid var(--md-line) !important;
+  background: var(--md-surface-muted) !important;
+  color: var(--md-ink-secondary) !important;
+  border-radius: 6px !important;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600 !important;
+}
+
+.fh-meridian .fh-home-pro__composer input {
+  border: 1px solid var(--md-line) !important;
+  border-radius: 8px !important;
+  background: var(--md-surface) !important;
+  color: var(--md-ink) !important;
+  font-weight: 400 !important;
+}
+
+.fh-meridian .fh-home-pro__composer input::placeholder {
+  color: var(--md-ink-faint);
+}
+
+.fh-meridian .fh-home-pro__composer input:focus {
+  border-color: var(--md-trust-500) !important;
+  background: var(--md-surface) !important;
+  box-shadow: 0 0 0 3px rgba(30, 79, 140, 0.16) !important;
+}
+
+/* Mini calendar */
+.fh-meridian .fh-fridge-home__mini-cal,
+.fh-meridian .fh-home-pro__mini-cal,
+.fh-meridian.fh-start-page .fh-fridge-home__mini-cal {
+  border: 1px solid var(--md-line) !important;
+  border-radius: var(--md-radius) !important;
+  background: var(--md-surface-muted) !important;
+  box-shadow: none !important;
+}
+
+.fh-meridian .fh-fridge-home__mini-cal-label {
+  font-family: var(--md-font) !important;
+  font-weight: 600 !important;
+  color: var(--md-ink) !important;
+}
+
+.fh-meridian .fh-fridge-home__mini-cal-weekdays span {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--md-ink-faint);
+}
+
+.fh-meridian .fh-fridge-home__mini-cal-day {
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--md-ink);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+
+.fh-meridian .fh-fridge-home__mini-cal-day.is-muted {
+  color: var(--md-ink-faint);
+}
+
+.fh-meridian .fh-fridge-home__mini-cal-day.is-today {
+  background: var(--md-trust-500) !important;
+  color: var(--md-on-trust) !important;
+  box-shadow: none !important;
+}
+
+.fh-meridian .fh-fridge-home__mini-cal-day.has-events::after {
+  background: var(--md-trust-500) !important;
+}
+
+.fh-meridian .fh-fridge-home__mini-cal-day.is-today.has-events::after {
+  background: #fff !important;
+}
+
+.fh-meridian .fh-fridge-home__mini-cal-day:hover,
+.fh-meridian .fh-fridge-home__mini-cal-day:focus-visible {
+  background: var(--md-trust-50) !important;
+  border-color: var(--md-trust-200) !important;
+}
+
+.fh-meridian .fh-fridge-home__mini-cal-day.is-today:hover,
+.fh-meridian .fh-fridge-home__mini-cal-day.is-today:focus-visible {
+  background: var(--md-trust-600) !important;
+  color: var(--md-on-trust) !important;
+}
+
+.fh-meridian .fh-fridge-home__agenda-day {
+  font-weight: 600;
+  color: var(--md-ink);
+}
+
+/* Storage KPIs */
+.fh-meridian .fh-mini-stat,
+.fh-meridian .fh-pro-stat,
+.fh-meridian.fh-start-page .fh-mini-stat,
+.fh-meridian.fh-home-pro .fh-mini-stat {
+  border: 1px solid var(--md-line) !important;
+  border-radius: var(--md-radius) !important;
+  background: var(--md-surface-muted) !important;
+  box-shadow: none !important;
+}
+
+.fh-meridian .fh-mini-stat--mint,
+.fh-meridian .fh-mini-stat--aqua,
+.fh-meridian .fh-mini-stat--blue,
+.fh-meridian .fh-mini-stat--amber {
+  background: var(--md-surface) !important;
+  border-color: var(--md-line) !important;
+}
+
+.fh-meridian .fh-mini-stat__value,
+.fh-meridian .fh-pro-stat strong {
+  font-family: var(--md-font) !important;
+  font-weight: 600 !important;
+  color: var(--md-ink) !important;
+  font-variant-numeric: tabular-nums;
+}
+
+.fh-meridian .fh-mini-stat__label,
+.fh-meridian .fh-pro-stat span {
+  font-family: var(--md-font) !important;
+  font-weight: 500 !important;
+  letter-spacing: 0.04em !important;
+  text-transform: uppercase !important;
+  color: var(--md-ink-muted) !important;
+}
+
+.fh-meridian .fh-fridge-home__storage-note {
+  color: var(--md-ink-muted);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.fh-meridian.fh-home-pro .fh-fridge-home__storage {
+  background: var(--md-surface) !important;
+}
+
+@media (max-width: 760px) {
+  .fh-meridian .fh-fridge-home__clock,
+  .fh-meridian .fh-home-pro__clock {
+    text-align: left;
+  }
+}

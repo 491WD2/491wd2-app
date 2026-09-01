@@ -1,0 +1,77 @@
+/**
+ * Dashboard Preview — design tokens (presentation rebuild v3).
+ * Scoped to `.dashboard-preview` only.
+ */
+
+.dashboard-preview {
+  --dp-bg: #f5f7fb;
+  --dp-bg-tint:
+    radial-gradient(circle at 0% 0%, rgba(147, 197, 253, 0.14), transparent 34%),
+    radial-gradient(circle at 100% 0%, rgba(196, 181, 253, 0.12), transparent 32%),
+    radial-gradient(circle at 88% 100%, rgba(110, 231, 183, 0.1), transparent 30%),
+    var(--dp-bg);
+
+  --dp-ink: #0f172a;
+  --dp-ink-soft: #334155;
+  --dp-muted: #64748b;
+  --dp-line: #e2e8f0;
+  --dp-line-soft: #eef2f7;
+
+  --dp-surface: #ffffff;
+  --dp-surface-muted: #f8fafc;
+
+  --dp-shopping: #14b8a6;
+  --dp-shopping-soft: #ecfdf5;
+  --dp-shopping-strong: #0d9488;
+  --dp-calendar: #4f46e5;
+  --dp-calendar-soft: #eef2ff;
+  --dp-upcoming: #7c3aed;
+  --dp-upcoming-soft: #f5f3ff;
+  --dp-pantry: #f59e0b;
+  --dp-pantry-soft: #fffbeb;
+  --dp-chores: #f97316;
+  --dp-chores-soft: #fff7ed;
+  --dp-messages: #a855f7;
+  --dp-messages-soft: #faf5ff;
+
+  --dp-radius-shell: 0;
+  --dp-radius-panel: 22px;
+  --dp-radius-card: 22px;
+  --dp-radius-control: 14px;
+  --dp-radius-pill: 999px;
+
+  --dp-shadow-card:
+    0 1px 2px rgba(15, 23, 42, 0.04),
+    0 10px 28px rgba(15, 23, 42, 0.06);
+  --dp-shadow-hover:
+    0 2px 4px rgba(15, 23, 42, 0.04),
+    0 16px 36px rgba(15, 23, 42, 0.09);
+
+  --dp-font: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --dp-transition: 160ms ease;
+
+  min-height: 100vh;
+  color: var(--dp-ink);
+  font-family: var(--dp-font);
+  font-size: 14px;
+  line-height: 1.45;
+  background: var(--dp-bg-tint);
+  -webkit-font-smoothing: antialiased;
+}
+
+.dashboard-preview *,
+.dashboard-preview *::before,
+.dashboard-preview *::after {
+  box-sizing: border-box;
+}
+
+.dashboard-preview button,
+.dashboard-preview input {
+  font: inherit;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dashboard-preview {
+    --dp-transition: 0ms;
+  }
+}

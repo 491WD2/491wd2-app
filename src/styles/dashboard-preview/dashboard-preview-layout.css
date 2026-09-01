@@ -1,0 +1,302 @@
+/**
+ * Dashboard Preview — shell + layout (presentation rebuild v3).
+ */
+
+/* ── App shell ── */
+.dashboard-preview .dp-app {
+  display: grid;
+  grid-template-columns: 68px minmax(0, 1fr);
+  min-height: 100vh;
+}
+
+.dashboard-preview .dp-rail {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 16px 8px;
+  background: var(--dp-surface);
+  border-right: 1px solid var(--dp-line);
+  box-shadow: 4px 0 24px rgba(15, 23, 42, 0.03);
+}
+
+.dashboard-preview .dp-rail__btn {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border: none;
+  border-radius: 14px;
+  background: transparent;
+  color: #94a3b8;
+  cursor: pointer;
+  position: relative;
+  transition: background-color var(--dp-transition), color var(--dp-transition), box-shadow var(--dp-transition);
+}
+
+.dashboard-preview .dp-rail__btn:hover {
+  background: #f1f5f9;
+  color: #64748b;
+}
+
+.dashboard-preview .dp-rail__btn.is-active {
+  background: linear-gradient(135deg, #6366f1, #4f46e5);
+  color: #fff;
+  box-shadow: 0 8px 20px rgba(79, 70, 229, 0.28);
+}
+
+.dashboard-preview .dp-rail__btn.is-active::after {
+  content: "";
+  position: absolute;
+  right: -9px;
+  top: 50%;
+  width: 3px;
+  height: 20px;
+  border-radius: 999px;
+  background: #4f46e5;
+  transform: translateY(-50%);
+}
+
+.dashboard-preview .dp-rail__icon {
+  width: 19px;
+  height: 19px;
+}
+
+.dashboard-preview .dp-workspace {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 100vh;
+}
+
+.dashboard-preview .dp-topbar {
+  display: grid;
+  grid-template-columns: auto minmax(200px, 1fr) auto;
+  align-items: center;
+  gap: 16px;
+  min-height: 64px;
+  padding: 12px 22px;
+  background: var(--dp-surface);
+  border-bottom: 1px solid var(--dp-line);
+}
+
+.dashboard-preview .dp-topbar__brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.dashboard-preview .dp-topbar__mark {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #6366f1, #4f46e5);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.dashboard-preview .dp-topbar__title {
+  color: var(--dp-ink);
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.dashboard-preview .dp-topbar__search {
+  display: flex;
+  align-items: center;
+  min-height: 40px;
+  padding: 0 16px;
+  border-radius: var(--dp-radius-pill);
+  background: #f8fafc;
+  border: 1px solid var(--dp-line);
+  color: #94a3b8;
+  font-size: 13px;
+}
+
+.dashboard-preview .dp-topbar__actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.dashboard-preview .dp-topbar__icon-btn {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border: none;
+  border-radius: 12px;
+  background: #f8fafc;
+  color: #64748b;
+  cursor: pointer;
+  transition: background-color var(--dp-transition), color var(--dp-transition);
+}
+
+.dashboard-preview .dp-topbar__icon-btn:hover {
+  background: #eef2ff;
+  color: #4f46e5;
+}
+
+.dashboard-preview .dp-topbar__icon {
+  width: 18px;
+  height: 18px;
+}
+
+.dashboard-preview .dp-topbar__badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: #4f46e5;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 18px;
+  text-align: center;
+}
+
+.dashboard-preview .dp-canvas {
+  flex: 1;
+  padding: 20px 22px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  min-width: 0;
+}
+
+/* ── Utility band ── */
+.dashboard-preview .dp-band {
+  display: grid;
+  grid-template-columns: minmax(140px, 0.75fr) minmax(0, 1.4fr) minmax(180px, 0.85fr);
+  gap: 14px;
+  align-items: center;
+  padding: 14px 18px;
+  border-radius: var(--dp-radius-panel);
+  background: var(--dp-surface);
+  border: 1px solid var(--dp-line);
+  box-shadow: var(--dp-shadow-card);
+}
+
+.dashboard-preview .dp-band__clock {
+  min-width: 0;
+}
+
+.dashboard-preview .dp-band__time {
+  margin: 0;
+  color: var(--dp-ink);
+  font-size: 28px;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+}
+
+.dashboard-preview .dp-band__date {
+  margin: 4px 0 0;
+  color: var(--dp-muted);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.dashboard-preview .dp-band__status {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+  min-width: 0;
+}
+
+.dashboard-preview .dp-band__chips {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 6px;
+}
+
+.dashboard-preview .dp-band__weather {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--dp-muted);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.dashboard-preview .dp-band__weather-icon {
+  width: 14px;
+  height: 14px;
+  opacity: 0.7;
+}
+
+/* ── Six-widget grid ── */
+.dashboard-preview .dp-grid {
+  display: grid;
+  grid-template-columns: minmax(260px, 0.92fr) minmax(380px, 1.28fr) minmax(240px, 0.8fr);
+  gap: 18px;
+  align-items: start;
+}
+
+.dashboard-preview .dp-grid > .dp-widget--calendar {
+  min-height: 380px;
+}
+
+@media (max-width: 1180px) {
+  .dashboard-preview .dp-app {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard-preview .dp-rail {
+    flex-direction: row;
+    justify-content: center;
+    padding: 10px;
+    border-right: none;
+    border-bottom: 1px solid var(--dp-line);
+  }
+
+  .dashboard-preview .dp-rail__btn.is-active::after {
+    right: auto;
+    top: auto;
+    bottom: -9px;
+    left: 50%;
+    width: 20px;
+    height: 3px;
+    transform: translateX(-50%);
+  }
+
+  .dashboard-preview .dp-topbar {
+    grid-template-columns: 1fr auto;
+  }
+
+  .dashboard-preview .dp-topbar__search {
+    display: none;
+  }
+
+  .dashboard-preview .dp-band {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard-preview .dp-band__status {
+    align-items: flex-start;
+  }
+
+  .dashboard-preview .dp-band__chips {
+    justify-content: flex-start;
+  }
+
+  .dashboard-preview .dp-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard-preview .dp-grid > .dp-widget--calendar {
+    min-height: 0;
+  }
+}

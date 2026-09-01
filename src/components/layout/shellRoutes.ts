@@ -23,6 +23,7 @@ import {
 export type RouteKey =
   | "dashboard"
   | "adminux"
+  | "dashboardPreview"
   | "messages"
   | "kiosk"
   | "family"
@@ -60,6 +61,7 @@ export const PRIMARY_NAV_EXCLUDED = new Set<RouteKey>([
   /** AdminUX command center — sidebar Home; keep bottom strip on short labels. */
   "adminux",
   "dashboard",
+  "dashboardPreview",
   "kitchenSchedule",
   "emergency",
 ]);
