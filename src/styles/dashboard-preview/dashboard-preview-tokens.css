@@ -1,20 +1,21 @@
 /**
- * Dashboard Preview — reference-inspired tokens.
+ * Dashboard Preview — reference bento tokens.
  * Scoped to `.dashboard-preview` only.
  */
 
 .dashboard-preview {
-  --dp-bg: #f0f2f8;
+  --dp-bg: #e8ecf4;
+  --dp-canvas: #eef1f7;
   --dp-page-bg:
-    radial-gradient(circle at 4% 0%, rgba(94, 234, 212, 0.12), transparent 32%),
-    radial-gradient(circle at 96% 4%, rgba(167, 139, 250, 0.1), transparent 30%),
-    radial-gradient(circle at 88% 96%, rgba(251, 191, 36, 0.08), transparent 28%),
-    var(--dp-bg);
+    radial-gradient(circle at 0% 0%, rgba(94, 234, 212, 0.14), transparent 34%),
+    radial-gradient(circle at 100% 0%, rgba(129, 140, 248, 0.12), transparent 32%),
+    radial-gradient(circle at 88% 100%, rgba(251, 191, 36, 0.1), transparent 30%),
+    var(--dp-canvas);
 
-  --dp-text: #1e293b;
-  --dp-text-secondary: #64748b;
+  --dp-text: #0f172a;
+  --dp-text-secondary: #475569;
   --dp-text-muted: #94a3b8;
-  --dp-font: "Inter", "Mulish", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --dp-font: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
   --dp-font-nums: "Inter", ui-sans-serif, system-ui, sans-serif;
 
   --dp-blue: #4f7cff;
@@ -38,35 +39,45 @@
   --dp-card-strong: #ffffff;
   --dp-card-fallback: #ffffff;
   --dp-nested: #f8fafc;
-  --dp-border: rgba(226, 232, 240, 0.8);
-  --dp-divider: #e8edf4;
+  --dp-border: rgba(226, 232, 240, 0.95);
+  --dp-divider: #e2e8f0;
 
-  --dp-utility-bg: #ffffff;
+  --dp-rail-bg: #ffffff;
+  --dp-topbar-bg: #ffffff;
+  --dp-utility-bg: transparent;
 
-  --dp-frame-pad: 20px;
-  --dp-shell-max-width: 1720px;
+  --dp-shell-bleed-x: 1.5rem;
+  --dp-shell-bleed-y: 1.75rem;
+  --dp-shell-max-width: none;
+  --dp-frame-pad: 0;
   --dp-frame-bg: transparent;
   --dp-frame-border: none;
   --dp-frame-shadow: none;
   --dp-frame-blur: 0px;
 
   --dp-radius-shell: 0px;
-  --dp-radius-large: 22px;
+  --dp-radius-large: 24px;
   --dp-radius-card: 22px;
   --dp-radius-compact: 16px;
-  --dp-radius-row: 12px;
+  --dp-radius-row: 14px;
   --dp-radius-btn: 9999px;
   --dp-radius-pill: 9999px;
 
-  --dp-gap: 16px;
-  --dp-gap-sm: 8px;
-  --dp-gap-section: 12px;
-  --dp-gap-section-lg: 20px;
-  --dp-content-pad: 20px;
+  --dp-gap: 18px;
+  --dp-gap-sm: 10px;
+  --dp-gap-section: 14px;
+  --dp-gap-section-lg: 22px;
+  --dp-content-pad: 22px;
 
-  --dp-shadow-low: 0 1px 2px rgba(15, 23, 42, 0.04), 0 4px 16px rgba(15, 23, 42, 0.04);
-  --dp-shadow: 0 2px 4px rgba(15, 23, 42, 0.03), 0 8px 24px rgba(15, 23, 42, 0.06);
-  --dp-shadow-elevated: 0 4px 8px rgba(15, 23, 42, 0.04), 0 16px 40px rgba(15, 23, 42, 0.08);
+  --dp-shadow-low:
+    0 1px 2px rgba(15, 23, 42, 0.04),
+    0 6px 20px rgba(15, 23, 42, 0.05);
+  --dp-shadow:
+    0 2px 4px rgba(15, 23, 42, 0.03),
+    0 12px 32px rgba(15, 23, 42, 0.08);
+  --dp-shadow-elevated:
+    0 4px 8px rgba(15, 23, 42, 0.04),
+    0 20px 48px rgba(15, 23, 42, 0.1);
 
   --dp-blur: 12px;
   --dp-transition: 165ms ease;
@@ -85,13 +96,6 @@
 .dashboard-preview *::before,
 .dashboard-preview *::after {
   box-sizing: border-box;
-}
-
-@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-  .dashboard-preview {
-    --dp-card: var(--dp-card-fallback);
-    --dp-utility-bg: rgba(255, 255, 255, 0.96);
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {

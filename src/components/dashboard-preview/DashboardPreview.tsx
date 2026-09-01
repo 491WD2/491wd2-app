@@ -36,8 +36,10 @@ export function DashboardPreview({
     fallback?.();
   }
 
+  const householdName = data.adminSettings.householdName?.trim() || "Household";
+
   return (
-    <DashboardPreviewShell>
+    <DashboardPreviewShell householdName={householdName}>
       <DashboardUtilityBand
         model={model}
         go={go}
