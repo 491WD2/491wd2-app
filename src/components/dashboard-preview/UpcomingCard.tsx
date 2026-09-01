@@ -30,42 +30,39 @@ export function UpcomingCard({ model, go, onOpenCalendar }: UpcomingCardProps) {
   const visibleRows = upcomingRows.slice(0, 6);
 
   return (
-    <section
-      className="dashboard-preview__card dashboard-preview__card--upcoming"
-      aria-label="Upcoming events"
-    >
-      <header className="dashboard-preview__card-head dashboard-preview__card-head--row">
-        <div className="dashboard-preview__card-head-with-icon">
-          <span className="dashboard-preview__icon-badge dashboard-preview__icon-badge--upcoming" aria-hidden="true">
-            <Clock3 className="dashboard-preview__icon-badge-svg" />
+    <section className="dp-widget dp-widget--upcoming" aria-label="Upcoming events">
+      <header className="dp-widget__head">
+        <div className="dp-widget__title-row">
+          <span className="dp-widget__icon dp-widget__icon--upcoming" aria-hidden="true">
+            <Clock3 />
           </span>
           <div>
-            <h2 className="dashboard-preview__section-title">Upcoming</h2>
-            <p className="dashboard-preview__meta">{upcomingAgendaHeading}</p>
+            <h2 className="dp-widget__title">Upcoming</h2>
+            <p className="dp-widget__meta">{upcomingAgendaHeading}</p>
           </div>
         </div>
-        <button type="button" className="dashboard-preview__button--secondary" onClick={openCalendar}>
+        <button type="button" className="dp-btn dp-btn--ghost" onClick={openCalendar}>
           View all
         </button>
       </header>
 
       {visibleRows.length === 0 ? (
-        <p className="dashboard-preview__placeholder">No upcoming events on the planner.</p>
+        <p className="dp-empty">No upcoming events on the planner.</p>
       ) : (
-        <ul className="dashboard-preview__upcoming-agenda">
+        <ul className="dp-agenda">
           {visibleRows.map((row) => {
             const dateBlock = formatDateBlock(row.date);
             return (
               <li key={row.id}>
-                <button type="button" className="dashboard-preview__upcoming-row" onClick={openCalendar}>
-                  <span className="dashboard-preview__upcoming-date" aria-hidden="true">
-                    <span className="dashboard-preview__upcoming-date-day">{dateBlock.day}</span>
-                    <span className="dashboard-preview__upcoming-date-month">{dateBlock.month}</span>
+                <button type="button" className="dp-agenda__row" onClick={openCalendar}>
+                  <span className="dp-agenda__date" aria-hidden="true">
+                    <span className="dp-agenda__day">{dateBlock.day}</span>
+                    <span className="dp-agenda__month">{dateBlock.month}</span>
                   </span>
-                  <span className="dashboard-preview__upcoming-dot" aria-hidden="true" />
-                  <span className="dashboard-preview__upcoming-copy">
-                    <span className="dashboard-preview__upcoming-title">{row.title}</span>
-                    <span className="dashboard-preview__upcoming-meta">{upcomingTimeMeta(row.meta)}</span>
+                  <span className="dp-agenda__marker" aria-hidden="true" />
+                  <span className="dp-agenda__copy">
+                    <span className="dp-agenda__title">{row.title}</span>
+                    <span className="dp-agenda__meta">{upcomingTimeMeta(row.meta)}</span>
                   </span>
                 </button>
               </li>

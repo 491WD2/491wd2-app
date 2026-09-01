@@ -36,10 +36,8 @@ export function DashboardPreview({
     fallback?.();
   }
 
-  const householdName = data.adminSettings.householdName?.trim() || "Household";
-
   return (
-    <DashboardPreviewShell householdName={householdName}>
+    <DashboardPreviewShell go={go}>
       <DashboardUtilityBand
         model={model}
         go={go}
@@ -48,14 +46,13 @@ export function DashboardPreview({
         onOpenCalendar={onOpenCalendar}
       />
 
-      <div className="dashboard-preview__six-grid" aria-label="Primary dashboard widgets">
+      <div className="dp-grid dashboard-preview__six-grid" aria-label="Primary dashboard widgets">
         <ShoppingCard
           data={data}
           model={model}
           setData={setData}
           go={go}
           onOpenShopping={onOpenShopping}
-          variant="primary"
         />
         <CalendarCard model={model} go={go} onOpenCalendar={onOpenCalendar} />
         <UpcomingCard model={model} go={go} onOpenCalendar={onOpenCalendar} />

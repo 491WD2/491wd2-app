@@ -20,7 +20,6 @@ export function ShoppingCard({
   setData,
   go,
   onOpenShopping,
-  variant = "default",
 }: ShoppingCardProps) {
   const { needToBuy } = model;
   const [shoppingDraft, setShoppingDraft] = useState("");
@@ -42,35 +41,26 @@ export function ShoppingCard({
   }
 
   return (
-    <section
-      className={[
-        "dashboard-preview__card",
-        "dashboard-preview__card--shopping-accent",
-        variant === "primary" ? "dashboard-preview__card--shopping-primary" : "",
-      ]
-        .filter(Boolean)
-        .join(" ")}
-      aria-label="Shopping list"
-    >
-      <header className="dashboard-preview__card-head dashboard-preview__card-head--row">
-        <div className="dashboard-preview__card-head-with-icon">
-          <span className="dashboard-preview__icon-badge dashboard-preview__icon-badge--shopping" aria-hidden="true">
-            <ShoppingCart className="dashboard-preview__icon-badge-svg" />
+    <section className="dp-widget dp-widget--shopping" aria-label="Shopping list">
+      <header className="dp-widget__head">
+        <div className="dp-widget__title-row">
+          <span className="dp-widget__icon dp-widget__icon--shopping" aria-hidden="true">
+            <ShoppingCart />
           </span>
           <div>
-            <h2 className="dashboard-preview__section-title">Shopping</h2>
-            <p className="dashboard-preview__meta">{shoppingItemLabel} on the list</p>
+            <h2 className="dp-widget__title">Shopping</h2>
+            <p className="dp-widget__meta">{shoppingItemLabel} on the list</p>
           </div>
         </div>
-        <button type="button" className="dashboard-preview__button--secondary" onClick={() => go("/shopping", onOpenShopping)}>
+        <button type="button" className="dp-btn dp-btn--ghost" onClick={() => go("/shopping", onOpenShopping)}>
           Open shopping
         </button>
       </header>
 
       {needToBuy.length === 0 ? (
-        <p className="dashboard-preview__placeholder">Shopping list is clear.</p>
+        <p className="dp-empty">Shopping list is clear.</p>
       ) : (
-        <ul className="dashboard-preview__list">
+        <ul className="dp-checklist">
           {needToBuy.slice(0, 5).map((item) => {
             const qty = [item.quantity, item.unit].filter(Boolean).join(" ") || "1";
             const category = item.category?.trim();
@@ -80,18 +70,13 @@ export function ShoppingCard({
               category.toLowerCase() !== "general";
             return (
               <li key={item.id}>
-                <button
-                  type="button"
-                  className="dashboard-preview__row"
-                  onClick={() => go("/shopping", onOpenShopping)}
-                >
-                  <span className="dashboard-preview__row-main">
-                    <span className="dashboard-preview__row-title">{item.name}</span>
-                    {showCategory ? (
-                      <span className="dashboard-preview__row-meta">{category}</span>
-                    ) : null}
+                <button type="button" className="dp-checklist__row" onClick={() => go("/shopping", onOpenShopping)}>
+                  <span className="dp-checklist__bullet" aria-hidden="true" />
+                  <span className="dp-checklist__copy">
+                    <span className="dp-checklist__title">{item.name}</span>
+                    {showCategory ? <span className="dp-checklist__meta">{category}</span> : null}
                   </span>
-                  <span className="dashboard-preview__row-qty">{qty}</span>
+                  <span className="dp-checklist__qty">{qty}</span>
                 </button>
               </li>
             );
@@ -99,16 +84,16 @@ export function ShoppingCard({
         </ul>
       )}
 
-      <form className="dashboard-preview__composer" onSubmit={onShoppingAdd}>
+      <form className="dp-composer dp-composer--shopping" onSubmit={onShoppingAdd}>
         <input
           aria-label="Quick add shopping item"
           autoComplete="off"
-          className="dashboard-preview__composer-input"
+          className="dp-composer__input"
           onChange={(e) => setShoppingDraft(e.target.value)}
           placeholder="Add an item…"
           value={shoppingDraft}
         />
-        <button type="submit" className="dashboard-preview__button" aria-label="Add shopping item">
+        <button type="submit" className="dp-btn dp-btn--shopping" aria-label="Add shopping item">
           Add
         </button>
       </form>

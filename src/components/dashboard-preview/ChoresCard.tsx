@@ -21,31 +21,28 @@ export function ChoresCard({ model, setData, go, onOpenTasks }: ChoresCardProps)
   const fallbackRows = todayChores.length === 0 ? todayRows.slice(0, 6) : [];
 
   return (
-    <section
-      className="dashboard-preview__card dashboard-preview__card--chores"
-      aria-label="Today's chores"
-    >
-      <header className="dashboard-preview__card-head dashboard-preview__card-head--row">
-        <div className="dashboard-preview__card-head-with-icon">
-          <span className="dashboard-preview__icon-badge dashboard-preview__icon-badge--chores" aria-hidden="true">
-            <Sparkles className="dashboard-preview__icon-badge-svg" />
+    <section className="dp-widget dp-widget--chores" aria-label="Today's chores">
+      <header className="dp-widget__head">
+        <div className="dp-widget__title-row">
+          <span className="dp-widget__icon dp-widget__icon--chores" aria-hidden="true">
+            <Sparkles />
           </span>
           <div>
-            <h2 className="dashboard-preview__section-title">Chores</h2>
-            <p className="dashboard-preview__meta">
+            <h2 className="dp-widget__title">Chores</h2>
+            <p className="dp-widget__meta">
               {openChoreCount === 1 ? "1 open today" : `${openChoreCount} open today`}
             </p>
           </div>
         </div>
-        <button type="button" className="dashboard-preview__button--secondary" onClick={() => go("/tasks", onOpenTasks)}>
+        <button type="button" className="dp-btn dp-btn--ghost" onClick={() => go("/tasks", onOpenTasks)}>
           Open chores
         </button>
       </header>
 
       {todayChores.length === 0 && todayRows.length === 0 ? (
-        <p className="dashboard-preview__placeholder">Nothing due for today yet.</p>
+        <p className="dp-empty">Nothing due for today yet.</p>
       ) : (
-        <ul className="dashboard-preview__list dashboard-preview__list--chores">
+        <ul className="dp-checklist dp-checklist--chores">
           {choreRows.map((task) => (
             <ChoreRow
               key={task.id}
@@ -56,10 +53,11 @@ export function ChoresCard({ model, setData, go, onOpenTasks }: ChoresCardProps)
           ))}
           {fallbackRows.map((item) => (
             <li key={item.id}>
-              <button type="button" className="dashboard-preview__row" onClick={() => go("/tasks", onOpenTasks)}>
-                <span className="dashboard-preview__row-main">
-                  <span className="dashboard-preview__row-title">{item.title}</span>
-                  <span className="dashboard-preview__row-meta">
+              <button type="button" className="dp-checklist__row" onClick={() => go("/tasks", onOpenTasks)}>
+                <span className="dp-checklist__bullet" aria-hidden="true" />
+                <span className="dp-checklist__copy">
+                  <span className="dp-checklist__title">{item.title}</span>
+                  <span className="dp-checklist__meta">
                     {item.time} · {item.done ? "Done" : "Chore"}
                   </span>
                 </span>
@@ -89,16 +87,16 @@ function ChoreRow({
     <li>
       <button
         type="button"
-        className={["dashboard-preview__row", done ? "is-done" : ""].filter(Boolean).join(" ")}
+        className={["dp-checklist__row", done ? "is-done" : ""].filter(Boolean).join(" ")}
         onClick={onToggle}
         aria-pressed={done}
       >
-        <span className="dashboard-preview__row-check" aria-hidden="true">
-          {done ? <Check className="dashboard-preview__check-icon" /> : null}
+        <span className="dp-checklist__check" aria-hidden="true">
+          {done ? <Check /> : null}
         </span>
-        <span className="dashboard-preview__row-main">
-          <span className="dashboard-preview__row-title">{task.title}</span>
-          <span className="dashboard-preview__row-meta">
+        <span className="dp-checklist__copy">
+          <span className="dp-checklist__title">{task.title}</span>
+          <span className="dp-checklist__meta">
             {assignmentLabel} · {done ? "Done" : "Open"}
           </span>
         </span>

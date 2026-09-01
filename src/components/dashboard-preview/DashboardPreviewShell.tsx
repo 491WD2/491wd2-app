@@ -1,94 +1,85 @@
 import {
-  BarChart3,
   CalendarDays,
   LayoutDashboard,
+  MessageCircle,
   Package,
   Settings,
   ShoppingCart,
 } from "lucide-react";
 import type { ReactNode } from "react";
+import type { DashboardGo } from "./types";
 
-const RAIL_ITEMS = [
-  { icon: LayoutDashboard, label: "Dashboard", active: true },
-  { icon: BarChart3, label: "Overview", active: false },
-  { icon: ShoppingCart, label: "Shopping", active: false },
-  { icon: Package, label: "Storage", active: false },
-  { icon: CalendarDays, label: "Calendar", active: false },
-  { icon: Settings, label: "Settings", active: false },
+const RAIL_NAV = [
+  { key: "home", icon: LayoutDashboard, label: "Dashboard", href: "/dashboard-preview" },
+  { key: "shopping", icon: ShoppingCart, label: "Shopping", href: "/shopping" },
+  { key: "pantry", icon: Package, label: "Storage", href: "/pantry" },
+  { key: "calendar", icon: CalendarDays, label: "Calendar", href: "/calendar" },
+  { key: "messages", icon: MessageCircle, label: "Messages", href: "/messages" },
+  { key: "settings", icon: Settings, label: "Settings", href: "/settings" },
 ] as const;
 
 type DashboardPreviewShellProps = {
   children: ReactNode;
-  householdName: string;
+  go: DashboardGo;
 };
 
 /**
- * Reference-style inner app chrome for the dashboard preview experiment.
- * AppShell remains the only app-level navigation — this is preview-only chrome.
+ * Preview-only presentation shell — replaces AppShell chrome on /dashboard-preview.
  */
-export function DashboardPreviewShell({ children, householdName }: DashboardPreviewShellProps) {
-  const householdInitial = householdName.trim().charAt(0).toUpperCase() || "H";
-
+export function DashboardPreviewShell({ children, go }: DashboardPreviewShellProps) {
   return (
-    <div className="dashboard-preview" data-testid="dashboard-preview-root" data-dp-build="reference-bento-v2">
-      <div className="dashboard-preview__bleed">
-        <div className="dashboard-preview__app">
-          <aside className="dashboard-preview__rail" aria-label="Preview navigation rail">
-            {RAIL_ITEMS.map((item) => {
-              const Icon = item.icon;
-              return (
-                <button
-                  key={item.label}
-                  type="button"
-                  className={[
-                    "dashboard-preview__rail-btn",
-                    item.active ? "is-active" : "",
-                  ]
-                    .filter(Boolean)
-                    .join(" ")}
-                  aria-label={item.label}
-                  aria-current={item.active ? "page" : undefined}
-                >
-                  <Icon className="dashboard-preview__rail-icon" aria-hidden="true" />
-                </button>
-              );
-            })}
-          </aside>
+    <div className="dashboard-preview" data-testid="dashboard-preview-root" data-dp-build="presentation-v3">
+      <div className="dp-app">
+        <aside className="dp-rail" aria-label="Preview navigation">
+          {RAIL_NAV.map((item) => {
+            const Icon = item.icon;
+            return (
+              <button
+                key={item.key}
+                type="button"
+                className={["dp-rail__btn", item.key === "home" ? "is-active" : ""].filter(Boolean).join(" ")}
+                aria-label={item.label}
+                aria-current={item.key === "home" ? "page" : undefined}
+                onClick={() => {
+                  if (item.key !== "home") {
+                    go(item.href);
+                  }
+                }}
+              >
+                <Icon className="dp-rail__icon" aria-hidden="true" />
+              </button>
+            );
+          })}
+        </aside>
 
-          <div className="dashboard-preview__workspace">
-            <header className="dashboard-preview__topbar" aria-label="Preview top bar">
-              <div className="dashboard-preview__topbar-brand">
-                <span className="dashboard-preview__topbar-logo" aria-hidden="true">
-                  {householdInitial}
-                </span>
-                <div className="dashboard-preview__topbar-copy">
-                  <p className="dashboard-preview__topbar-eyebrow">Household dashboard</p>
-                  <p className="dashboard-preview__topbar-title">{householdName}</p>
-                </div>
-              </div>
-
-              <div className="dashboard-preview__topbar-center">
-                <span className="dashboard-preview__build-pill">Preview build</span>
-              </div>
-
-              <div className="dashboard-preview__topbar-actions" aria-label="Preview utilities">
-                <span className="dashboard-preview__topbar-badge" aria-label="3 notifications">
-                  3
-                </span>
-                <span className="dashboard-preview__topbar-avatar" aria-hidden="true">
-                  {householdInitial}
-                </span>
-              </div>
-            </header>
-
-            <div className="dashboard-preview__canvas">
-              <div className="dashboard-preview__viewport">
-                <div className="dashboard-preview__frame">
-                  <div className="dashboard-preview__content">{children}</div>
-                </div>
-              </div>
+        <div className="dp-workspace">
+          <header className="dp-topbar" aria-label="Preview header">
+            <div className="dp-topbar__brand">
+              <span className="dp-topbar__mark" aria-hidden="true">
+                FH
+              </span>
+              <span className="dp-topbar__title">Household</span>
             </div>
-          </div>
+            <div className="dp-topbar__search" aria-hidden="true">
+              <span>Search household…</span>
+            </div>
+            <div className="dp-topbar__actions">
+              <button type="button" className="dp-topbar__icon-btn" aria-label="Messages" onClick={() => go("/messages")}>
+                <MessageCircle className="dp-topbar__icon" aria-hidden="true" />
+              </button>
+              <button
+                type="button"
+                className="dp-topbar__icon-btn"
+                aria-label="Notifications"
+                onClick={() => go("/notifications")}
+              >
+                <span className="dp-topbar__badge">3</span>
+                <CalendarDays className="dp-topbar__icon" aria-hidden="true" />
+              </button>
+            </div>
+          </header>
+
+          <main className="dp-canvas">{children}</main>
         </div>
       </div>
     </div>
