@@ -11,6 +11,26 @@ describe("household capabilities", () => {
     expect(result.value.data.shopping?.[0]?.name).toBe("Eggs");
   });
 
+  it("shopping.addItem('Milk') twice does not create a duplicate", () => {
+    const data = createDefaultFamilyData();
+    data.shopping = (data.shopping ?? []).filter(
+      (item) => item.name.trim().toLowerCase() !== "milk",
+    );
+
+    const first = shoppingAddItemCapability.execute(data, { name: "Milk" });
+    expect(first.ok).toBe(true);
+    expect(first.ok && first.value.kind).toBe("added");
+    if (!first.ok || first.value.kind !== "added") return;
+
+    const second = shoppingAddItemCapability.execute(first.value.data, { name: "Milk" });
+    expect(second.ok).toBe(true);
+    if (!second.ok) return;
+    expect(second.value.kind).toBe("duplicate");
+    expect(
+      first.value.data.shopping?.filter((item) => item.name === "Milk"),
+    ).toHaveLength(1);
+  });
+
   it("chores.complete matches household action behavior", () => {
     const data = createDefaultFamilyData();
     const task: Task = {

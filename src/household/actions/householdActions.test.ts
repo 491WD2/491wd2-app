@@ -107,6 +107,20 @@ describe("applyChoreToggleComplete", () => {
     expect(reopenedTask.status).toBe("Not Started");
     expect(reopenedTask.lastCompletedDate).toBe("");
     expect(isDoneToday(reopenedTask, todayIso)).toBe(false);
+
+    const completedAgain = applyChoreToggleComplete(
+      reopened.value.data,
+      reopenedTask,
+      todayIso,
+    );
+    expect(completedAgain.ok).toBe(true);
+    if (!completedAgain.ok) return;
+    expect(completedAgain.value.toggled).toBe("completed");
+
+    const againTask = completedAgain.value.data.tasks.find((t) => t.id === task.id)!;
+    expect(againTask.status).toBe("Done");
+    expect(againTask.lastCompletedDate).toBe(todayIso);
+    expect(isDoneToday(againTask, todayIso)).toBe(true);
   });
 
   it("preserves nextDueDate and assignedMemberId when reopening a recurring chore", () => {
@@ -144,20 +158,33 @@ describe("applyShoppingAddItem duplicate protection", () => {
     const pantryBefore = [...data.pantry];
     const plannerBefore = [...data.planner];
     const householdName = data.adminSettings.householdName;
+    // Default seed already includes Milk; start from a list without it so
+    // add → add is the regression path the action must protect.
+    data.shopping = (data.shopping ?? []).filter(
+      (item) => item.name.trim().toLowerCase() !== "milk",
+    );
+    const shoppingCountBeforeAdd = data.shopping.length;
 
     const first = applyShoppingAddItem(data, "Milk");
     expect(first.ok).toBe(true);
+    expect(first.ok && first.value.kind).toBe("added");
     if (!first.ok || first.value.kind !== "added") return;
 
-    const second = applyShoppingAddItem(first.value.data, "Milk");
+    const afterFirst = first.value.data;
+    expect(
+      afterFirst.shopping?.filter((item) => item.name === "Milk"),
+    ).toHaveLength(1);
+
+    const second = applyShoppingAddItem(afterFirst, "Milk");
     expect(second.ok).toBe(true);
     if (!second.ok) return;
     expect(second.value.kind).toBe("duplicate");
 
-    const milkItems = first.value.data.shopping?.filter((item) => item.name === "Milk") ?? [];
+    const milkItems = afterFirst.shopping?.filter((item) => item.name === "Milk") ?? [];
     expect(milkItems).toHaveLength(1);
-    expect(first.value.data.pantry).toEqual(pantryBefore);
-    expect(first.value.data.planner).toEqual(plannerBefore);
-    expect(first.value.data.adminSettings.householdName).toBe(householdName);
+    expect(afterFirst.shopping).toHaveLength(shoppingCountBeforeAdd + 1);
+    expect(afterFirst.pantry).toEqual(pantryBefore);
+    expect(afterFirst.planner).toEqual(plannerBefore);
+    expect(afterFirst.adminSettings.householdName).toBe(householdName);
   });
 });
