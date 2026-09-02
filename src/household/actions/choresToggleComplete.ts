@@ -43,6 +43,10 @@ export function applyChoreToggleComplete(
             ? {
                 ...item,
                 lastCompletedDate: "",
+                status:
+                  item.status === "Done" || item.status === "Completed"
+                    ? "Not Started"
+                    : item.status,
                 updatedAt: stamp,
               }
             : {
