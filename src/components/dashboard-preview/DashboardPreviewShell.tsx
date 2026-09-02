@@ -28,7 +28,7 @@ type DashboardPreviewShellProps = {
  */
 export function DashboardPreviewShell({ children, go }: DashboardPreviewShellProps) {
   return (
-    <div className="dashboard-preview" data-testid="dashboard-preview-root" data-dp-build="presentation-v3">
+    <div className="dashboard-preview" data-testid="dashboard-preview-root" data-dp-build="presentation-v3-responsive">
       <div className="dp-app">
         <aside className="dp-rail" aria-label="Preview navigation">
           {RAIL_NAV.map((item) => {

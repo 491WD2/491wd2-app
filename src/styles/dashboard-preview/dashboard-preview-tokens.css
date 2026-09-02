@@ -50,7 +50,18 @@
   --dp-font: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
   --dp-transition: 160ms ease;
 
+  /*
+   * Breakpoint system (media queries must use these same values):
+   *   desktop:            1280px+
+   *   tablet / kiosk:      720px–1279px
+   *   mobile:             <720px
+   */
+  --dp-touch-min: 44px;
+  --dp-touch-pref: 48px;
+
   min-height: 100vh;
+  min-height: 100dvh;
+  overflow-x: clip;
   color: var(--dp-ink);
   font-family: var(--dp-font);
   font-size: 14px;
