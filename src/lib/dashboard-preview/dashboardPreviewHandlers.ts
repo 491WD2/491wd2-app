@@ -1,21 +1,15 @@
 import type { Dispatch, SetStateAction } from "react";
 import type { FamilyData, KitchenDutyCompletion, Task } from "../../data/familyData";
+import {
+  applyChoreToggleComplete,
+  applyShoppingAddItem,
+  isDoneToday,
+} from "../../household/actions";
 import { createActivity } from "../activity";
 import {
   getTodayKitchenWeekdayLocal,
   kitchenDutyRelatedNotificationId,
 } from "../kitchenDuty";
-import { getNextDueDate } from "../utils";
-import { createShoppingItemFromName } from "../../pages/shopping/shoppingUtils";
-import { findDuplicateShoppingIndex } from "../../services/rulesEngine";
-
-function isDoneToday(task: Task, todayIso: string): boolean {
-  return (
-    task.lastCompletedDate === todayIso ||
-    task.status === "Done" ||
-    task.status === "Completed"
-  );
-}
 
 export type DashboardPreviewGo = (href: string, fallback?: () => void) => void;
 
@@ -117,48 +111,9 @@ export function createToggleTodayChore(input: {
   setData: Dispatch<SetStateAction<FamilyData>>;
 }) {
   return (task: Task) => {
-    const stamp = new Date().toISOString();
-    const completedDate = input.todayIso;
     input.setData((current) => {
-      const existing = current.tasks.find((item) => item.id === task.id);
-      if (!existing) return current;
-      const alreadyDone = isDoneToday(existing, input.todayIso);
-      return createActivity(
-        {
-          ...current,
-          tasks: current.tasks.map((item) =>
-            item.id === task.id
-              ? alreadyDone
-                ? {
-                    ...item,
-                    lastCompletedDate: "",
-                    updatedAt: stamp,
-                  }
-                : {
-                    ...item,
-                    status: item.type === "chore" ? "Not Started" : "Done",
-                    isBrainDump: false,
-                    lastCompletedDate: completedDate,
-                    nextDueDate:
-                      item.type === "chore"
-                        ? getNextDueDate(completedDate, item.frequency)
-                        : item.nextDueDate,
-                    updatedAt: stamp,
-                  }
-              : item,
-          ),
-        },
-        {
-          type: alreadyDone ? "updated" : "completed",
-          entityType: existing.type === "chore" ? "chore" : "task",
-          entityId: existing.id,
-          entityTitle: existing.title,
-          memberId: existing.assignedMemberId || undefined,
-          message: alreadyDone
-            ? `Reopened: ${existing.title}.`
-            : `Completed ${existing.type === "chore" ? "chore" : "task"}: ${existing.title}.`,
-        },
-      );
+      const result = applyChoreToggleComplete(current, task, input.todayIso);
+      return result.ok ? result.value.data : current;
     });
   };
 }
@@ -172,29 +127,18 @@ export function createAddShoppingItem(input: {
   setShoppingDraft: (value: string) => void;
 }) {
   return (rawName: string): boolean => {
-    const name = rawName.trim();
-    if (!name) return false;
-    const duplicateIndex = findDuplicateShoppingIndex(input.data.shopping ?? [], name);
-    if (duplicateIndex >= 0) {
+    const result = applyShoppingAddItem(input.data, rawName);
+    if (!result.ok) {
+      return false;
+    }
+
+    if (result.value.kind === "duplicate") {
       input.setShoppingDraft("");
       input.go("/shopping", input.onOpenShopping);
       return true;
     }
-    const item = createShoppingItemFromName(name);
-    input.setData((prev) =>
-      createActivity(
-        {
-          ...prev,
-          shopping: [item, ...(prev.shopping ?? [])],
-        },
-        {
-          type: "created",
-          entityType: "shopping",
-          entityId: item.id,
-          message: `Added “${item.name}” to shopping.`,
-        },
-      ),
-    );
+
+    input.setData(result.value.data);
     input.setShoppingDraft("");
     return true;
   };
