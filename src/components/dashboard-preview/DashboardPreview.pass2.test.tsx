@@ -73,4 +73,102 @@ describe("DashboardPreview Pass 2 smoke", () => {
     expect(navigateWithinApp).toHaveBeenCalledWith("/quick-add?type=grocery&name=");
     expect(navigateWithinApp).toHaveBeenCalledWith("/shopping");
   });
+
+  it("keeps preview navigation links and six widgets available", async () => {
+    const user = userEvent.setup();
+    const navigateWithinApp = jest.fn();
+    const base = createDefaultFamilyData();
+
+    render(
+      <DashboardPreview
+        data={base}
+        setData={jest.fn()}
+        navigateWithinApp={navigateWithinApp}
+        onOpenPantry={jest.fn()}
+        onOpenShopping={jest.fn()}
+        onOpenCalendar={jest.fn()}
+        onOpenTasks={jest.fn()}
+      />,
+    );
+
+    const rail = screen.getByLabelText(/Preview navigation/i);
+    expect(within(rail).getByRole("button", { name: "Dashboard" })).toBeInTheDocument();
+    expect(within(rail).getByRole("button", { name: "Shopping" })).toBeInTheDocument();
+    expect(within(rail).getByRole("button", { name: "Storage" })).toBeInTheDocument();
+    expect(within(rail).getByRole("button", { name: "Calendar" })).toBeInTheDocument();
+    expect(within(rail).getByRole("button", { name: "Messages" })).toBeInTheDocument();
+    expect(within(rail).getByRole("button", { name: "Settings" })).toBeInTheDocument();
+
+    await user.click(within(rail).getByRole("button", { name: "Shopping" }));
+    expect(navigateWithinApp).toHaveBeenCalledWith("/shopping");
+  });
+
+  it("adds a shopping item through the existing household action", async () => {
+    const user = userEvent.setup();
+    const setData = jest.fn();
+    const data = createDefaultFamilyData();
+
+    render(
+      <DashboardPreview
+        data={data}
+        setData={setData}
+        navigateWithinApp={jest.fn()}
+        onOpenPantry={jest.fn()}
+        onOpenShopping={jest.fn()}
+        onOpenCalendar={jest.fn()}
+        onOpenTasks={jest.fn()}
+      />,
+    );
+
+    await user.type(screen.getByLabelText(/Quick add shopping item/i), "Oat Milk");
+    await user.click(screen.getByRole("button", { name: /Add shopping item/i }));
+
+    expect(setData).toHaveBeenCalled();
+    const next = setData.mock.calls[0][0];
+    expect(next.shopping.some((item: { name: string }) => item.name === "Oat Milk")).toBe(true);
+    expect(next.shopping.filter((item: { name: string }) => item.name === "Milk")).toHaveLength(1);
+  });
+
+  it("completes a today chore through the existing household action", async () => {
+    const user = userEvent.setup();
+    const setData = jest.fn();
+    const todayIso = new Date().toISOString().slice(0, 10);
+    const data = createDefaultFamilyData();
+    data.tasks = [
+      {
+        id: "chore-preview-1",
+        title: "Unload dishwasher",
+        owner: "",
+        type: "chore",
+        status: "Not Started",
+        priority: "Medium",
+        frequency: "daily",
+        dueDate: todayIso,
+        lastCompletedDate: "",
+        nextDueDate: todayIso,
+        assignedMemberId: "",
+        createdAt: `${todayIso}T00:00:00.000Z`,
+        updatedAt: `${todayIso}T00:00:00.000Z`,
+      },
+    ];
+
+    render(
+      <DashboardPreview
+        data={data}
+        setData={setData}
+        navigateWithinApp={jest.fn()}
+        onOpenPantry={jest.fn()}
+        onOpenShopping={jest.fn()}
+        onOpenCalendar={jest.fn()}
+        onOpenTasks={jest.fn()}
+      />,
+    );
+
+    await user.click(screen.getByRole("button", { name: /Unload dishwasher/i }));
+    expect(setData).toHaveBeenCalled();
+    const updater = setData.mock.calls[0][0];
+    const next = typeof updater === "function" ? updater(data) : updater;
+    const chore = next.tasks.find((task: { id: string }) => task.id === "chore-preview-1");
+    expect(chore.lastCompletedDate).toBe(todayIso);
+  });
 });
