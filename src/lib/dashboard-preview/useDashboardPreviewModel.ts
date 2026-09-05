@@ -18,7 +18,7 @@ import {
 } from "../kitchenDuty";
 import { selectUpcomingEventsForHousehold } from "../upcomingEvents";
 import { findMemberById, getMemberFullName } from "../utils";
-import { getChoreDueDate } from "../choreTrackerUtils";
+import { selectDashboardChores } from "./selectDashboardChores";
 
 const MESSAGE_PREVIEW_LIMIT = 4;
 const NOTIFICATION_PREVIEW_LIMIT = 5;
@@ -69,16 +69,11 @@ export function useDashboardPreviewModel(data: FamilyData, now: Date) {
     [data, todayIso, openTasks],
   );
 
-  const todayChores = useMemo(
-    () =>
-      (data.tasks ?? []).filter(
-        (task) =>
-          task &&
-          task.status !== "Skipped" &&
-          (getChoreDueDate(task) === todayIso || task.lastCompletedDate === todayIso),
-      ),
-    [data.tasks, todayIso],
+  const choreSelection = useMemo(
+    () => selectDashboardChores(data, todayIso),
+    [data, todayIso],
   );
+  const todayChores = choreSelection.rows.map((row) => row.task);
 
   const upcomingEvents = useMemo(
     () => selectUpcomingEventsForHousehold(data, todayIso, 8),
@@ -142,7 +137,7 @@ export function useDashboardPreviewModel(data: FamilyData, now: Date) {
     data.kitchenDutyCompletions ?? [],
     todayIso,
   );
-  const openChoreCount = todayRows.filter((row) => !row.done).length;
+  const openChoreCount = choreSelection.openCount;
   const kitchenAssigned = Boolean(kitchenTodayMember);
   const kitchenDayLabel = todayKitchenDay
     ? labelKitchenWeekday(todayKitchenDay)
@@ -209,6 +204,7 @@ export function useDashboardPreviewModel(data: FamilyData, now: Date) {
     needToBuy,
     todayRows,
     todayChores,
+    choreSelection,
     upcomingEvents,
     todayEvents,
     agendaEvents,
