@@ -17,7 +17,6 @@ import {
   getModuleCalendarLabel,
   getModuleDocsLabel,
   getModuleFamilyLabel,
-  getModuleProjectsLabel,
   getModuleSettingsLabel,
   getModuleShoppingLabel,
 } from "./lib/customization";
@@ -80,11 +79,6 @@ const MessagesPage = lazy(() =>
 const EmergencyPlanningPage = lazy(() =>
   import("./pages/EmergencyPlanningPage").then((m) => ({
     default: m.EmergencyPlanningPage,
-  })),
-);
-const HouseholdSidebarToolPage = lazy(() =>
-  import("./pages/HouseholdSidebarToolPage").then((m) => ({
-    default: m.HouseholdSidebarToolPage,
   })),
 );
 
@@ -192,10 +186,7 @@ export default function App() {
         pets: "Pets",
         emergency: "Emergency Planning",
         subscriptions: "Subscriptions",
-        projects: getModuleProjectsLabel(data.adminSettings) || "Projects",
-        photos: "Photos",
         planner: "Planner",
-        routines: "Routines",
         pantry: "Pantry & Inventory",
         shopping: getModuleShoppingLabel(data.adminSettings),
         calendar: getModuleCalendarLabel(data.adminSettings),
@@ -351,48 +342,6 @@ export default function App() {
           onOpenDashboard={() => navigateToRoute("adminux")}
         />
       ) : null}
-      {activeRoute === "projects" ? (
-        <HouseholdSidebarToolPage
-          title="Projects"
-          description="Longer household projects stay here in the sidebar — not on the wake page."
-          tips={[
-            "Use this space for multi-day household work.",
-            "Daily chores and kitchen duty stay on Home and Cleaning / Kitchen.",
-          ]}
-          relatedHref="/tasks"
-          relatedLabel="Open Cleaning / Kitchen"
-          onOpenHome={() => navigateToRoute("adminux")}
-          navigateWithinApp={navigateTo}
-        />
-      ) : null}
-      {activeRoute === "photos" ? (
-        <HouseholdSidebarToolPage
-          title="Photos"
-          description="Household photo references stay in the sidebar so Home stays uncluttered."
-          tips={[
-            "Cleaning task reference photos still live with Cleaning / Kitchen notes.",
-            "A fuller Photos library can grow later without changing today’s wake layout.",
-          ]}
-          relatedHref="/tasks"
-          relatedLabel="Open Cleaning / Kitchen"
-          onOpenHome={() => navigateToRoute("adminux")}
-          navigateWithinApp={navigateTo}
-        />
-      ) : null}
-      {activeRoute === "routines" ? (
-        <HouseholdSidebarToolPage
-          title="Routines"
-          description="Recurring household routines stay in the sidebar, off the main wake cards."
-          tips={[
-            "Daily chores and kitchen duty remain on Home.",
-            "Use Cleaning / Kitchen for today’s checklist and assignments.",
-          ]}
-          relatedHref="/tasks"
-          relatedLabel="Open Cleaning / Kitchen"
-          onOpenHome={() => navigateToRoute("adminux")}
-          navigateWithinApp={navigateTo}
-        />
-      ) : null}
       {activeRoute === "pantry" ? (
         <ModuleGate
           moduleKey="pantry"
@@ -514,14 +463,11 @@ const routePathMap: Record<RouteKey, string> = {
   notifications: "/notifications",
   subscriptions: "/subscriptions",
   pets: "/pets",
-  projects: "/projects",
   pantry: "/pantry",
   shopping: "/shopping",
   calendar: "/calendar",
   planner: "/planner",
   docs: "/docs",
-  photos: "/photos",
-  routines: "/routines",
   emergency: "/emergency",
   settings: "/settings",
 };

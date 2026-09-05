@@ -91,12 +91,7 @@ function routeVisible(
   if (key === "emergency") {
     return true;
   }
-  if (
-    key === "projects" ||
-    key === "photos" ||
-    key === "planner" ||
-    key === "routines"
-  ) {
+  if (key === "planner") {
     return true;
   }
   return (
