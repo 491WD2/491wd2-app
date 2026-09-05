@@ -16,13 +16,12 @@ import {
   isKitchenDutyCompleteForDate,
   labelKitchenWeekday,
 } from "../kitchenDuty";
-import { selectUpcomingEventsForHousehold } from "../upcomingEvents";
 import { findMemberById, getMemberFullName } from "../utils";
 import { selectDashboardChores } from "./selectDashboardChores";
+import { selectDashboardUpcoming } from "./selectDashboardUpcoming";
 
 const MESSAGE_PREVIEW_LIMIT = 4;
 const NOTIFICATION_PREVIEW_LIMIT = 5;
-const UPCOMING_PREVIEW_LIMIT = 6;
 const WEEKDAY_LABELS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"] as const;
 
 function localTodayIso(date = new Date()): string {
@@ -75,41 +74,12 @@ export function useDashboardPreviewModel(data: FamilyData, now: Date) {
   );
   const todayChores = choreSelection.rows.map((row) => row.task);
 
-  const upcomingEvents = useMemo(
-    () => selectUpcomingEventsForHousehold(data, todayIso, 8),
+  const upcomingSelection = useMemo(
+    () => selectDashboardUpcoming(data, todayIso),
     [data, todayIso],
   );
-
-  const todayEvents = useMemo(
-    () => upcomingEvents.filter((event) => event.isToday),
-    [upcomingEvents],
-  );
-
-  const agendaEvents = todayEvents.length > 0 ? todayEvents : upcomingEvents;
-  const upcomingAgendaHeading = todayEvents.length > 0 ? clock.dateLine : "Upcoming";
-
-  const upcomingRows = useMemo(
-    () =>
-      agendaEvents.slice(0, UPCOMING_PREVIEW_LIMIT).map((event) => {
-        const memberChips = (event.assigneeLabel || "Family")
-          .split(",")
-          .map((name) => name.trim())
-          .filter(Boolean);
-        const category = event.category?.trim();
-        const metaParts = [
-          event.whenLabel,
-          category && category.toLowerCase() !== "other" ? category : null,
-          memberChips.join(", "),
-        ].filter(Boolean);
-        return {
-          id: event.id,
-          title: event.title,
-          date: event.date,
-          meta: metaParts.join(" · "),
-        };
-      }),
-    [agendaEvents],
-  );
+  const upcomingRows = upcomingSelection.rows;
+  const upcomingAgendaHeading = upcomingSelection.heading;
 
   const importantMessages = useMemo(
     () => selectImportantMessagesForHome(data, MESSAGE_PREVIEW_LIMIT),
@@ -189,7 +159,8 @@ export function useDashboardPreviewModel(data: FamilyData, now: Date) {
   }, [hubModel, pantryAlertCount, storageZoneStats]);
 
   const shoppingCount = needToBuy.length;
-  const todayEventCount = todayEvents.length;
+  const todayEventCount = upcomingSelection.todayCount;
+  const upcomingEventCount = upcomingSelection.relevantCount;
   const messagesAndAlertsCount = importantMessages.length + attentionNotifications.length;
 
   return {
@@ -205,9 +176,7 @@ export function useDashboardPreviewModel(data: FamilyData, now: Date) {
     todayRows,
     todayChores,
     choreSelection,
-    upcomingEvents,
-    todayEvents,
-    agendaEvents,
+    upcomingSelection,
     upcomingAgendaHeading,
     upcomingRows,
     importantMessages,
@@ -225,6 +194,7 @@ export function useDashboardPreviewModel(data: FamilyData, now: Date) {
     pantryModel,
     shoppingCount,
     todayEventCount,
+    upcomingEventCount,
     messagesAndAlertsCount,
   };
 }

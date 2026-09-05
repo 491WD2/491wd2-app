@@ -19,15 +19,10 @@ function formatDateBlock(dateIso: string): { day: string; month: string } {
   };
 }
 
-function upcomingTimeMeta(meta: string): string {
-  const [whenLabel] = meta.split(" · ");
-  return whenLabel?.trim() || meta;
-}
-
 export function UpcomingCard({ model, go, onOpenCalendar }: UpcomingCardProps) {
-  const { upcomingAgendaHeading, upcomingRows } = model;
+  const { upcomingSelection } = model;
   const openCalendar = () => go("/calendar", onOpenCalendar);
-  const visibleRows = upcomingRows.slice(0, 6);
+  const visibleRows = upcomingSelection.rows;
 
   return (
     <section className="dp-widget dp-widget--upcoming" aria-label="Upcoming events">
@@ -38,7 +33,7 @@ export function UpcomingCard({ model, go, onOpenCalendar }: UpcomingCardProps) {
           </span>
           <div>
             <h2 className="dp-widget__title">Upcoming</h2>
-            <p className="dp-widget__meta">{upcomingAgendaHeading}</p>
+            <p className="dp-widget__meta">{upcomingSelection.heading}</p>
           </div>
         </div>
         <button type="button" className="dp-btn dp-btn--ghost" onClick={openCalendar}>
@@ -47,7 +42,7 @@ export function UpcomingCard({ model, go, onOpenCalendar }: UpcomingCardProps) {
       </header>
 
       {visibleRows.length === 0 ? (
-        <p className="dp-empty">No upcoming events on the planner.</p>
+        <p className="dp-empty">{upcomingSelection.emptyLabel}</p>
       ) : (
         <ul className="dp-agenda">
           {visibleRows.map((row) => {
@@ -62,7 +57,7 @@ export function UpcomingCard({ model, go, onOpenCalendar }: UpcomingCardProps) {
                   <span className="dp-agenda__marker" aria-hidden="true" />
                   <span className="dp-agenda__copy">
                     <span className="dp-agenda__title">{row.title}</span>
-                    <span className="dp-agenda__meta">{upcomingTimeMeta(row.meta)}</span>
+                    {row.meta ? <span className="dp-agenda__meta">{row.meta}</span> : null}
                   </span>
                 </button>
               </li>
