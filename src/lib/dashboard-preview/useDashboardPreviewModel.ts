@@ -1,15 +1,11 @@
 import { useMemo } from "react";
 import type { FamilyData } from "../../data/familyData";
-import {
-  resolveSessionMemberIdForUi,
-  selectImportantMessagesForHome,
-} from "../familyDataSelectors";
+import { resolveSessionMemberIdForUi } from "../familyDataSelectors";
 import {
   buildFamilyHubDashboardModel,
   orderWakePageMembers,
 } from "../familyHubDashboardData";
 import { buildFridgeMiniMonth, formatFridgeClock } from "../fridgeHomeModel";
-import { dedupeNotificationsForDisplay } from "../householdNotify";
 import { buildTodayHomeRows, dashboardGreeting } from "../kioskHomeDashboardCharts";
 import {
   getTodayKitchenWeekdayLocal,
@@ -18,12 +14,11 @@ import {
 } from "../kitchenDuty";
 import { findMemberById, getMemberFullName } from "../utils";
 import { selectDashboardChores } from "./selectDashboardChores";
+import { selectDashboardMessages } from "./selectDashboardMessages";
 import { selectDashboardPantry } from "./selectDashboardPantry";
 import { selectDashboardShopping } from "./selectDashboardShopping";
 import { selectDashboardUpcoming } from "./selectDashboardUpcoming";
 
-const MESSAGE_PREVIEW_LIMIT = 4;
-const NOTIFICATION_PREVIEW_LIMIT = 5;
 const WEEKDAY_LABELS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"] as const;
 
 function localTodayIso(date = new Date()): string {
@@ -81,17 +76,9 @@ export function useDashboardPreviewModel(data: FamilyData, now: Date) {
   const upcomingRows = upcomingSelection.rows;
   const upcomingAgendaHeading = upcomingSelection.heading;
 
-  const importantMessages = useMemo(
-    () => selectImportantMessagesForHome(data, MESSAGE_PREVIEW_LIMIT),
-    [data],
-  );
-
-  const attentionNotifications = useMemo(() => {
-    const raw = (data.notifications ?? []).filter(
-      (n) => n && !n.dismissedAt && !n.readAt,
-    );
-    return dedupeNotificationsForDisplay(raw).slice(0, NOTIFICATION_PREVIEW_LIMIT);
-  }, [data.notifications]);
+  const messagesSelection = useMemo(() => selectDashboardMessages(data), [data]);
+  const importantMessages = messagesSelection.messages;
+  const attentionNotifications = messagesSelection.notifications;
 
   const todayKitchenDay = getTodayKitchenWeekdayLocal(now);
   const kitchenTodayEntry = todayKitchenDay
@@ -156,7 +143,7 @@ export function useDashboardPreviewModel(data: FamilyData, now: Date) {
   const shoppingCount = shoppingSelection.count;
   const todayEventCount = upcomingSelection.todayCount;
   const upcomingEventCount = upcomingSelection.relevantCount;
-  const messagesAndAlertsCount = importantMessages.length + attentionNotifications.length;
+  const messagesAndAlertsCount = messagesSelection.count;
 
   return {
     todayIso,
@@ -177,6 +164,7 @@ export function useDashboardPreviewModel(data: FamilyData, now: Date) {
     upcomingRows,
     importantMessages,
     attentionNotifications,
+    messagesSelection,
     todayKitchenDay,
     kitchenTodayMember,
     kitchenName,
