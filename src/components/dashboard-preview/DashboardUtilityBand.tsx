@@ -18,7 +18,7 @@ export function DashboardUtilityBand({
   onOpenTasks,
   onOpenCalendar,
 }: DashboardUtilityBandProps) {
-  const { clock, kitchenAssigned, kitchenComplete, openChoreCount, shoppingCount, todayEventCount } = model;
+  const { clock, kitchenAssigned, kitchenComplete, openChoreCount, shoppingCount, upcomingEventCount } = model;
 
   const kitchenLabel = kitchenComplete ? "Kitchen complete" : kitchenAssigned ? "Kitchen assigned" : "Kitchen";
 
@@ -50,7 +50,7 @@ export function DashboardUtilityBand({
             {shoppingCount} shopping
           </button>
           <button type="button" className="dp-chip dp-chip--events" onClick={() => go("/calendar", onOpenCalendar)}>
-            {todayEventCount} event{todayEventCount === 1 ? "" : "s"}
+            {upcomingEventCount} event{upcomingEventCount === 1 ? "" : "s"}
           </button>
         </div>
         <div className="dp-band__weather" aria-label="Weather unavailable">

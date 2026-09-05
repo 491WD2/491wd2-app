@@ -8,10 +8,9 @@ type MessagesNotificationsCardProps = {
 };
 
 export function MessagesNotificationsCard({ model, go }: MessagesNotificationsCardProps) {
-  const { importantMessages, attentionNotifications, messagesAndAlertsCount } = model;
-  const hasContent = importantMessages.length > 0 || attentionNotifications.length > 0;
-  const countLabel =
-    messagesAndAlertsCount === 1 ? "1 item" : `${messagesAndAlertsCount} items`;
+  const { messagesSelection } = model;
+  const { messages: importantMessages, notifications: attentionNotifications } = messagesSelection;
+  const hasContent = messagesSelection.count > 0;
 
   return (
     <section className="dp-widget dp-widget--messages" aria-label="Messages and notifications">
@@ -22,7 +21,7 @@ export function MessagesNotificationsCard({ model, go }: MessagesNotificationsCa
           </span>
           <div>
             <h2 className="dp-widget__title">Messages</h2>
-            <p className="dp-widget__meta">{countLabel} pinned or unread</p>
+            <p className="dp-widget__meta">{messagesSelection.summaryLabel}</p>
           </div>
         </div>
         <button type="button" className="dp-btn dp-btn--ghost" onClick={() => go("/messages")}>
@@ -31,7 +30,7 @@ export function MessagesNotificationsCard({ model, go }: MessagesNotificationsCa
       </header>
 
       {!hasContent ? (
-        <p className="dp-empty">No pinned messages or unread alerts.</p>
+        <p className="dp-empty">{messagesSelection.emptyLabel}</p>
       ) : (
         <ul className="dp-inbox">
           {importantMessages.map((msg) => (

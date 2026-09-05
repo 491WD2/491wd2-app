@@ -1,28 +1,24 @@
 import { useMemo } from "react";
 import type { FamilyData } from "../../data/familyData";
-import {
-  resolveSessionMemberIdForUi,
-  selectImportantMessagesForHome,
-} from "../familyDataSelectors";
+import { resolveSessionMemberIdForUi } from "../familyDataSelectors";
 import {
   buildFamilyHubDashboardModel,
   orderWakePageMembers,
 } from "../familyHubDashboardData";
 import { buildFridgeMiniMonth, formatFridgeClock } from "../fridgeHomeModel";
-import { dedupeNotificationsForDisplay } from "../householdNotify";
 import { buildTodayHomeRows, dashboardGreeting } from "../kioskHomeDashboardCharts";
 import {
   getTodayKitchenWeekdayLocal,
   isKitchenDutyCompleteForDate,
   labelKitchenWeekday,
 } from "../kitchenDuty";
-import { selectUpcomingEventsForHousehold } from "../upcomingEvents";
 import { findMemberById, getMemberFullName } from "../utils";
-import { getChoreDueDate } from "../choreTrackerUtils";
+import { selectDashboardChores } from "./selectDashboardChores";
+import { selectDashboardMessages } from "./selectDashboardMessages";
+import { selectDashboardPantry } from "./selectDashboardPantry";
+import { selectDashboardShopping } from "./selectDashboardShopping";
+import { selectDashboardUpcoming } from "./selectDashboardUpcoming";
 
-const MESSAGE_PREVIEW_LIMIT = 4;
-const NOTIFICATION_PREVIEW_LIMIT = 5;
-const UPCOMING_PREVIEW_LIMIT = 6;
 const WEEKDAY_LABELS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"] as const;
 
 function localTodayIso(date = new Date()): string {
@@ -54,10 +50,8 @@ export function useDashboardPreviewModel(data: FamilyData, now: Date) {
     [data.familyMembers],
   );
 
-  const needToBuy = useMemo(
-    () => (data.shopping ?? []).filter((item) => item && !item.purchased),
-    [data.shopping],
-  );
+  const shoppingSelection = useMemo(() => selectDashboardShopping(data), [data]);
+  const needToBuy = shoppingSelection.items;
 
   const openTasks = useMemo(
     () => (data.tasks ?? []).filter((t) => t && isOpenTask(t.status)),
@@ -69,64 +63,22 @@ export function useDashboardPreviewModel(data: FamilyData, now: Date) {
     [data, todayIso, openTasks],
   );
 
-  const todayChores = useMemo(
-    () =>
-      (data.tasks ?? []).filter(
-        (task) =>
-          task &&
-          task.status !== "Skipped" &&
-          (getChoreDueDate(task) === todayIso || task.lastCompletedDate === todayIso),
-      ),
-    [data.tasks, todayIso],
-  );
-
-  const upcomingEvents = useMemo(
-    () => selectUpcomingEventsForHousehold(data, todayIso, 8),
+  const choreSelection = useMemo(
+    () => selectDashboardChores(data, todayIso),
     [data, todayIso],
   );
+  const todayChores = choreSelection.rows.map((row) => row.task);
 
-  const todayEvents = useMemo(
-    () => upcomingEvents.filter((event) => event.isToday),
-    [upcomingEvents],
+  const upcomingSelection = useMemo(
+    () => selectDashboardUpcoming(data, todayIso),
+    [data, todayIso],
   );
+  const upcomingRows = upcomingSelection.rows;
+  const upcomingAgendaHeading = upcomingSelection.heading;
 
-  const agendaEvents = todayEvents.length > 0 ? todayEvents : upcomingEvents;
-  const upcomingAgendaHeading = todayEvents.length > 0 ? clock.dateLine : "Upcoming";
-
-  const upcomingRows = useMemo(
-    () =>
-      agendaEvents.slice(0, UPCOMING_PREVIEW_LIMIT).map((event) => {
-        const memberChips = (event.assigneeLabel || "Family")
-          .split(",")
-          .map((name) => name.trim())
-          .filter(Boolean);
-        const category = event.category?.trim();
-        const metaParts = [
-          event.whenLabel,
-          category && category.toLowerCase() !== "other" ? category : null,
-          memberChips.join(", "),
-        ].filter(Boolean);
-        return {
-          id: event.id,
-          title: event.title,
-          date: event.date,
-          meta: metaParts.join(" · "),
-        };
-      }),
-    [agendaEvents],
-  );
-
-  const importantMessages = useMemo(
-    () => selectImportantMessagesForHome(data, MESSAGE_PREVIEW_LIMIT),
-    [data],
-  );
-
-  const attentionNotifications = useMemo(() => {
-    const raw = (data.notifications ?? []).filter(
-      (n) => n && !n.dismissedAt && !n.readAt,
-    );
-    return dedupeNotificationsForDisplay(raw).slice(0, NOTIFICATION_PREVIEW_LIMIT);
-  }, [data.notifications]);
+  const messagesSelection = useMemo(() => selectDashboardMessages(data), [data]);
+  const importantMessages = messagesSelection.messages;
+  const attentionNotifications = messagesSelection.notifications;
 
   const todayKitchenDay = getTodayKitchenWeekdayLocal(now);
   const kitchenTodayEntry = todayKitchenDay
@@ -142,15 +94,15 @@ export function useDashboardPreviewModel(data: FamilyData, now: Date) {
     data.kitchenDutyCompletions ?? [],
     todayIso,
   );
-  const openChoreCount = todayRows.filter((row) => !row.done).length;
+  const openChoreCount = choreSelection.openCount;
   const kitchenAssigned = Boolean(kitchenTodayMember);
   const kitchenDayLabel = todayKitchenDay
     ? labelKitchenWeekday(todayKitchenDay)
     : "No kitchen day mapped";
   const kitchenStatus = kitchenComplete ? "Done" : kitchenName;
 
-  const pantryAlertCount =
-    (hubModel.overview?.lowStock ?? 0) + (hubModel.overview?.expiringFood ?? 0);
+  const pantrySelection = useMemo(() => selectDashboardPantry(hubModel), [hubModel]);
+  const pantryAlertCount = pantrySelection.alertCount;
 
   const storageZoneStats = useMemo(() => {
     const items = (data.pantry ?? []).filter((item) => item && !item.inactiveInInventory);
@@ -170,19 +122,6 @@ export function useDashboardPreviewModel(data: FamilyData, now: Date) {
   }, [data.pantry]);
 
   const pantryModel = useMemo(() => {
-    const lowStockCount = hubModel.overview?.lowStock ?? 0;
-    const expiringCount = hubModel.overview?.expiringFood ?? 0;
-    const alertRows =
-      pantryAlertCount > 0
-        ? [
-            {
-              id: "pantry-alerts",
-              title: `${pantryAlertCount} pantry alert${pantryAlertCount === 1 ? "" : "s"}`,
-              detail: `${lowStockCount} low stock · ${expiringCount} expiring`,
-              href: "/pantry?view=pantry",
-            },
-          ]
-        : [];
     const zoneStats = storageZoneStats
       ? [
           { key: "pantry", label: "Pantry", count: storageZoneStats.pantry },
@@ -190,12 +129,21 @@ export function useDashboardPreviewModel(data: FamilyData, now: Date) {
           { key: "freezer", label: "Freezer", count: storageZoneStats.freezer },
         ]
       : [];
-    return { lowStockCount, expiringCount, zoneStats, alertRows, pantryAlertCount };
-  }, [hubModel, pantryAlertCount, storageZoneStats]);
+    return {
+      lowStockCount: pantrySelection.lowStockCount,
+      expiringCount: pantrySelection.expiringCount,
+      zoneStats,
+      alertRows: pantrySelection.rows,
+      pantryAlertCount: pantrySelection.alertCount,
+      summaryLabel: pantrySelection.summaryLabel,
+      emptyLabel: pantrySelection.emptyLabel,
+    };
+  }, [pantrySelection, storageZoneStats]);
 
-  const shoppingCount = needToBuy.length;
-  const todayEventCount = todayEvents.length;
-  const messagesAndAlertsCount = importantMessages.length + attentionNotifications.length;
+  const shoppingCount = shoppingSelection.count;
+  const todayEventCount = upcomingSelection.todayCount;
+  const upcomingEventCount = upcomingSelection.relevantCount;
+  const messagesAndAlertsCount = messagesSelection.count;
 
   return {
     todayIso,
@@ -207,15 +155,16 @@ export function useDashboardPreviewModel(data: FamilyData, now: Date) {
     hubModel,
     orderedMembers,
     needToBuy,
+    shoppingSelection,
     todayRows,
     todayChores,
-    upcomingEvents,
-    todayEvents,
-    agendaEvents,
+    choreSelection,
+    upcomingSelection,
     upcomingAgendaHeading,
     upcomingRows,
     importantMessages,
     attentionNotifications,
+    messagesSelection,
     todayKitchenDay,
     kitchenTodayMember,
     kitchenName,
@@ -225,10 +174,12 @@ export function useDashboardPreviewModel(data: FamilyData, now: Date) {
     kitchenDayLabel,
     kitchenStatus,
     pantryAlertCount,
+    pantrySelection,
     storageZoneStats,
     pantryModel,
     shoppingCount,
     todayEventCount,
+    upcomingEventCount,
     messagesAndAlertsCount,
   };
 }

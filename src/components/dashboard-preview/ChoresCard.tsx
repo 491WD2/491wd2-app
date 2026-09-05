@@ -1,7 +1,8 @@
 import { Check, Sparkles } from "lucide-react";
 import type { Dispatch, SetStateAction } from "react";
 import type { FamilyData, Task } from "../../data/familyData";
-import { createToggleTodayChore, isDoneToday } from "../../lib/dashboard-preview/dashboardPreviewHandlers";
+import { createToggleTodayChore } from "../../lib/dashboard-preview/dashboardPreviewHandlers";
+import type { DashboardChoreRow } from "../../lib/dashboard-preview/selectDashboardChores";
 import type { DashboardPreviewModel } from "../../lib/dashboard-preview/useDashboardPreviewModel";
 import type { DashboardGo } from "./types";
 
@@ -14,11 +15,9 @@ type ChoresCardProps = {
 };
 
 export function ChoresCard({ model, setData, go, onOpenTasks }: ChoresCardProps) {
-  const { todayIso, todayChores, todayRows, openChoreCount } = model;
+  const { todayIso, choreSelection } = model;
   const toggleTodayChore = createToggleTodayChore({ todayIso, setData });
-
-  const choreRows = todayChores.length > 0 ? todayChores.slice(0, 6) : [];
-  const fallbackRows = todayChores.length === 0 ? todayRows.slice(0, 6) : [];
+  const rows = choreSelection.rows;
 
   return (
     <section className="dp-widget dp-widget--chores" aria-label="Today's chores">
@@ -29,9 +28,7 @@ export function ChoresCard({ model, setData, go, onOpenTasks }: ChoresCardProps)
           </span>
           <div>
             <h2 className="dp-widget__title">Chores</h2>
-            <p className="dp-widget__meta">
-              {openChoreCount === 1 ? "1 open today" : `${openChoreCount} open today`}
-            </p>
+            <p className="dp-widget__meta">{choreSelection.summaryLabel}</p>
           </div>
         </div>
         <button type="button" className="dp-btn dp-btn--ghost" onClick={() => go("/tasks", onOpenTasks)}>
@@ -39,30 +36,16 @@ export function ChoresCard({ model, setData, go, onOpenTasks }: ChoresCardProps)
         </button>
       </header>
 
-      {todayChores.length === 0 && todayRows.length === 0 ? (
-        <p className="dp-empty">Nothing due for today yet.</p>
+      {rows.length === 0 ? (
+        <p className="dp-empty">{choreSelection.emptyLabel}</p>
       ) : (
         <ul className="dp-checklist dp-checklist--chores">
-          {choreRows.map((task) => (
+          {rows.map((row) => (
             <ChoreRow
-              key={task.id}
-              task={task}
-              todayIso={todayIso}
-              onToggle={() => toggleTodayChore(task)}
+              key={row.task.id}
+              row={row}
+              onToggle={() => toggleTodayChore(row.task)}
             />
-          ))}
-          {fallbackRows.map((item) => (
-            <li key={item.id}>
-              <button type="button" className="dp-checklist__row" onClick={() => go("/tasks", onOpenTasks)}>
-                <span className="dp-checklist__bullet" aria-hidden="true" />
-                <span className="dp-checklist__copy">
-                  <span className="dp-checklist__title">{item.title}</span>
-                  <span className="dp-checklist__meta">
-                    {item.time} · {item.done ? "Done" : "Chore"}
-                  </span>
-                </span>
-              </button>
-            </li>
           ))}
         </ul>
       )}
@@ -71,15 +54,14 @@ export function ChoresCard({ model, setData, go, onOpenTasks }: ChoresCardProps)
 }
 
 function ChoreRow({
-  task,
-  todayIso,
+  row,
   onToggle,
 }: {
-  task: Task;
-  todayIso: string;
+  row: DashboardChoreRow;
   onToggle: () => void;
 }) {
-  const done = isDoneToday(task, todayIso);
+  const task: Task = row.task;
+  const done = row.attention === "completed-today";
   const assignmentLabel =
     task.assignedMemberId || task.owner?.trim() ? "Assigned" : "Household";
 
@@ -97,7 +79,7 @@ function ChoreRow({
         <span className="dp-checklist__copy">
           <span className="dp-checklist__title">{task.title}</span>
           <span className="dp-checklist__meta">
-            {assignmentLabel} · {done ? "Done" : "Open"}
+            {assignmentLabel} · {row.attentionLabel}
           </span>
         </span>
       </button>

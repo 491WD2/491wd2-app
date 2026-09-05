@@ -32,9 +32,7 @@ export function PantryAlertsCard({
           </span>
           <div>
             <h2 className="dp-widget__title">Pantry &amp; storage</h2>
-            <p className="dp-widget__meta">
-              {lowStockCount} low · {expiringCount} expiring
-            </p>
+            <p className="dp-widget__meta">{pantryModel.summaryLabel}</p>
           </div>
         </div>
         <button type="button" className="dp-btn dp-btn--ghost" onClick={() => go("/pantry", onOpenPantry)}>
@@ -69,7 +67,7 @@ export function PantryAlertsCard({
             ))}
           </ul>
         ) : (
-          <p className="dp-empty">No pantry alerts right now.</p>
+          <p className="dp-empty">{pantryModel.emptyLabel}</p>
         )}
 
         {storageZoneStats ? (

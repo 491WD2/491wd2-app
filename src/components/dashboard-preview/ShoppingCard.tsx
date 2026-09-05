@@ -21,7 +21,7 @@ export function ShoppingCard({
   go,
   onOpenShopping,
 }: ShoppingCardProps) {
-  const { needToBuy } = model;
+  const { shoppingSelection } = model;
   const [shoppingDraft, setShoppingDraft] = useState("");
 
   const addShoppingItem = createAddShoppingItem({
@@ -31,9 +31,6 @@ export function ShoppingCard({
     onOpenShopping,
     setShoppingDraft,
   });
-
-  const shoppingItemLabel =
-    needToBuy.length === 1 ? "1 item" : `${needToBuy.length} items`;
 
   function onShoppingAdd(event: FormEvent) {
     event.preventDefault();
@@ -49,7 +46,7 @@ export function ShoppingCard({
           </span>
           <div>
             <h2 className="dp-widget__title">Shopping</h2>
-            <p className="dp-widget__meta">{shoppingItemLabel} on the list</p>
+            <p className="dp-widget__meta">{shoppingSelection.summaryLabel}</p>
           </div>
         </div>
         <button type="button" className="dp-btn dp-btn--ghost" onClick={() => go("/shopping", onOpenShopping)}>
@@ -57,30 +54,22 @@ export function ShoppingCard({
         </button>
       </header>
 
-      {needToBuy.length === 0 ? (
-        <p className="dp-empty">Shopping list is clear.</p>
+      {shoppingSelection.rows.length === 0 ? (
+        <p className="dp-empty">{shoppingSelection.emptyLabel}</p>
       ) : (
         <ul className="dp-checklist">
-          {needToBuy.slice(0, 5).map((item) => {
-            const qty = [item.quantity, item.unit].filter(Boolean).join(" ") || "1";
-            const category = item.category?.trim();
-            const showCategory =
-              Boolean(category) &&
-              category.toLowerCase() !== "other" &&
-              category.toLowerCase() !== "general";
-            return (
-              <li key={item.id}>
-                <button type="button" className="dp-checklist__row" onClick={() => go("/shopping", onOpenShopping)}>
-                  <span className="dp-checklist__bullet" aria-hidden="true" />
-                  <span className="dp-checklist__copy">
-                    <span className="dp-checklist__title">{item.name}</span>
-                    {showCategory ? <span className="dp-checklist__meta">{category}</span> : null}
-                  </span>
-                  <span className="dp-checklist__qty">{qty}</span>
-                </button>
-              </li>
-            );
-          })}
+          {shoppingSelection.rows.map((row) => (
+            <li key={row.item.id}>
+              <button type="button" className="dp-checklist__row" onClick={() => go("/shopping", onOpenShopping)}>
+                <span className="dp-checklist__bullet" aria-hidden="true" />
+                <span className="dp-checklist__copy">
+                  <span className="dp-checklist__title">{row.item.name}</span>
+                  {row.categoryLabel ? <span className="dp-checklist__meta">{row.categoryLabel}</span> : null}
+                </span>
+                <span className="dp-checklist__qty">{row.quantityLabel}</span>
+              </button>
+            </li>
+          ))}
         </ul>
       )}
 
