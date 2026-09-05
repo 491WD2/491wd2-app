@@ -103,7 +103,7 @@ const categorySuggestions: Partial<Record<PlannerEventCategory, string[]>> = {
 
 type CalendarViewMode = "plan" | "month" | "week" | "day" | "list";
 type CalendarGuidedFlow = "find" | "today";
-type CalendarDashboardMode = "schedule" | "tasks" | "board" | "projects" | "notes";
+type CalendarDashboardMode = "schedule" | "tasks" | "board" | "notes";
 
 const VIEW_LABELS: Record<CalendarViewMode, string> = {
   plan: "Board",
@@ -117,7 +117,6 @@ const DASHBOARD_MODES: { id: CalendarDashboardMode; label: string }[] = [
   { id: "schedule", label: "Schedule Planner" },
   { id: "tasks", label: "Task List" },
   { id: "board", label: "Household Board" },
-  { id: "projects", label: "Projects" },
   { id: "notes", label: "Notes" },
 ];
 
@@ -664,10 +663,6 @@ export function CalendarPage({ data, setData, navigateWithinApp }: PageProps) {
   }
 
   function handleDashboardMode(mode: CalendarDashboardMode) {
-    if (mode === "projects") {
-      goApp("/projects");
-      return;
-    }
     if (mode === "notes") {
       goApp("/messages");
       return;

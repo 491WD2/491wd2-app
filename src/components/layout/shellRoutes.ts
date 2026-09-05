@@ -3,14 +3,11 @@ import {
   Bell,
   CalendarDays,
   CalendarRange,
-  Camera,
-  FolderKanban,
   Home,
   LayoutDashboard,
   MessageCircle,
   Package,
   PawPrint,
-  Repeat,
   Settings,
   Shield,
   ShoppingCart,
@@ -33,25 +30,19 @@ export type RouteKey =
   | "notifications"
   | "subscriptions"
   | "pets"
-  | "projects"
   | "pantry"
   | "shopping"
   | "calendar"
   | "planner"
   | "docs"
-  | "photos"
-  | "routines"
   | "emergency"
   | "settings";
 
 /** Sidebar-only / deep links — not in compact mobile header strip. */
 export const PRIMARY_NAV_EXCLUDED = new Set<RouteKey>([
   "family",
-  "projects",
   "docs",
   "planner",
-  "photos",
-  "routines",
   /** Dedicated checklist — sidebar + deep links, not the compact bottom strip. */
   "kitchen",
   "notifications",
@@ -84,10 +75,7 @@ export const SIDEBAR_ROUTE_KEYS = [
   "emergency",
   "pets",
   "subscriptions",
-  "projects",
-  "photos",
   "planner",
-  "routines",
   "settings",
 ] as const satisfies readonly RouteKey[];
 
@@ -106,10 +94,7 @@ export const SIDEBAR_PRIMARY_KEYS = [
 export const SIDEBAR_HOUSEHOLD_TOOL_KEYS = [
   "pets",
   "subscriptions",
-  "projects",
-  "photos",
   "planner",
-  "routines",
 ] as const satisfies readonly RouteKey[];
 
 const SIDEBAR_ROUTE_SET = new Set<RouteKey>(SIDEBAR_ROUTE_KEYS);
@@ -140,11 +125,8 @@ export const routes: Array<{
   { key: "subscriptions", label: "Subscriptions", icon: Wallet },
   { key: "pets", label: "Pets", icon: PawPrint },
   { key: "family", label: "Members", icon: Users },
-  { key: "projects", label: "Projects", icon: FolderKanban },
   { key: "planner", label: "Planner", icon: CalendarDays },
   { key: "docs", label: "Notes", icon: BookOpen },
-  { key: "photos", label: "Photos", icon: Camera },
-  { key: "routines", label: "Routines", icon: Repeat },
   { key: "emergency", label: "Emergency Planning", icon: Shield },
   { key: "settings", label: "Settings", icon: Settings },
 ];

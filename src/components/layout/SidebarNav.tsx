@@ -53,10 +53,7 @@ const NAV_LABEL: Partial<Record<RouteKey, string>> = {
   emergency: "Emergency Planning",
   pets: "Pets",
   subscriptions: "Subscriptions",
-  projects: "Projects",
-  photos: "Photos",
   planner: "Planner",
-  routines: "Routines",
   settings: "Settings",
 };
 
@@ -82,12 +79,7 @@ function routeVisible(
   if (key === "emergency") {
     return true;
   }
-  if (
-    key === "projects" ||
-    key === "photos" ||
-    key === "planner" ||
-    key === "routines"
-  ) {
+  if (key === "planner") {
     return true;
   }
   return (
