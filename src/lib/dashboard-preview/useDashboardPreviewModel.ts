@@ -18,6 +18,7 @@ import {
 } from "../kitchenDuty";
 import { findMemberById, getMemberFullName } from "../utils";
 import { selectDashboardChores } from "./selectDashboardChores";
+import { selectDashboardPantry } from "./selectDashboardPantry";
 import { selectDashboardShopping } from "./selectDashboardShopping";
 import { selectDashboardUpcoming } from "./selectDashboardUpcoming";
 
@@ -113,8 +114,8 @@ export function useDashboardPreviewModel(data: FamilyData, now: Date) {
     : "No kitchen day mapped";
   const kitchenStatus = kitchenComplete ? "Done" : kitchenName;
 
-  const pantryAlertCount =
-    (hubModel.overview?.lowStock ?? 0) + (hubModel.overview?.expiringFood ?? 0);
+  const pantrySelection = useMemo(() => selectDashboardPantry(hubModel), [hubModel]);
+  const pantryAlertCount = pantrySelection.alertCount;
 
   const storageZoneStats = useMemo(() => {
     const items = (data.pantry ?? []).filter((item) => item && !item.inactiveInInventory);
@@ -134,19 +135,6 @@ export function useDashboardPreviewModel(data: FamilyData, now: Date) {
   }, [data.pantry]);
 
   const pantryModel = useMemo(() => {
-    const lowStockCount = hubModel.overview?.lowStock ?? 0;
-    const expiringCount = hubModel.overview?.expiringFood ?? 0;
-    const alertRows =
-      pantryAlertCount > 0
-        ? [
-            {
-              id: "pantry-alerts",
-              title: `${pantryAlertCount} pantry alert${pantryAlertCount === 1 ? "" : "s"}`,
-              detail: `${lowStockCount} low stock · ${expiringCount} expiring`,
-              href: "/pantry?view=pantry",
-            },
-          ]
-        : [];
     const zoneStats = storageZoneStats
       ? [
           { key: "pantry", label: "Pantry", count: storageZoneStats.pantry },
@@ -154,8 +142,16 @@ export function useDashboardPreviewModel(data: FamilyData, now: Date) {
           { key: "freezer", label: "Freezer", count: storageZoneStats.freezer },
         ]
       : [];
-    return { lowStockCount, expiringCount, zoneStats, alertRows, pantryAlertCount };
-  }, [hubModel, pantryAlertCount, storageZoneStats]);
+    return {
+      lowStockCount: pantrySelection.lowStockCount,
+      expiringCount: pantrySelection.expiringCount,
+      zoneStats,
+      alertRows: pantrySelection.rows,
+      pantryAlertCount: pantrySelection.alertCount,
+      summaryLabel: pantrySelection.summaryLabel,
+      emptyLabel: pantrySelection.emptyLabel,
+    };
+  }, [pantrySelection, storageZoneStats]);
 
   const shoppingCount = shoppingSelection.count;
   const todayEventCount = upcomingSelection.todayCount;
@@ -190,6 +186,7 @@ export function useDashboardPreviewModel(data: FamilyData, now: Date) {
     kitchenDayLabel,
     kitchenStatus,
     pantryAlertCount,
+    pantrySelection,
     storageZoneStats,
     pantryModel,
     shoppingCount,
