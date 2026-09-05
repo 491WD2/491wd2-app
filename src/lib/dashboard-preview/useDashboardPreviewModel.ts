@@ -18,6 +18,7 @@ import {
 } from "../kitchenDuty";
 import { findMemberById, getMemberFullName } from "../utils";
 import { selectDashboardChores } from "./selectDashboardChores";
+import { selectDashboardShopping } from "./selectDashboardShopping";
 import { selectDashboardUpcoming } from "./selectDashboardUpcoming";
 
 const MESSAGE_PREVIEW_LIMIT = 4;
@@ -53,10 +54,8 @@ export function useDashboardPreviewModel(data: FamilyData, now: Date) {
     [data.familyMembers],
   );
 
-  const needToBuy = useMemo(
-    () => (data.shopping ?? []).filter((item) => item && !item.purchased),
-    [data.shopping],
-  );
+  const shoppingSelection = useMemo(() => selectDashboardShopping(data), [data]);
+  const needToBuy = shoppingSelection.items;
 
   const openTasks = useMemo(
     () => (data.tasks ?? []).filter((t) => t && isOpenTask(t.status)),
@@ -158,7 +157,7 @@ export function useDashboardPreviewModel(data: FamilyData, now: Date) {
     return { lowStockCount, expiringCount, zoneStats, alertRows, pantryAlertCount };
   }, [hubModel, pantryAlertCount, storageZoneStats]);
 
-  const shoppingCount = needToBuy.length;
+  const shoppingCount = shoppingSelection.count;
   const todayEventCount = upcomingSelection.todayCount;
   const upcomingEventCount = upcomingSelection.relevantCount;
   const messagesAndAlertsCount = importantMessages.length + attentionNotifications.length;
@@ -173,6 +172,7 @@ export function useDashboardPreviewModel(data: FamilyData, now: Date) {
     hubModel,
     orderedMembers,
     needToBuy,
+    shoppingSelection,
     todayRows,
     todayChores,
     choreSelection,
