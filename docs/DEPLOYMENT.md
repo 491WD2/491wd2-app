@@ -17,7 +17,7 @@ Household kiosk app: **React 19 + TypeScript (strict) + Tailwind CSS v4 + Vite 8
 | `npm run build:production` | Alias for `npm run build` |
 | `npm run test` | Jest + React Testing Library (analytics, offline, a11y, nav) |
 | `npm run start` | Serve `dist/` locally (preview server, all interfaces `:4173`) |
-| `npm run dev` | Development server (`localhost:5173`) |
+| `npm run dev` | Development server (`0.0.0.0:5173`) |
 | `npm run handoff` | Build + package `handoff/` for client delivery |
 
 ### One-shot production build
@@ -39,7 +39,9 @@ npm run start
 
 Open **http://localhost:4173/** (or your machine’s LAN IP for kiosk hardware).
 
-Chore kiosk: **http://localhost:4173/chores** (sidebar → Chores).
+Canonical Home: **http://localhost:4173/adminux** (aliases `/`, `/home`, `/dashboard`).  
+Live Cleaning / Kitchen: **http://localhost:4173/tasks**.  
+`/chores` and `/cleaning/*` are **not** live pages; they redirect to `/tasks`. See **[ROUTES.md](ROUTES.md)**.
 
 ## What the build optimizes
 
@@ -48,8 +50,8 @@ Chore kiosk: **http://localhost:4173/chores** (sidebar → Chores).
 - **esbuild** minification, `target: es2022`
 - **Tree-shaking** via Rollup (Vite)
 - **Manual chunks**: `vendor-react`, `vendor-lucide`, `supabase`, `vendor-zxing`, `vendor-qrcode`, plus app splits `chore-analytics` and `chore-data`
-- **Lazy routes** in `App.tsx` and `CurrentBuild.tsx`: chores, dashboard home, cleaning, backend console, and module pages load on demand
-- **Chore shell code-splitting**: Analytics Agent, edit modal, onboarding tour, tab views, and drag assign board load on demand (`ChoresPage.tsx`, `ChoresScheduleView.tsx`)
+- **Lazy routes** in `CurrentBuild.tsx` load live module pages on demand (Home, shopping, pantry, calendar, tasks, settings, …)
+- **Unmounted chore kiosk** (`ChoresPage.tsx`) is leftover source — not a live route. Do not QA it as `/chores`.
 - **`sideEffects`** in `package.json` marks `**/*.css` so JS tree-shaking stays aggressive
 
 ### Chore kiosk performance
@@ -83,7 +85,7 @@ Upload **`dist/`** contents to:
 
 ### SPA routing (required)
 
-All client paths (`/chores`, `/shopping`, etc.) must serve `index.html`:
+All client paths (`/adminux`, `/tasks`, `/shopping`, etc.) must serve `index.html`:
 
 **nginx example:**
 
@@ -100,7 +102,7 @@ location / {
 
 ## Accessibility
 
-Chore kiosk a11y audit: **[docs/ACCESSIBILITY.md](ACCESSIBILITY.md)** (ARIA, keyboard, contrast, 76px targets).
+Historical chore-kiosk a11y notes (unmounted `/chores` UI): **[ACCESSIBILITY.md](ACCESSIBILITY.md)**.
 
 ## Kiosk / responsive QA checklist
 
@@ -108,16 +110,13 @@ Full step-by-step QA (accessibility, analytics, AI, offline): **[QA_KIOSK.md](QA
 
 Test on **phone**, **tablet landscape**, and **large touch display** after `npm run start`:
 
-### Chores (`/chores`)
+### Cleaning / Kitchen (`/tasks`)
 
 | Area | Check |
 | --- | --- |
-| **Home** | Greeting, AI cards, stats grid 2×2 → 4 cols, task list, swipe-to-complete |
-| **Dashboard** | Member cards grid, tap → Users tab |
-| **Schedule** | Week pills wrap, Assign drag board scrolls horizontally on narrow screens |
-| **Users** | Member chips wrap, message board, task list |
-| **Touch** | Buttons ≥ 76px; tab bar targets; modal close |
-| **Real-time** | Complete task on Home → Dashboard counts update; second tab shows sync toast |
+| **Home → Cleaning / Kitchen** | Sidebar and Home “chores” actions open `/tasks`, not `/chores` |
+| **Legacy URLs** | `/chores` and `/cleaning/*` replace to `/tasks` (no 404) |
+| **Kitchen** | `/kitchen` and `/kitchen-schedule` still work as deep links |
 
 ### Global
 

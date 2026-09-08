@@ -1,6 +1,8 @@
-# Household chore components (`/chores`)
+# Household chore components (unmounted `/chores` kiosk)
 
-Touch-first kiosk shell. **Palette:** `#FFD522` `#FF4B6C` `#C516E1` `#735DFF` `#1D1136` `#FFFFFF`.
+> **Not a live route.** `ChoresPage` is not mounted in `CurrentBuild`. The live household surface is **`/tasks`** (Cleaning / Kitchen). `/chores` only redirects there. See **[docs/ROUTES.md](../../../docs/ROUTES.md)**.
+
+Touch-first kiosk shell leftover. **Palette:** `#FFD522` `#FF4B6C` `#C516E1` `#735DFF` `#1D1136` `#FFFFFF`.
 
 ## Architecture
 
@@ -86,7 +88,7 @@ Primary block: `.wd-chore-hh` in `src/ui-builder.css`. Prefer `choreClasses` / `
 
 ## Production build
 
-See [docs/DEPLOYMENT.md](../../../docs/DEPLOYMENT.md) — `npm run build`, chore QA at `/chores`.
+See [docs/DEPLOYMENT.md](../../../docs/DEPLOYMENT.md) — `npm run build`. Live QA is `/tasks`, not `/chores`.
 
 ## Accessibility
 
