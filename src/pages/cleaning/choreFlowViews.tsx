@@ -258,7 +258,7 @@ function FlowShell({
   const meta = FLOW_META[flowId];
   return (
     <div className="wd-cleaning-page wd-cleaning-page--flow">
-      <KioskChecklistBackBar title={meta.title} onBack={() => onNavigate("/chores")} />
+      <KioskChecklistBackBar title={meta.title} onBack={() => onNavigate("/tasks")} />
       <header className="wd-chore-kiosk-checklist__header">
         <div className="wd-chore-kiosk-checklist__header-copy">
           <h1>{meta.title}</h1>

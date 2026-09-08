@@ -1,6 +1,6 @@
 # Chore AI personalization & adaptive suggestions
 
-Client-side intelligence for `/chores` — **no external API**. Signals include schedule data, completion timestamps, time of day, household roles, kiosk feedback, and real-time store updates.
+Client-side intelligence for the **unmounted** `/chores` kiosk — **no external API**. The live household surface is `/tasks`. Signals include schedule data, completion timestamps, time of day, household roles, kiosk feedback, and real-time store updates.
 
 ## Modules
 

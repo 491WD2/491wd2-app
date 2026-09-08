@@ -1,5 +1,7 @@
 # Family Hub / Kiosk Dashboard — Cleanup Summary
 
+> **Stale (2026-05-13).** Historical cleanup notes. Smoke-test list still mentions `/chores` and `/cleaning/*`, which are not live routes. Current map: **[docs/ROUTES.md](docs/ROUTES.md)**.
+
 **Date:** 2026-05-13  
 **Project:** `familysite-491` (`/Users/stellaroskens/491WD2`)  
 **Goal:** Remove unused and duplicate code while preserving chores, member pages, weekly/recurring tasks, analytics, and dashboard UX.
@@ -168,4 +170,4 @@ npm run test
 npm run build
 ```
 
-Core routes to smoke-test: `/`, `/chores`, My Build dashboard, member scope URLs, `/cleaning/recurring`, `/cleaning/rooms`.
+Core routes to smoke-test today: `/` or `/adminux`, `/tasks`, `/shopping`, `/pantry`, `/calendar`, `/messages`. Do not treat `/chores` or `/cleaning/*` as live pages.

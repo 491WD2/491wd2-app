@@ -586,7 +586,7 @@ export function CleaningChecklistPage({
 
   function backToHub() {
     sessionStorage.removeItem(CHORE_HUB_SESSION_KEY);
-    onNavigate("/chores");
+    onNavigate("/tasks");
   }
 
   const sourceRecords = recordsForPage(effectivePageId, roomSlug);
@@ -728,7 +728,7 @@ export function CleaningRoomsIndexPage({ onNavigate }: { onNavigate: (path: stri
   const hubMeta = hubCardForPage("rooms");
 
   function backToHub() {
-    onNavigate("/chores");
+    onNavigate("/tasks");
   }
 
   return (
@@ -801,7 +801,7 @@ export function CleaningSuppliesPage({ onNavigate }: { onNavigate: (path: string
   const hubMeta = hubCardForPage("supplies");
 
   function backToHub() {
-    onNavigate("/chores");
+    onNavigate("/tasks");
   }
 
   return (

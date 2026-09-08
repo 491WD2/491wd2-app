@@ -1,6 +1,8 @@
-# Chore kiosk — final QA & deployment checklist
+# Chore kiosk — historical QA notes
 
-Use this after `npm run test` and `npm run build` pass.
+> **Stale (2026-05).** This checklist describes the unmounted `/chores` kiosk (`ChoresPage`). That route is **not** a live product page. Current Cleaning / Kitchen is **`/tasks`**. Current Home is **`/adminux`**. See **[ROUTES.md](ROUTES.md)**.
+
+Use current gates after `npm run test` and `npm run build` pass.
 
 ## Automated gates
 
@@ -10,7 +12,7 @@ npm ci
 npm run typecheck
 npm run test
 npm run build
-npm run start   # http://localhost:4173/chores
+npm run start   # http://localhost:4173/adminux  (Cleaning / Kitchen: /tasks)
 ```
 
 | Gate | Command | Expected |
@@ -59,7 +61,7 @@ Full audit: **[ACCESSIBILITY.md](ACCESSIBILITY.md)**.
 
 ### Performance
 
-- Initial `/chores` avoids loading analytics/modals until opened (Network tab).
+- Historical `/chores` kiosk is unmounted; do not use it as a smoke-test URL.
 - Swipe and drag feel smooth (60 FPS target; rAF-batched swipe).
 
 ## Multi-language
