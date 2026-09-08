@@ -9,6 +9,7 @@ import {
 import {
   CalendarDays,
   ChefHat,
+  MessageCircle,
   Package,
   ShoppingCart,
   Sparkles,
@@ -29,6 +30,10 @@ import {
   isKitchenDutyCompleteForDate,
   labelKitchenWeekday,
 } from "../../lib/kitchenDuty";
+import {
+  selectImportantMessagesForHome,
+} from "../../lib/familyDataSelectors";
+import { selectRecentMessagesForHome } from "../../lib/kioskHomeDashboardCharts";
 import { selectUpcomingEventsForHousehold } from "../../lib/upcomingEvents";
 import { findMemberById, getMemberFullName } from "../../lib/utils";
 import { createShoppingItemFromName } from "../../pages/shopping/shoppingUtils";
@@ -108,6 +113,11 @@ export function NotionHomeWorkspace({
     () => selectUpcomingEventsForHousehold(data, todayIso, 8),
     [data, todayIso],
   );
+
+  const homeMessages = useMemo(() => {
+    const important = selectImportantMessagesForHome(data, 4);
+    return important.length > 0 ? important : selectRecentMessagesForHome(data, 4);
+  }, [data]);
 
   const todayEvents = useMemo(
     () => upcomingEvents.filter((event) => event.isToday),
@@ -223,6 +233,11 @@ export function NotionHomeWorkspace({
           <li>
             <button type="button" onClick={() => go("/shopping", onOpenShopping)}>
               {needToBuy.length} shopping
+            </button>
+          </li>
+          <li>
+            <button type="button" onClick={() => go("/messages")}>
+              {homeMessages.length} message{homeMessages.length === 1 ? "" : "s"}
             </button>
           </li>
         </ul>
@@ -471,6 +486,55 @@ export function NotionHomeWorkspace({
           </StartPageWidget>
 
           <StartPageWidget
+            className="fh-fridge-home__messages"
+            aria-labelledby="fh-fridge-messages"
+            header={
+              <WidgetHeader
+                titleId="fh-fridge-messages"
+                title="Messages"
+                subtitle={
+                  homeMessages.length === 0
+                    ? "Household notes"
+                    : `${homeMessages.length} on Home`
+                }
+                icon={
+                  <WidgetIconTile tone="violet">
+                    <MessageCircle className="h-4 w-4" />
+                  </WidgetIconTile>
+                }
+                action={
+                  <WidgetActionPill onClick={() => go("/messages")}>
+                    Open messages
+                  </WidgetActionPill>
+                }
+              />
+            }
+          >
+            {homeMessages.length === 0 ? (
+              <WidgetEmptyState>No pinned or recent household messages.</WidgetEmptyState>
+            ) : (
+              <ul className="fh-fridge-home__activity-list fh-home-pro__list">
+                {homeMessages.map((item) => (
+                  <li key={item.id}>
+                    <button
+                      type="button"
+                      className="fh-pro-list-row"
+                      onClick={() => go("/messages")}
+                    >
+                      <span className="fh-pro-list-row__title">
+                        {item.title?.trim() || item.message || "Family note"}
+                      </span>
+                      <span className="fh-pro-list-row__meta">
+                        {item.pinned ? "Pinned" : item.priority === "urgent" ? "Urgent" : item.priority === "important" ? "Important" : "Note"}
+                      </span>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </StartPageWidget>
+
+          <StartPageWidget
             as="aside"
             className="fh-fridge-home__storage"
             aria-labelledby="fh-fridge-storage"
@@ -505,6 +569,10 @@ export function NotionHomeWorkspace({
                   <button type="button" className="fh-pro-btn fh-pro-btn--ghost" onClick={() => go("/shopping", onOpenShopping)}>
                     <ShoppingCart className="h-4 w-4" aria-hidden />
                     Shopping
+                  </button>
+                  <button type="button" className="fh-pro-btn fh-pro-btn--ghost" onClick={() => go("/messages")}>
+                    <MessageCircle className="h-4 w-4" aria-hidden />
+                    Messages
                   </button>
                 </nav>
               </WidgetFooter>
