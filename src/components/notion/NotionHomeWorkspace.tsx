@@ -89,6 +89,10 @@ function weatherIcon(now: Date) {
   return CloudSun;
 }
 
+function firstName(name: string): string {
+  return name.trim().split(/\s+/)[0] || name;
+}
+
 export function NotionHomeWorkspace({
   data,
   setData,
@@ -221,7 +225,9 @@ export function NotionHomeWorkspace({
           </span>
           <span className="fh-home-bright__kitchen-copy">
             <span className="fh-home-bright__kitchen-label">Who’s on kitchen</span>
-            <span className="fh-home-bright__kitchen-name">{kitchenName}</span>
+            <span className="fh-home-bright__kitchen-name">
+              {kitchenTodayMember ? firstName(kitchenName) : kitchenName}
+            </span>
             <span className="fh-home-bright__kitchen-state">
               {kitchenComplete ? "Duty completed" : "Kitchen duty today"}
             </span>

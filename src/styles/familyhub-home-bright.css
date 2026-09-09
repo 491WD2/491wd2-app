@@ -451,17 +451,22 @@
 
 @media (max-width: 900px) {
   .fh-home-bright__strip {
-    grid-template-columns: 1fr auto;
+    grid-template-columns: minmax(0, 1fr) auto;
   }
 
-  .fh-home-bright__kitchen,
-  .fh-home-bright__actions {
-    grid-column: 1 / -1;
+  .fh-home-bright__when {
+    grid-column: 1;
+    grid-row: 1;
   }
 
   .fh-home-bright__weather {
     grid-column: 2;
     grid-row: 1;
+  }
+
+  .fh-home-bright__kitchen,
+  .fh-home-bright__actions {
+    grid-column: 1 / -1;
   }
 
   .fh-home-bright__main {
@@ -470,21 +475,12 @@
 }
 
 @media (max-width: 640px) {
-  .fh-home-bright__strip {
-    grid-template-columns: 1fr;
-  }
-
-  .fh-home-bright__weather {
-    justify-content: flex-start;
-  }
-
   .fh-home-bright__actions {
-    overflow-x: auto;
-    flex-wrap: nowrap;
-    padding-bottom: 0.15rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
   }
 
   .fh-home-bright__action {
-    flex-shrink: 0;
+    justify-content: center;
   }
 }
