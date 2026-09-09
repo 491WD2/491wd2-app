@@ -79,7 +79,7 @@ export function PantryPage(props: PageProps) {
   }
 
   return (
-    <div className="wd-pantry-route wd-pantry-route--adminux">
+    <div className="wd-pantry-route wd-pantry-route--adminux fh-ops-bright fh-pantry-bright">
       <PantryInventoryModulePage {...props} />
     </div>
   );

@@ -1,0 +1,58 @@
+/**
+ * Shared bright-language tokens for Shopping and Pantry only.
+ * Does not restyle Home (.fh-home-bright) or other routes.
+ */
+
+.fh-ops-bright {
+  --ops-ink: #102033;
+  --ops-muted: #4b6074;
+  --ops-cyan: #12c2c2;
+  --ops-sky: #2b8cff;
+  --ops-green: #22c55e;
+  --ops-orange: #ff8a1f;
+  --ops-yellow: #f5c400;
+  --ops-violet: #7c5cff;
+  --ops-pink: #ff5ea8;
+  --ops-card: #ffffff;
+  --ops-radius: 22px;
+  --ops-shadow: 0 10px 28px rgba(31, 74, 122, 0.08);
+}
+
+.fh-ops-bright .fh-ops-badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 1.45rem;
+  padding: 0.1rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.fh-ops-bright .fh-ops-badge--due,
+.fh-ops-bright .fh-ops-badge--out {
+  background: #ffe3ea;
+  color: #be123c;
+}
+
+.fh-ops-bright .fh-ops-badge--low {
+  background: #fff4c2;
+  color: #a16207;
+}
+
+.fh-ops-bright .fh-ops-badge--soon,
+.fh-ops-bright .fh-ops-badge--restock {
+  background: #ffe7cc;
+  color: #c05612;
+}
+
+.fh-ops-bright .fh-ops-badge--on-list {
+  background: #d9fbfb;
+  color: #0f766e;
+}
+
+.fh-ops-bright .fh-ops-badge--stocked {
+  background: #d9fbe8;
+  color: #15803d;
+}

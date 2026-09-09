@@ -102,7 +102,8 @@ const ScanPutAwayWizardLazy = lazy(() =>
   })),
 );
 
-const PAGE_BG = "aux-pantry__canvas min-h-full text-[#0f172a] [-webkit-font-smoothing:antialiased]";
+const PAGE_BG =
+  "aux-pantry__canvas fh-ops-bright fh-pantry-bright min-h-full text-[#0f172a] [-webkit-font-smoothing:antialiased]";
 const CARD_SHELL =
   "rounded-[1.15rem] border border-[rgba(15,23,42,0.08)] bg-white shadow-[0_12px_32px_rgba(15,23,42,0.07)]";
 const SM_LABEL = "text-[11px] font-semibold uppercase tracking-[0.12em] text-[#64748b]";
@@ -242,6 +243,15 @@ export function PantryInventoryModulePage({
       ),
     [data.pantry],
   );
+  const shoppingLinkedIds = useMemo(() => {
+    const ids = new Set<string>();
+    for (const item of data.pantry) {
+      if (item && !item.inactiveInInventory && findActiveShoppingMatch(data.shopping, item)) {
+        ids.add(item.id);
+      }
+    }
+    return ids;
+  }, [data.pantry, data.shopping]);
   const recentlyAddedItems = useMemo(() => {
     const cutoff = Date.now() - 14 * 24 * 60 * 60 * 1000;
     return data.pantry.filter((p) => {
@@ -554,7 +564,7 @@ export function PantryInventoryModulePage({
     return Math.max(set.size, zoneSummaries.filter((z) => z.count > 0).length);
   }, [data.pantry, zoneSummaries]);
 
-  function handleStatFilter(kind: "all" | "low" | "out" | "recent" | "purchased" | "storage") {
+  function handleStatFilter(kind: "all" | "low" | "out" | "soon" | "recent" | "purchased" | "storage") {
     setActiveTab("inventory");
     setStorageZoneFilter("all");
     setCategoryFilter("all");
@@ -575,6 +585,11 @@ export function PantryInventoryModulePage({
     if (kind === "out") {
       setStatusFilter("all");
       setStockStatusFilter("Out");
+      return;
+    }
+    if (kind === "soon") {
+      setStatusFilter("expiring");
+      setStockStatusFilter("expiring");
       return;
     }
     if (kind === "recent") {
@@ -1019,9 +1034,14 @@ export function PantryInventoryModulePage({
           totalItems={activeInventoryCount}
           lowStock={lowStockItems.length}
           outOfStock={outItems.length}
+          useSoon={useSoonNeedItems.length}
           recentlyUpdated={recentlyUpdatedItems.length}
           purchasedToAdd={purchasedItemsToAdd.length}
           storageAreaCount={storageAreaCount}
+          onOpenShopping={() => {
+            onOpenShopping?.();
+            navigateWithinApp?.("/shopping");
+          }}
           zoneSummaries={zoneSummaries}
           activeZone={storageZoneFilter}
           onSelectZone={handleSelectZone}
@@ -1543,6 +1563,8 @@ export function PantryInventoryModulePage({
             items={sortedFilteredItems}
             adjustItemQuantity={adjustItemQuantity}
             addInventoryItemToShopping={addInventoryItemToShopping}
+            shoppingLinkedIds={shoppingLinkedIds}
+            onAddItem={() => setActiveTab("add-item")}
             onEditItem={(itemId) => {
               setPantryImageEditId(itemId);
               setActiveTab("inventory");

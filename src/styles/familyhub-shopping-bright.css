@@ -1,0 +1,186 @@
+/**
+ * Shopping /shopping — bright FamilySite visual pass.
+ * Scoped to .fh-shop-bright so Calendar/Messages/Tasks stay untouched.
+ */
+
+.fh-shop-bright.aux-shopping__canvas,
+.fh-shop-bright {
+  background:
+    radial-gradient(720px 280px at 0% -8%, rgba(18, 194, 194, 0.16), transparent 58%),
+    radial-gradient(560px 240px at 100% 0%, rgba(43, 140, 255, 0.14), transparent 52%),
+    linear-gradient(180deg, #f4fbff 0%, #f8fffb 48%, #fffdf6 100%);
+}
+
+.fh-shop-bright .aux-shopping {
+  --aux-shop-ink: var(--ops-ink, #102033);
+  --aux-shop-muted: var(--ops-muted, #4b6074);
+  --aux-shop-card: #ffffff;
+  --aux-shop-border: rgba(16, 32, 51, 0.08);
+  --aux-shop-shadow: 0 10px 28px rgba(31, 74, 122, 0.08);
+  --aux-shop-radius: 22px;
+  font-family: var(--font-ui, "Mulish", system-ui, sans-serif);
+}
+
+.fh-shop-bright .aux-shopping__hero {
+  border: 1px solid rgba(18, 194, 194, 0.18);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(217, 251, 251, 0.55));
+  box-shadow: var(--aux-shop-shadow);
+}
+
+.fh-shop-bright .aux-shopping__eyebrow {
+  color: #0f766e;
+}
+
+.fh-shop-bright .aux-shopping__btn--primary {
+  min-height: 3rem;
+  padding-inline: 1.15rem;
+  background: #12c2c2;
+  box-shadow: 0 8px 18px rgba(18, 194, 194, 0.28);
+}
+
+.fh-shop-bright .aux-shopping__btn--scan {
+  background: #ff8a1f;
+}
+
+.fh-shop-bright .aux-shopping__btn--teal {
+  background: #22c55e;
+}
+
+.fh-shop-bright .aux-shopping__btn--violet {
+  background: #7c5cff;
+}
+
+.fh-shop-bright .aux-shopping__stat {
+  color: var(--ops-ink, #102033);
+  border: 1px solid rgba(16, 32, 51, 0.08);
+  background: #ffffff;
+  box-shadow: var(--aux-shop-shadow);
+}
+
+.fh-shop-bright .aux-shopping__stat strong {
+  color: inherit;
+}
+
+.fh-shop-bright .aux-shopping__stat span {
+  opacity: 1;
+  color: var(--ops-muted, #4b6074);
+}
+
+.fh-shop-bright .aux-shopping__stat--need {
+  background: #d9fbfb;
+  border-color: rgba(18, 194, 194, 0.28);
+}
+.fh-shop-bright .aux-shopping__stat--purchased {
+  background: #d9fbe8;
+  border-color: rgba(34, 197, 94, 0.28);
+}
+.fh-shop-bright .aux-shopping__stat--saved,
+.fh-shop-bright .aux-shopping__stat--to-add {
+  background: #ffe7cc;
+  border-color: rgba(255, 138, 31, 0.28);
+}
+.fh-shop-bright .aux-shopping__stat--shared {
+  background: #ece6ff;
+  border-color: rgba(124, 92, 255, 0.28);
+}
+.fh-shop-bright .aux-shopping__stat--library {
+  background: #dcebff;
+  border-color: rgba(43, 140, 255, 0.28);
+}
+
+.fh-shop-bright .aux-shopping__quick-add {
+  padding: 0.15rem 0 0.2rem;
+}
+
+.fh-shop-bright .aux-shopping__field input:focus,
+.fh-shop-bright .aux-shopping__field select:focus {
+  border-color: #12c2c2;
+  box-shadow: 0 0 0 3px rgba(18, 194, 194, 0.18);
+}
+
+.fh-shop-bright .aux-shopping__empty {
+  display: grid;
+  justify-items: center;
+  gap: 0.75rem;
+  padding: 1.6rem 0.75rem;
+  border-radius: 18px;
+  background: #f4fbff;
+}
+
+.fh-shop-bright .aux-shopping-row {
+  align-items: start;
+  padding: 0.95rem 0.15rem;
+  border-top-color: rgba(16, 32, 51, 0.06);
+}
+
+.fh-shop-bright .aux-shopping-row__lead {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.7rem;
+  min-width: 0;
+}
+
+.fh-shop-bright .aux-shopping-row__check {
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  flex-shrink: 0;
+  margin: 0;
+  border: 2px solid rgba(18, 194, 194, 0.45);
+  border-radius: 12px;
+  background: #fff;
+  color: #0f766e;
+  cursor: pointer;
+}
+
+.fh-shop-bright .aux-shopping-row__check:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(18, 194, 194, 0.22);
+}
+
+.fh-shop-bright .aux-shopping-row__check.is-done {
+  background: #22c55e;
+  border-color: #22c55e;
+  color: #fff;
+}
+
+.fh-shop-bright .aux-shopping-row__flags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-top: 0.35rem;
+}
+
+.fh-shop-bright .aux-shopping-row__actions button {
+  min-height: 2.5rem;
+  padding: 0.35rem 0.7rem;
+  font-size: 0.78rem;
+}
+
+.fh-shop-bright .aux-shopping-row__actions button.is-primary {
+  background: #12c2c2;
+}
+
+.fh-shop-bright .aux-shopping-row__actions button.is-warn {
+  background: #ff8a1f;
+}
+
+.fh-shop-bright .aux-shopping__list-card em {
+  color: #0f766e;
+}
+
+@media (max-width: 720px) {
+  .fh-shop-bright .aux-shopping__quick-add {
+    grid-template-columns: 1fr;
+  }
+
+  .fh-shop-bright .aux-shopping__hero-actions {
+    width: 100%;
+  }
+
+  .fh-shop-bright .aux-shopping__btn--primary {
+    flex: 1 1 100%;
+  }
+}

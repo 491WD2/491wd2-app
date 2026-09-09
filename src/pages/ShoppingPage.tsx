@@ -49,6 +49,7 @@ import type {
   ShoppingPageAction,
 } from "../types/shopping";
 import type { GroceryCartLine } from "../types/grocery";
+import { summarizeShoppingForHome } from "../lib/homePriorityDashboard";
 import {
   createShoppingItemFromName,
   findActiveShoppingDuplicate,
@@ -225,6 +226,21 @@ export function ShoppingPage({ data, setData, navigateWithinApp, shoppingSearch 
   const savedOpenItems = useMemo(
     () => data.shopping.filter((item) => !item.purchased),
     [data.shopping],
+  );
+  const todayIso = useMemo(() => {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, "0");
+    const day = String(now.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  }, []);
+  const householdShopping = useMemo(
+    () => summarizeShoppingForHome(data.shopping, todayIso),
+    [data.shopping, todayIso],
+  );
+  const dueSoonNames = useMemo(
+    () => new Set(householdShopping.dueSoon.map((item) => item.name.trim().toLowerCase())),
+    [householdShopping.dueSoon],
   );
   const savedPurchasedItems = useMemo(
     () => data.shopping.filter((item) => item.purchased),
@@ -960,7 +976,11 @@ export function ShoppingPage({ data, setData, navigateWithinApp, shoppingSearch 
         {visibleCurrentLines.length === 0 ? (
           <div className="aux-shopping__empty" role="status">
             <p>Your Need to Buy list is empty.</p>
-            <span>Use Quick Add, Add Product, or Scan Item to start.</span>
+            <span>Add the next household item and keep shopping connected to pantry.</span>
+            <button type="button" className="aux-shopping__btn aux-shopping__btn--primary" onClick={() => openAddItemModal()}>
+              <Plus className="h-4 w-4" aria-hidden />
+              Add Item
+            </button>
           </div>
         ) : (
           <>
@@ -979,6 +999,8 @@ export function ShoppingPage({ data, setData, navigateWithinApp, shoppingSearch 
                   line={line}
                   mode="need"
                   linkedPantryName={linked?.name}
+                  dueSoon={dueSoonNames.has(line.productName.trim().toLowerCase())}
+                  isRestock={Boolean(linked)}
                   onMarkPurchased={() => toggleCartPurchased(line.id, true)}
                   onDelete={() => removeItem(line.id)}
                   onEdit={() => openShoppingLineDetails(line)}
@@ -1048,12 +1070,17 @@ export function ShoppingPage({ data, setData, navigateWithinApp, shoppingSearch 
           <div>
             <p className="aux-shopping__eyebrow">Household shopping</p>
             <h1>Shopping</h1>
-            <p>Keep household shopping organized and connected to inventory.</p>
+            <p>
+              {activeCartLines.length} to buy
+              {householdShopping.dueSoon.length > 0 ? ` · ${householdShopping.dueSoon.length} due now` : ""}
+              {householdShopping.restock.length > 0 ? ` · ${householdShopping.restock.length} restock` : ""}
+              {purchasedCartLines.length > 0 ? ` · ${purchasedCartLines.length} purchased` : ""}
+            </p>
           </div>
           <div className="aux-shopping__hero-actions">
             <button type="button" className="aux-shopping__btn aux-shopping__btn--primary" onClick={() => openAddItemModal()}>
               <Plus className="h-4 w-4" aria-hidden />
-              Add Product
+              Add Item
             </button>
             <button type="button" className="aux-shopping__btn aux-shopping__btn--scan" onClick={openScanModal}>
               <ScanLine className="h-4 w-4" aria-hidden />
@@ -1143,6 +1170,9 @@ export function ShoppingPage({ data, setData, navigateWithinApp, shoppingSearch 
           </form>
         </section>
 
+        {renderNeedToBuySection()}
+        {renderPurchasedSection()}
+
         <section className="aux-shopping__card" aria-label="Shopping lists">
           <div className="aux-shopping__card-head">
             <h2>Current, Saved &amp; Shared lists</h2>
@@ -1168,9 +1198,6 @@ export function ShoppingPage({ data, setData, navigateWithinApp, shoppingSearch 
             ))}
           </div>
         </section>
-
-        {renderNeedToBuySection()}
-        {renderPurchasedSection()}
 
         {savedOpenItems.length > 0 ? (
           <section className="aux-shopping__card" aria-label="Saved household shopping items">
@@ -1568,7 +1595,7 @@ export function ShoppingPage({ data, setData, navigateWithinApp, shoppingSearch 
   );
 
   return (
-    <div className="aux-shopping__canvas wd-shopping-ref">
+    <div className="aux-shopping__canvas wd-shopping-ref fh-ops-bright fh-shop-bright">
       {renderTopBar()}
       {screen === "hub" ? renderHubScreen() : null}
       {screen === "lists" ? renderListsScreen() : null}

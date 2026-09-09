@@ -17,6 +17,9 @@
 @import "./styles/familyhub-start-page.css";
 @import "./styles/familyhub-pro.css";
 @import "./styles/familyhub-home-bright.css";
+@import "./styles/familyhub-ops-bright.css";
+@import "./styles/familyhub-shopping-bright.css";
+@import "./styles/familyhub-pantry-bright.css";
 
 /** Tailwind v4 — scan app sources; purges unused utilities in production */
 @source "./**/*.{ts,tsx}";
