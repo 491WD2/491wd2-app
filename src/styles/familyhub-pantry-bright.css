@@ -42,15 +42,21 @@
 }
 
 .fh-pantry-bright .aux-pantry__stat {
-  color: var(--ops-ink, #102033);
+  min-height: 5.5rem;
+  color: #102033;
   border: 1px solid rgba(16, 32, 51, 0.08);
   background: #ffffff;
   box-shadow: var(--aux-pantry-shadow);
 }
 
+.fh-pantry-bright .aux-pantry__stat strong,
 .fh-pantry-bright .aux-pantry__stat span {
+  color: #102033;
   opacity: 1;
-  color: var(--ops-muted, #4b6074);
+}
+
+.fh-pantry-bright .aux-pantry__stat span {
+  color: #4b6074;
 }
 
 .fh-pantry-bright .aux-pantry__stat--total {

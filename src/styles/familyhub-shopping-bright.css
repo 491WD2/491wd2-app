@@ -52,19 +52,21 @@
 }
 
 .fh-shop-bright .aux-shopping__stat {
-  color: var(--ops-ink, #102033);
+  min-height: 5.5rem;
+  color: #102033;
   border: 1px solid rgba(16, 32, 51, 0.08);
   background: #ffffff;
   box-shadow: var(--aux-shop-shadow);
 }
 
-.fh-shop-bright .aux-shopping__stat strong {
-  color: inherit;
+.fh-shop-bright .aux-shopping__stat strong,
+.fh-shop-bright .aux-shopping__stat span {
+  color: #102033;
+  opacity: 1;
 }
 
 .fh-shop-bright .aux-shopping__stat span {
-  opacity: 1;
-  color: var(--ops-muted, #4b6074);
+  color: #4b6074;
 }
 
 .fh-shop-bright .aux-shopping__stat--need {
