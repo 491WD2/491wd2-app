@@ -41,28 +41,41 @@ function todayIso(date = new Date()): string {
   return `${y}-${m}-${d}`;
 }
 
-describe("Stage N1A Home workspace", () => {
-  it("renders greeting, household name, and clock", () => {
+function headingOrder(...names: RegExp[]) {
+  const headings = names.map((name) => screen.getByRole("heading", { name }));
+  for (let i = 0; i < headings.length - 1; i += 1) {
+    expect(
+      headings[i].compareDocumentPosition(headings[i + 1]) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+  }
+}
+
+describe("Home priority dashboard", () => {
+  it("renders household identity, live clock, kitchen assignment, and weather", () => {
     render(<HomeHarness />);
-    expect(screen.getByRole("heading", { level: 1, name: /Roskens Household/i })).toBeInTheDocument();
-    expect(screen.getByLabelText("Greeting and clock")).toBeInTheDocument();
+    expect(screen.getByText("Roskens Household")).toBeInTheDocument();
+    expect(screen.getByLabelText("Date, time, kitchen, and weather")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Who’s on kitchen/i })).toBeInTheDocument();
+    expect(screen.getByLabelText("Weather placeholder")).toBeInTheDocument();
+    expect(screen.getByText(/forecast not connected/i)).toBeInTheDocument();
     expect(screen.queryByRole("region", { name: "Family members" })).not.toBeInTheDocument();
   });
 
-  it("leads with kitchen duty and calendar; storage is a link only", () => {
+  it("puts shopping first, then pantry, events, calendar, and secondary modules", () => {
     render(<HomeHarness />);
-    expect(screen.getByRole("heading", { name: /Today’s kitchen duty/i })).toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: /^Calendar$/i })).toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: /^Upcoming$/i })).toBeInTheDocument();
-    expect(screen.queryByRole("heading", { name: /Food remaining/i })).not.toBeInTheDocument();
-    expect(screen.queryByRole("heading", { name: /Your storage/i })).not.toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: /Pantry & Storage/i })).toBeInTheDocument();
-    expect(
-      screen.getByText(/Track pantry stock, fridge items, and freezer storage/i),
-    ).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /^Open storage$/i })).toBeInTheDocument();
-    expect(screen.getByRole("navigation", { name: "Quick links" })).toBeInTheDocument();
-    expect(screen.getByLabelText("Today at a glance")).toBeInTheDocument();
+    headingOrder(
+      /^Shopping$/i,
+      /^Pantry$/i,
+      /What’s happening next/i,
+      /^Calendar$/i,
+      /^Messages$/i,
+      /^Chores$/i,
+    );
+    expect(screen.getByRole("button", { name: /^Open shopping$/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /^Open pantry$/i })).toBeInTheDocument();
+    expect(screen.getByRole("navigation", { name: "Quick add" })).toBeInTheDocument();
+    expect(screen.queryByRole("heading", { name: /Today’s kitchen duty/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole("heading", { name: /Pantry & Storage/i })).not.toBeInTheDocument();
   });
 
   it("does not render the old module gallery or family box", () => {
@@ -72,7 +85,7 @@ describe("Stage N1A Home workspace", () => {
     expect(screen.queryByText(/Notion AI/i)).not.toBeInTheDocument();
   });
 
-  it("renders today chore data under kitchen duty and excludes inventing sample tasks", () => {
+  it("keeps today’s chores in the secondary chores card", () => {
     const dueToday: Task = {
       id: "chore-today-1",
       title: "Wipe kitchen counters",
@@ -98,7 +111,7 @@ describe("Stage N1A Home workspace", () => {
           tasks: [dueToday],
           planner: [
             {
-              id: "planner-sample-should-not-show-in-today",
+              id: "planner-sample-should-not-show-in-chores",
               title: "Hidden planner-only event",
               date: todayIso(),
               time: "10:00",
@@ -112,15 +125,18 @@ describe("Stage N1A Home workspace", () => {
       />,
     );
     expect(screen.getByText("Wipe kitchen counters")).toBeInTheDocument();
-    const kitchenHeading = screen.getByRole("heading", { name: /Today’s kitchen duty/i });
-    const kitchenSection = kitchenHeading.closest(".fh-fridge-home__kitchen");
-    expect(kitchenSection).not.toBeNull();
-    expect(within(kitchenSection as HTMLElement).queryByText("Hidden planner-only event")).not.toBeInTheDocument();
-    expect(within(kitchenSection as HTMLElement).getByText("Wipe kitchen counters")).toBeInTheDocument();
+    const choresHeading = screen.getByRole("heading", { name: /^Chores$/i });
+    const choresSection = choresHeading.closest(".fh-fridge-home__kitchen");
+    expect(choresSection).not.toBeNull();
+    expect(
+      within(choresSection as HTMLElement).queryByText("Hidden planner-only event"),
+    ).not.toBeInTheDocument();
+    expect(within(choresSection as HTMLElement).getByText("Wipe kitchen counters")).toBeInTheDocument();
+    expect(screen.getByText("Hidden planner-only event")).toBeInTheDocument();
     expect(screen.queryByText(/Sample chore/i)).not.toBeInTheDocument();
   });
 
-  it("renders Upcoming planner data from live records", () => {
+  it("renders upcoming planner data from live records", () => {
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
     const event: PlannerEvent = {
@@ -142,6 +158,7 @@ describe("Stage N1A Home workspace", () => {
       />,
     );
     expect(screen.getByText("Family dentist visit")).toBeInTheDocument();
+    expect(screen.getByText("Tomorrow")).toBeInTheDocument();
   });
 
   it("shows honest empty states without sample records", () => {
@@ -153,12 +170,14 @@ describe("Stage N1A Home workspace", () => {
           planner: [],
           messageBoard: [],
           shopping: [],
+          pantry: [],
         })}
       />,
     );
     expect(screen.getByText("Nothing due for today yet.")).toBeInTheDocument();
     expect(screen.getByText("No upcoming events on the planner.")).toBeInTheDocument();
     expect(screen.getByText("Shopping list is clear.")).toBeInTheDocument();
+    expect(screen.getByText("Open pantry to start tracking household inventory.")).toBeInTheDocument();
     expect(screen.queryByText(/Demo task/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/Lorem ipsum/i)).not.toBeInTheDocument();
   });

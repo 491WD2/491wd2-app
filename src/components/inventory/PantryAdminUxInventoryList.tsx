@@ -5,8 +5,19 @@ import {
   getInventoryLocationLabel,
   getPantryItemDisplayImageSrc,
   getPantryItemPlaceholderEmoji,
+  isUseSoonCandidate,
 } from "../../pages/inventory/inventoryUtils";
 import { getInventoryStatusLabel } from "../../services/inventoryStatus";
+
+function itemFlags(item: PantryItem, onShoppingList: boolean) {
+  return (
+    <span className="aux-pantry-table__flags">
+      <span className={statusBadgeClass(item)}>{getInventoryStatusLabel(item)}</span>
+      {isUseSoonCandidate(item) ? <span className="fh-ops-badge fh-ops-badge--soon">Use soon</span> : null}
+      {onShoppingList ? <span className="fh-ops-badge fh-ops-badge--on-list">On shopping list</span> : null}
+    </span>
+  );
+}
 
 function statusBadgeClass(item: PantryItem): string {
   if (item.status === "Out") {
@@ -49,6 +60,8 @@ type Props = {
   addInventoryItemToShopping: (item: PantryItem) => void;
   onEditItem: (itemId: string) => void;
   onUpdateStock: (itemId: string) => void;
+  shoppingLinkedIds?: Set<string>;
+  onAddItem?: () => void;
 };
 
 export function PantryAdminUxInventoryList({
@@ -57,6 +70,8 @@ export function PantryAdminUxInventoryList({
   addInventoryItemToShopping,
   onEditItem,
   onUpdateStock,
+  shoppingLinkedIds,
+  onAddItem,
 }: Props) {
   const rows = useMemo(() => items, [items]);
 
@@ -67,9 +82,17 @@ export function PantryAdminUxInventoryList({
           <h2>Inventory</h2>
           <p>No items match these filters</p>
         </div>
-        <p className="text-sm font-semibold text-slate-500">
-          Try clearing filters, or add an item / scan a barcode to start stocking the house.
-        </p>
+        <div className="aux-pantry__empty">
+          <p className="text-sm font-bold text-slate-800">Nothing here yet.</p>
+          <p className="text-sm font-semibold text-slate-500">
+            Clear filters, or add an item to start tracking what the house has.
+          </p>
+          {onAddItem ? (
+            <button type="button" className="aux-pantry__btn aux-pantry__btn--primary" onClick={onAddItem}>
+              Add pantry item
+            </button>
+          ) : null}
+        </div>
       </section>
     );
   }
@@ -93,7 +116,7 @@ export function PantryAdminUxInventoryList({
                 <p className="aux-pantry-table__muted mt-0.5 text-xs">
                   {item.category} · {getInventoryLocationLabel(item) || item.storageArea}
                 </p>
-                <span className={`${statusBadgeClass(item)} mt-2`}>{getInventoryStatusLabel(item)}</span>
+                <span className="mt-2 block">{itemFlags(item, Boolean(shoppingLinkedIds?.has(item.id)))}</span>
               </div>
             </div>
             <div className="aux-pantry-mobile-card__meta">
@@ -114,7 +137,7 @@ export function PantryAdminUxInventoryList({
                 Update Stock
               </button>
               <button type="button" onClick={() => addInventoryItemToShopping(item)}>
-                Add to Shopping List
+                {shoppingLinkedIds?.has(item.id) ? "Already on shopping list" : "Add to Shopping List"}
               </button>
               <button type="button" onClick={() => onEditItem(item.id)}>
                 Edit
@@ -177,7 +200,7 @@ export function PantryAdminUxInventoryList({
                   </div>
                 </td>
                 <td>
-                  <span className={statusBadgeClass(item)}>{getInventoryStatusLabel(item)}</span>
+                  {itemFlags(item, Boolean(shoppingLinkedIds?.has(item.id)))}
                 </td>
                 <td className="aux-pantry-table__muted">
                   {item.lastUpdated ? formatShortDate(item.lastUpdated) : "—"}
@@ -188,7 +211,7 @@ export function PantryAdminUxInventoryList({
                       Update Stock
                     </button>
                     <button type="button" onClick={() => addInventoryItemToShopping(item)}>
-                      Add to Shopping List
+                      {shoppingLinkedIds?.has(item.id) ? "Already on shopping list" : "Add to Shopping List"}
                     </button>
                     <button type="button" onClick={() => onEditItem(item.id)}>
                       Edit

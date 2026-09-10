@@ -1,0 +1,486 @@
+/**
+ * Home /adminux priority dashboard — bright family-hub visual pass.
+ * Scoped to .fh-home-bright so other routes keep their current skins.
+ */
+
+.fh-home-bright {
+  --hb-ink: #102033;
+  --hb-muted: #4b6074;
+  --hb-cyan: #12c2c2;
+  --hb-sky: #2b8cff;
+  --hb-green: #22c55e;
+  --hb-orange: #ff8a1f;
+  --hb-yellow: #f5c400;
+  --hb-violet: #7c5cff;
+  --hb-pink: #ff5ea8;
+  --hb-card: #ffffff;
+  --hb-radius: 22px;
+  --hb-shadow: 0 10px 28px rgba(31, 74, 122, 0.08);
+  --hb-shadow-hover: 0 14px 32px rgba(31, 74, 122, 0.12);
+  gap: 1rem;
+  max-width: min(1280px, 100%);
+  background:
+    radial-gradient(720px 280px at 0% -10%, rgba(18, 194, 194, 0.16), transparent 58%),
+    radial-gradient(640px 260px at 100% 0%, rgba(43, 140, 255, 0.16), transparent 55%),
+    radial-gradient(520px 220px at 70% 100%, rgba(255, 138, 31, 0.1), transparent 50%);
+}
+
+.fh-home-bright .fh-start-widget {
+  --widget-radius: var(--hb-radius);
+  border-radius: var(--hb-radius);
+  box-shadow: var(--hb-shadow);
+  background: var(--hb-card);
+}
+
+.fh-home-bright .fh-start-widget:hover {
+  box-shadow: var(--hb-shadow-hover);
+}
+
+.fh-home-bright__card--shop {
+  --widget-accent: var(--hb-cyan);
+  --widget-accent-soft: #d9fbfb;
+}
+
+.fh-home-bright__card--pantry {
+  --widget-accent: var(--hb-green);
+  --widget-accent-soft: #d9fbe8;
+}
+
+.fh-home-bright__card--events {
+  --widget-accent: var(--hb-orange);
+  --widget-accent-soft: #ffe7cc;
+}
+
+.fh-home-bright__card--calendar {
+  --widget-accent: var(--hb-sky);
+  --widget-accent-soft: #dcebff;
+}
+
+.fh-home-bright__card--messages {
+  --widget-accent: var(--hb-violet);
+  --widget-accent-soft: #ece6ff;
+}
+
+.fh-home-bright__card--chores {
+  --widget-accent: var(--hb-yellow);
+  --widget-accent-soft: #fff4c2;
+}
+
+.fh-home-bright__card--tools {
+  --widget-accent: var(--hb-pink);
+  --widget-accent-soft: #ffe3f1;
+}
+
+.fh-home-bright__strip {
+  display: grid;
+  grid-template-columns: minmax(10rem, auto) minmax(11rem, 0.9fr) minmax(0, 1.4fr) auto;
+  align-items: center;
+  gap: 0.75rem 0.85rem;
+  padding: 0.85rem 1rem;
+  border-radius: var(--hb-radius);
+  border: 1px solid rgba(43, 140, 255, 0.14);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(244, 251, 255, 0.92));
+  box-shadow: var(--hb-shadow);
+}
+
+.fh-home-bright__when {
+  min-width: 0;
+}
+
+.fh-home-bright__kicker {
+  margin: 0 0 0.15rem;
+  color: var(--hb-sky);
+  font-family: var(--font-ui);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.fh-home-bright__title {
+  margin: 0;
+  color: var(--hb-ink);
+  font-family: var(--font-heading);
+  font-size: clamp(1.05rem, 1.6vw, 1.25rem);
+  font-weight: 750;
+  letter-spacing: -0.03em;
+  line-height: 1.2;
+}
+
+.fh-home-bright__clock {
+  display: flex;
+  flex-direction: column;
+  gap: 0.05rem;
+}
+
+.fh-home-bright__clock-time {
+  margin: 0.15rem 0 0;
+  color: var(--hb-ink);
+  font-family: var(--font-heading);
+  font-size: clamp(1.45rem, 2.2vw, 1.85rem);
+  font-weight: 780;
+  letter-spacing: -0.04em;
+  line-height: 1;
+}
+
+.fh-home-bright__kitchen {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  min-width: 0;
+  min-height: 3.1rem;
+  padding: 0.45rem 0.7rem;
+  border: 0;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #fff4c2, #ffe7cc);
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.fh-home-bright__kitchen:hover,
+.fh-home-bright__kitchen:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(255, 138, 31, 0.28);
+}
+
+.fh-home-bright__kitchen-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.15rem;
+  height: 2.15rem;
+  border-radius: 12px;
+  background: #fff;
+  color: #d97706;
+  flex-shrink: 0;
+}
+
+.fh-home-bright__kitchen-copy {
+  min-width: 0;
+}
+
+.fh-home-bright__kitchen-label {
+  display: block;
+  color: #8a5d0f;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.fh-home-bright__kitchen-name {
+  display: block;
+  overflow: hidden;
+  color: var(--hb-ink);
+  font-size: 1rem;
+  font-weight: 780;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.fh-home-bright__kitchen-state {
+  display: block;
+  color: #8a5d0f;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.fh-home-bright__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.fh-home-bright__action {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-height: 2.15rem;
+  padding: 0.3rem 0.7rem;
+  border: 0;
+  border-radius: 999px;
+  color: #fff;
+  font-family: var(--font-ui);
+  font-size: 0.78rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.fh-home-bright__action--shop {
+  background: var(--hb-cyan);
+}
+.fh-home-bright__action--pantry {
+  background: var(--hb-green);
+}
+.fh-home-bright__action--event {
+  background: var(--hb-orange);
+}
+.fh-home-bright__action--message {
+  background: var(--hb-violet);
+}
+
+.fh-home-bright__action:hover,
+.fh-home-bright__action:focus-visible {
+  outline: none;
+  filter: brightness(1.05);
+  box-shadow: 0 0 0 3px rgba(43, 140, 255, 0.18);
+}
+
+.fh-home-bright__weather {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 8.5rem;
+  padding: 0.4rem 0.65rem;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #dcebff, #d9fbfb);
+  color: #155a9c;
+}
+
+.fh-home-bright__weather strong,
+.fh-home-bright__weather span {
+  display: block;
+}
+
+.fh-home-bright__weather strong {
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: var(--hb-ink);
+}
+
+.fh-home-bright__weather span {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--hb-muted);
+}
+
+.fh-home-bright__main {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+  gap: 1rem;
+}
+
+.fh-home-bright__ops,
+.fh-home-bright__schedule,
+.fh-home-bright__secondary {
+  display: grid;
+  gap: 1rem;
+}
+
+.fh-home-bright__secondary {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.fh-home-bright__metrics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-bottom: 0.75rem;
+}
+
+.fh-home-bright__chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 1.7rem;
+  padding: 0.15rem 0.65rem;
+  border-radius: 999px;
+  font-size: 0.74rem;
+  font-weight: 800;
+}
+
+.fh-home-bright__chip--cyan {
+  background: #d9fbfb;
+  color: #0f766e;
+}
+.fh-home-bright__chip--orange {
+  background: #ffe7cc;
+  color: #c05612;
+}
+.fh-home-bright__chip--green {
+  background: #d9fbe8;
+  color: #15803d;
+}
+.fh-home-bright__chip--rose {
+  background: #ffe3ea;
+  color: #be123c;
+}
+.fh-home-bright__chip--yellow {
+  background: #fff4c2;
+  color: #a16207;
+}
+.fh-home-bright__chip--violet {
+  background: #ece6ff;
+  color: #5b21b6;
+}
+.fh-home-bright__chip--sky {
+  background: #dcebff;
+  color: #1d4ed8;
+}
+
+.fh-home-bright .fh-home-pro__list .fh-pro-list-row {
+  border-radius: 14px;
+  border-color: rgba(16, 32, 51, 0.06);
+  background: #f8fcff;
+}
+
+.fh-home-bright .fh-home-pro__list .fh-pro-list-row:hover,
+.fh-home-bright .fh-home-pro__list .fh-pro-list-row:focus-visible {
+  background: #eef8ff;
+  border-color: rgba(43, 140, 255, 0.28);
+}
+
+.fh-home-bright__badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 1.45rem;
+  padding: 0.1rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.fh-home-bright__badge--due,
+.fh-home-bright__badge--out {
+  background: #ffe3ea;
+  color: #be123c;
+}
+
+.fh-home-bright__badge--low {
+  background: #fff4c2;
+  color: #a16207;
+}
+
+.fh-home-bright__badge--soon {
+  background: #ffe7cc;
+  color: #c05612;
+}
+
+.fh-home-bright__badge--today {
+  background: #d9fbe8;
+  color: #15803d;
+}
+
+.fh-home-bright__row-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  align-items: center;
+}
+
+.fh-home-bright .fh-home-pro__composer input {
+  background: #f4fbff;
+  border-color: rgba(18, 194, 194, 0.28);
+}
+
+.fh-home-bright .fh-home-pro__composer input:focus {
+  border-color: var(--hb-cyan);
+  box-shadow: 0 0 0 3px rgba(18, 194, 194, 0.18);
+}
+
+.fh-home-bright .fh-pro-btn--primary {
+  background: var(--hb-cyan);
+  border-color: var(--hb-cyan);
+  color: #fff;
+}
+
+.fh-home-bright .fh-fridge-home__mini-cal {
+  display: block;
+  width: 100%;
+  margin: 0;
+  padding: 0.85rem;
+  border: 1px solid rgba(43, 140, 255, 0.16) !important;
+  background: #f4f8ff !important;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
+}
+
+.fh-home-bright .fh-fridge-home__mini-cal-day.is-today {
+  background: var(--hb-sky);
+  color: #fff;
+}
+
+.fh-home-bright .fh-fridge-home__mini-cal-day.has-events::after {
+  background: var(--hb-orange);
+}
+
+.fh-home-bright__tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.fh-home-bright__tool {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-height: 2.3rem;
+  padding: 0.35rem 0.75rem;
+  border: 0;
+  border-radius: 14px;
+  background: #fff0f7;
+  color: #9d174d;
+  font-size: 0.82rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.fh-home-bright__tool:hover,
+.fh-home-bright__tool:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(255, 94, 168, 0.2);
+}
+
+.fh-home-bright__secondary .fh-start-widget {
+  min-height: 0;
+}
+
+.fh-home-bright__secondary .fh-start-widget__header {
+  padding: 0.85rem 0.95rem 0.65rem;
+}
+
+@media (max-width: 1080px) {
+  .fh-home-bright__secondary {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 900px) {
+  .fh-home-bright__strip {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .fh-home-bright__when {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .fh-home-bright__weather {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .fh-home-bright__kitchen,
+  .fh-home-bright__actions {
+    grid-column: 1 / -1;
+  }
+
+  .fh-home-bright__main {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .fh-home-bright__actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .fh-home-bright__action {
+    justify-content: center;
+  }
+}

@@ -1,3 +1,4 @@
+import { Check } from "lucide-react";
 import type { GroceryCartLine } from "../../types/grocery";
 import type { PantryItem } from "../../data/familyData";
 
@@ -5,6 +6,8 @@ type Props = {
   line: GroceryCartLine;
   linkedPantryName?: string | null;
   requestedBy?: string | null;
+  dueSoon?: boolean;
+  isRestock?: boolean;
   onMarkPurchased: () => void;
   onMoveBack?: () => void;
   onDelete: () => void;
@@ -18,6 +21,8 @@ export function ShoppingAdminUxRow({
   line,
   linkedPantryName,
   requestedBy,
+  dueSoon = false,
+  isRestock = false,
   onMarkPurchased,
   onMoveBack,
   onDelete,
@@ -27,15 +32,37 @@ export function ShoppingAdminUxRow({
   mode,
 }: Props) {
   const qty = `${line.quantity}${line.unit ? ` ${line.unit}` : ""}`;
+  const purchased = mode === "purchased";
 
   return (
     <article className="aux-shopping-row">
-      <div>
-        <p className="aux-shopping-row__name">{line.productName}</p>
-        <p className="aux-shopping-row__meta">
-          {line.store.trim() || "No store"}
-          {line.notes.trim() ? ` · ${line.notes.trim()}` : ""}
-        </p>
+      <div className="aux-shopping-row__lead">
+        <button
+          type="button"
+          className={purchased ? "aux-shopping-row__check is-done" : "aux-shopping-row__check"}
+          onClick={purchased ? () => onMoveBack?.() : onMarkPurchased}
+          aria-label={
+            purchased
+              ? `Mark ${line.productName} as still needed`
+              : `Mark ${line.productName} purchased`
+          }
+        >
+          <Check className="h-5 w-5" aria-hidden />
+        </button>
+        <div>
+          <p className="aux-shopping-row__name">{line.productName}</p>
+          <p className="aux-shopping-row__meta">
+            {line.store.trim() || "No store"}
+            {line.notes.trim() ? ` · ${line.notes.trim()}` : ""}
+          </p>
+          <div className="aux-shopping-row__flags">
+            {dueSoon ? <span className="fh-ops-badge fh-ops-badge--due">Due</span> : null}
+            {isRestock ? <span className="fh-ops-badge fh-ops-badge--restock">Restock</span> : null}
+            {linkedPantryName ? (
+              <span className="fh-ops-badge fh-ops-badge--on-list">Pantry: {linkedPantryName}</span>
+            ) : null}
+          </div>
+        </div>
       </div>
       <div>
         {onQuantityChange ? (

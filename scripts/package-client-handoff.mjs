@@ -66,7 +66,7 @@ function writeManifest() {
     documentation: docFiles.sort(),
     quickStart: [
       "cd handoff/dist && npx --yes serve -l 4173",
-      "Open http://localhost:4173/chores",
+      "Open http://localhost:4173/adminux (Cleaning / Kitchen: /tasks)",
     ],
   };
   writeFileSync(join(handoffRoot, "MANIFEST.json"), JSON.stringify(manifest, null, 2) + "\n");

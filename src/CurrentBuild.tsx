@@ -2,8 +2,13 @@ import { lazy, Suspense, useEffect, useLayoutEffect, useState } from "react";
 import {
   AppShell,
   type RouteKey,
-  type ShellRoute,
 } from "./components/layout/AppShell";
+import {
+  CANONICAL_HOME_PATH,
+  compatibilityRedirectPath,
+  parseAppPath,
+  routePathMap,
+} from "./lib/appPath";
 import { AppLoading } from "./components/layout/AppLoading";
 import { ModuleGate } from "./components/layout/ModuleGate";
 import { useFamilyData } from "./hooks/useFamilyData";
@@ -93,7 +98,7 @@ export default function App() {
   const locationSearch = routeHref.includes("?")
     ? routeHref.slice(routeHref.indexOf("?"))
     : "";
-  const { activeRoute, memberId } = parsePath(pathname);
+  const { activeRoute, memberId } = parseAppPath(pathname);
 
   useEffect(() => {
     function handlePopState() {
@@ -112,22 +117,16 @@ export default function App() {
     : undefined;
   const activeMemberLabel = activeMember ? getMemberFullName(activeMember) : undefined;
 
-  /** Legacy landing aliases resolve to Home (AdminUX command center). */
+  /** Home aliases → /adminux. Dead /chores and /cleaning/* → live /tasks. */
   useLayoutEffect(() => {
-    const normalized = pathname.replace(/\/$/, "") || "/";
-    if (
-      normalized !== "/" &&
-      normalized !== "/kiosk-login" &&
-      normalized !== "/login" &&
-      normalized !== "/home" &&
-      normalized !== "/dashboard"
-    ) {
+    const redirectTo = compatibilityRedirectPath(pathname);
+    if (!redirectTo) {
       return;
     }
     window.history.replaceState(
       null,
       "",
-      `/adminux${window.location.search}${window.location.hash}`,
+      `${redirectTo}${window.location.search}${window.location.hash}`,
     );
     setRouteHref(
       `${window.location.pathname}${window.location.search}${window.location.hash}`,
@@ -201,7 +200,7 @@ export default function App() {
     >
       <Suspense fallback={<AppLoading />}>
       {activeRoute === "cloud-login" ? (
-        <LoginPage onBack={() => navigateTo("/adminux")} />
+        <LoginPage onBack={() => navigateTo(CANONICAL_HOME_PATH)} />
       ) : null}
       {activeRoute === "kiosk" ? (
         <KioskPage
@@ -473,88 +472,4 @@ export default function App() {
     </AppShell>
     </HouseholdProductProvider>
   );
-}
-
-const routePathMap: Record<RouteKey, string> = {
-  dashboard: "/adminux",
-  adminux: "/adminux",
-  messages: "/messages",
-  kiosk: "/kiosk",
-  family: "/family",
-  tasks: "/tasks",
-  kitchen: "/kitchen",
-  kitchenSchedule: "/kitchen-schedule",
-  notifications: "/notifications",
-  subscriptions: "/subscriptions",
-  pets: "/pets",
-  projects: "/projects",
-  pantry: "/pantry",
-  shopping: "/shopping",
-  calendar: "/calendar",
-  planner: "/planner",
-  docs: "/docs",
-  photos: "/photos",
-  routines: "/routines",
-  emergency: "/emergency",
-  settings: "/settings",
-};
-
-function parsePath(pathname: string): {
-  activeRoute: ShellRoute;
-  memberId?: string;
-} {
-  const [, firstSegment, secondSegment] = pathname.split("/");
-
-  if (!firstSegment) {
-    return { activeRoute: "adminux" };
-  }
-
-  if (firstSegment === "login" || firstSegment === "kiosk-login") {
-    return { activeRoute: "adminux" };
-  }
-
-  if (firstSegment === "home") {
-    return { activeRoute: "adminux" };
-  }
-
-  if (firstSegment === "dashboard") {
-    return { activeRoute: "adminux" };
-  }
-
-  if (firstSegment === "cloud-login") {
-    return { activeRoute: "cloud-login" };
-  }
-
-  if (firstSegment === "quick-add") {
-    return { activeRoute: "quick-add" };
-  }
-
-  if (firstSegment === "kiosk") {
-    return { activeRoute: "kiosk" };
-  }
-
-  if (firstSegment === "kitchen-schedule") {
-    return { activeRoute: "kitchenSchedule" };
-  }
-
-  if (firstSegment === "planner") {
-    return { activeRoute: "planner" };
-  }
-
-  if (firstSegment === "family") {
-    return {
-      activeRoute: "family",
-      memberId: secondSegment ? decodeURIComponent(secondSegment) : undefined,
-    };
-  }
-
-  if (isRouteKey(firstSegment)) {
-    return { activeRoute: firstSegment };
-  }
-
-  return { activeRoute: "not-found" };
-}
-
-function isRouteKey(value: string): value is RouteKey {
-  return Object.keys(routePathMap).includes(value);
 }

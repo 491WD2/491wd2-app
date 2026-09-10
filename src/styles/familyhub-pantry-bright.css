@@ -1,0 +1,139 @@
+/**
+ * Pantry /pantry — bright FamilySite visual pass.
+ * Scoped to .fh-pantry-bright / .wd-pantry-route--adminux.
+ */
+
+.fh-pantry-bright.aux-pantry__canvas,
+.wd-pantry-route--adminux.fh-pantry-bright {
+  background:
+    radial-gradient(720px 280px at 0% -8%, rgba(34, 197, 94, 0.16), transparent 58%),
+    radial-gradient(560px 240px at 100% 0%, rgba(18, 194, 194, 0.12), transparent 52%),
+    linear-gradient(180deg, #f4fff8 0%, #f8fffb 48%, #fffdf6 100%);
+}
+
+.fh-pantry-bright .aux-pantry {
+  --aux-pantry-ink: var(--ops-ink, #102033);
+  --aux-pantry-muted: var(--ops-muted, #4b6074);
+  --aux-pantry-card: #ffffff;
+  --aux-pantry-border: rgba(16, 32, 51, 0.08);
+  --aux-pantry-shadow: 0 10px 28px rgba(31, 74, 122, 0.08);
+  --aux-pantry-radius: 22px;
+  font-family: var(--font-ui, "Mulish", system-ui, sans-serif);
+}
+
+.fh-pantry-bright .aux-pantry__hero {
+  border: 1px solid rgba(34, 197, 94, 0.2);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(217, 251, 232, 0.55));
+}
+
+.fh-pantry-bright .aux-pantry__eyebrow {
+  color: #15803d;
+}
+
+.fh-pantry-bright .aux-pantry__btn--primary {
+  min-height: 3rem;
+  background: #22c55e;
+  box-shadow: 0 8px 18px rgba(34, 197, 94, 0.26);
+}
+
+.fh-pantry-bright .aux-pantry__btn--scan {
+  background: #ff8a1f;
+}
+
+.fh-pantry-bright .aux-pantry__stat {
+  min-height: 5.5rem;
+  color: #102033;
+  border: 1px solid rgba(16, 32, 51, 0.08);
+  background: #ffffff;
+  box-shadow: var(--aux-pantry-shadow);
+}
+
+.fh-pantry-bright .aux-pantry__stat strong,
+.fh-pantry-bright .aux-pantry__stat span {
+  color: #102033;
+  opacity: 1;
+}
+
+.fh-pantry-bright .aux-pantry__stat span {
+  color: #4b6074;
+}
+
+.fh-pantry-bright .aux-pantry__stat--total {
+  background: #d9fbe8;
+  border-color: rgba(34, 197, 94, 0.28);
+}
+.fh-pantry-bright .aux-pantry__stat--low {
+  background: #fff4c2;
+  border-color: rgba(245, 196, 0, 0.35);
+}
+.fh-pantry-bright .aux-pantry__stat--out {
+  background: #ffe3ea;
+  border-color: rgba(255, 94, 168, 0.28);
+}
+.fh-pantry-bright .aux-pantry__stat--soon {
+  background: #ffe7cc;
+  border-color: rgba(255, 138, 31, 0.28);
+}
+.fh-pantry-bright .aux-pantry__stat--recent,
+.fh-pantry-bright .aux-pantry__stat--storage {
+  background: #dcebff;
+  border-color: rgba(43, 140, 255, 0.22);
+}
+.fh-pantry-bright .aux-pantry__stat--purchased {
+  background: #d9fbfb;
+  border-color: rgba(18, 194, 194, 0.28);
+}
+
+.fh-pantry-bright .aux-pantry__zone.is-active {
+  border-color: #22c55e;
+  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.18);
+}
+
+.fh-pantry-bright .aux-pantry__badge--out {
+  background: #ffe3ea;
+  color: #be123c;
+}
+.fh-pantry-bright .aux-pantry__badge--low {
+  background: #fff4c2;
+  color: #a16207;
+}
+.fh-pantry-bright .aux-pantry__badge--stocked {
+  background: #d9fbe8;
+  color: #15803d;
+}
+
+.fh-pantry-bright .aux-pantry-table__flags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+
+.fh-pantry-bright .aux-pantry-table__actions button,
+.fh-pantry-bright .aux-pantry-mobile-card button {
+  min-height: 2.5rem;
+}
+
+.fh-pantry-bright .aux-pantry__empty {
+  display: grid;
+  justify-items: center;
+  gap: 0.75rem;
+  padding: 1.6rem 0.75rem;
+  border-radius: 18px;
+  background: #f4fff8;
+  text-align: center;
+}
+
+.fh-pantry-bright .aux-pantry__finance {
+  display: none;
+}
+
+@media (max-width: 720px) {
+  .fh-pantry-bright .aux-pantry__hero-actions {
+    width: 100%;
+  }
+
+  .fh-pantry-bright .aux-pantry__btn--primary {
+    flex: 1 1 100%;
+  }
+}

@@ -4,7 +4,7 @@ Interactive admin dashboard for kiosk usage — reads events from `kioskAnalytic
 
 ## Component
 
-`ChoreAnalyticsAgent.tsx` — lazy-loaded on `/chores` when analytics panel is open (`?analytics=1` or **Analytics** toggle).
+`ChoreAnalyticsAgent.tsx` — leftover kiosk analytics. The `/chores` route is **not mounted**; it redirects to `/tasks`. This agent is not a live product entry point.
 
 ### Props (`ChoreAnalyticsAgentProps`)
 

@@ -1,4 +1,4 @@
-import { Camera, PackagePlus, ScanLine, Settings2 } from "lucide-react";
+import { Camera, PackagePlus, ScanLine, Settings2, ShoppingCart } from "lucide-react";
 import type { DemoPantryZone } from "../../data/demoPantryInventory";
 import type { PantryZoneSummary } from "../../lib/pantryStorageZones";
 import { cn } from "../../lib/utils";
@@ -9,6 +9,7 @@ type Props = {
   totalItems: number;
   lowStock: number;
   outOfStock: number;
+  useSoon: number;
   recentlyUpdated: number;
   purchasedToAdd: number;
   storageAreaCount: number;
@@ -17,8 +18,9 @@ type Props = {
   onSelectZone: (zone: DemoPantryZone | "all") => void;
   onAddItem: () => void;
   onScanItem: () => void;
+  onOpenShopping?: () => void;
   onOpenSettings?: () => void;
-  onStatFilter: (kind: "all" | "low" | "out" | "recent" | "purchased" | "storage") => void;
+  onStatFilter: (kind: "all" | "low" | "out" | "soon" | "recent" | "purchased" | "storage") => void;
   searchText: string;
   setSearchText: (value: string) => void;
   categoryFilter: string;
@@ -37,6 +39,7 @@ export function PantryAdminUxChrome({
   totalItems,
   lowStock,
   outOfStock,
+  useSoon,
   recentlyUpdated,
   purchasedToAdd,
   storageAreaCount,
@@ -45,6 +48,7 @@ export function PantryAdminUxChrome({
   onSelectZone,
   onAddItem,
   onScanItem,
+  onOpenShopping,
   onOpenSettings,
   onStatFilter,
   searchText,
@@ -66,7 +70,9 @@ export function PantryAdminUxChrome({
         <div>
           <p className="aux-pantry__eyebrow">Household kitchen</p>
           <h1>Pantry &amp; Inventory</h1>
-          <p>Track what the house has, what is low, and what needs to be added.</p>
+          <p>
+            {outOfStock} out · {lowStock} low · {useSoon} use soon · {totalItems} in stock
+          </p>
         </div>
         <div className="aux-pantry__hero-actions">
           <button type="button" className="aux-pantry__btn aux-pantry__btn--primary" onClick={onAddItem}>
@@ -77,6 +83,12 @@ export function PantryAdminUxChrome({
             <ScanLine className="h-4 w-4" aria-hidden />
             Scan Item
           </button>
+          {onOpenShopping ? (
+            <button type="button" className="aux-pantry__btn aux-pantry__btn--ghost" onClick={onOpenShopping}>
+              <ShoppingCart className="h-4 w-4" aria-hidden />
+              Open shopping
+            </button>
+          ) : null}
           {onOpenSettings ? (
             <button type="button" className="aux-pantry__btn aux-pantry__btn--ghost" onClick={onOpenSettings}>
               <Settings2 className="h-4 w-4" aria-hidden />
@@ -89,15 +101,19 @@ export function PantryAdminUxChrome({
       <section className="aux-pantry__stats" aria-label="Inventory summary">
         <button type="button" className="aux-pantry__stat aux-pantry__stat--total" onClick={() => onStatFilter("all")}>
           <strong>{totalItems}</strong>
-          <span>Total Items</span>
+          <span>In stock</span>
         </button>
         <button type="button" className="aux-pantry__stat aux-pantry__stat--low" onClick={() => onStatFilter("low")}>
           <strong>{lowStock}</strong>
-          <span>Low Stock</span>
+          <span>Low</span>
         </button>
         <button type="button" className="aux-pantry__stat aux-pantry__stat--out" onClick={() => onStatFilter("out")}>
           <strong>{outOfStock}</strong>
-          <span>Out of Stock</span>
+          <span>Out</span>
+        </button>
+        <button type="button" className="aux-pantry__stat aux-pantry__stat--soon" onClick={() => onStatFilter("soon")}>
+          <strong>{useSoon}</strong>
+          <span>Use soon</span>
         </button>
         <button
           type="button"
@@ -236,9 +252,6 @@ export function PantryAdminUxChrome({
         </div>
       </section>
 
-      <p className="aux-pantry__finance">
-        Pantry budget tools coming later · Estimated pantry value placeholder
-      </p>
     </>
   );
 }

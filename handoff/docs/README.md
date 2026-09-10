@@ -1,7 +1,9 @@
 # FamilySite 491 — Client handoff package
 
+> **Stale (May 2026).** Historical `/chores` kiosk package. Live Home is `/adminux`. Live Cleaning / Kitchen is `/tasks`. See **[../../docs/ROUTES.md](../../docs/ROUTES.md)**.
+
 **Project:** Household kiosk web app (React + TypeScript + Tailwind CSS)  
-**Deliverable focus:** Chore schedule kiosk at `/chores`  
+**Deliverable focus (historical):** Chore schedule kiosk at `/chores`  
 **Package date:** May 2026
 
 ---
