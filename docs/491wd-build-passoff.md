@@ -1,5 +1,7 @@
 # 491WD My Build — client passoff
 
+> **Stale (2026-05-14).** Do not use this file as the current route map. It documents `/chores`, `/cleaning/*`, `/product-library`, and `AppSidebar`, which are **not** the live product. Current Home is `/adminux`. Live chores/cleaning is `/tasks`. See **[ROUTES.md](ROUTES.md)**.
+
 Last updated: 2026-05-14
 
 ## Scope

@@ -1,5 +1,7 @@
 # Accessibility & kiosk UX audit — Chores (`/chores`)
 
+> **Stale.** This audit describes the unmounted `/chores` kiosk. It is not the live Cleaning / Kitchen page (`/tasks`). See **[ROUTES.md](ROUTES.md)**.
+
 Audit date: production chore shell. Target: **WCAG 2.2 AA** where feasible on a touch-first household kiosk.
 
 ## Summary

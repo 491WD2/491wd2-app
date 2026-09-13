@@ -1,5 +1,7 @@
 # PROJECT_AUDIT.md
 
+> **Stale (2026-07-16).** Do not use this audit as the current product status. It predates AdminUX Home, the live Messages page, and the `/tasks` chores hub. It incorrectly treats `/dashboard` as Home and `/chores` as live. Current routes: **[docs/ROUTES.md](docs/ROUTES.md)**.
+
 **Project:** FamilySite_491 (`familysite-491`)  
 **Folder audited:** `/Users/stellaroskens/491WD2`  
 **Audit date:** 2026-07-16  
